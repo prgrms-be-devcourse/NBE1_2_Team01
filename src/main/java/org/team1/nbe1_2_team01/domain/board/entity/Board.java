@@ -1,26 +1,35 @@
 package org.team1.nbe1_2_team01.domain.board.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Table(name = "board")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    private Belonging belonging;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "belonging_id")
+    private Belonging belonging;
 
-//    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
-//    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String title;
 

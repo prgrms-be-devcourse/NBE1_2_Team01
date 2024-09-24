@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 public class Participant {
 
     @Id
-    @Column(name = "USER_ID")
+    @Column(name = "user_id")
     private Long userId;
 
     @Id
-    @Column(name = "CHANNEL_ID")
+    @Column(name = "channel_id")
     private Long channelId;
 
     @Column(columnDefinition = "TINYINT(1)")

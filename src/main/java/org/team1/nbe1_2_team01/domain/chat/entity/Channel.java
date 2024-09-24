@@ -1,13 +1,16 @@
 package org.team1.nbe1_2_team01.domain.chat.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Table(name = "channel")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel {
 
     @Id
@@ -18,4 +21,6 @@ public class Channel {
 
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "participant")
+    private Participant participant;
 }
