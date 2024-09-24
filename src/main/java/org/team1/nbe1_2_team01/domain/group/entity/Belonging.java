@@ -35,18 +35,25 @@ public class Belonging {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(mappedBy = "belonging")
-    private Calendar calendar;
 
     @OneToMany(mappedBy = "belonging")
     private List<Board> boards = new ArrayList<>();
 
     @Builder
-    private Belonging(String course) {
+    private Belonging(User user,
+                      boolean isOwner,
+                      String course) {
+        this.user = user;
         this.course = course;
+        this.isOwner = isOwner;
+        user.addBelonging(this);
     }
 
     public void assignTeam(Team team){
         this.team = team;
+    }
+
+    public void addBoards(Board board) {
+        this.boards.add(board);
     }
 }

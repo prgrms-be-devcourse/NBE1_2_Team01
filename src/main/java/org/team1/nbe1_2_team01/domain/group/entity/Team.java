@@ -19,7 +19,7 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private TeamType teamType;
 
     private String name;
@@ -44,8 +44,8 @@ public class Team {
         this.deletionWaiting = deletionWaiting;
     }
 
-   // 연관 관계 편의 메소드
-    public void assignBelong(Belonging belonging){
+
+    public void assignBelonging(Belonging belonging){
         this.belongings.add(belonging);
         belonging.assignTeam(this);
     }

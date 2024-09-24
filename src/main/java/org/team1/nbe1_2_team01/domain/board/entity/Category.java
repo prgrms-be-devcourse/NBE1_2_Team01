@@ -20,17 +20,24 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belonging_id")
     private Belonging belonging;
 
-    @OneToMany(mappedBy ="category")
+    @OneToMany(mappedBy = "category")
     private List<Board> boards = new ArrayList<>();
 
-    private String name;
 
     @Builder
-    private Category(String name) {
+    private Category(Belonging belonging,
+                     String name) {
+        this.belonging = belonging;
         this.name = name;
+    }
+
+    public void addBoards(Board board) {
+        this.boards.add(board);
     }
 }

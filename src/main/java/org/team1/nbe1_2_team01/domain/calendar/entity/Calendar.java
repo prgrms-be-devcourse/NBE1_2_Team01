@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.calendar.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
@@ -30,6 +31,10 @@ public class Calendar {
     @OneToMany(mappedBy = "calendar")
     private List<Attendance> attendances = new ArrayList<>();
 
+    @Builder
+    private Calendar(Belonging belonging) {
+        this.belonging = belonging;
+    }
 
     public void addSchedule(Schedule schedule) {
         this.schedules.add(schedule);

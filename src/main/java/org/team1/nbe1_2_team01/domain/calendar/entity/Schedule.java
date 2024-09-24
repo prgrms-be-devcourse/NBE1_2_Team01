@@ -18,16 +18,17 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendar_id")
-    private Calendar calendar;
-
     private String name;
 
     @Enumerated(value = EnumType.STRING)
     private ScheduleType scheduleType;
 
     private LocalDateTime scheduledAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "calendar_id")
+    private Calendar calendar;
+
 
     @Builder
     private Schedule(

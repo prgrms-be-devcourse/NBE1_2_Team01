@@ -2,8 +2,10 @@ package org.team1.nbe1_2_team01.domain.chat.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,10 +23,16 @@ public class Channel {
 
     private String channelName;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "channel")
     private List<Participant> participants = new ArrayList<>();
+
+    @Builder
+    private Channel(String channelName) {
+        this.channelName = channelName;
+    }
 
     public void addParticipant(Participant participant) {
         this.participants.add(participant);

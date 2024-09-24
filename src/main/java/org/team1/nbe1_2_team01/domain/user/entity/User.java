@@ -82,4 +82,8 @@ public class User {
     public void addParticipant(Participant participant) {
         this.participants.add(participant);
     }
+
+    public void addBelonging(Belonging belonging) {
+        this.belongings.add(belonging);
+    }
 }

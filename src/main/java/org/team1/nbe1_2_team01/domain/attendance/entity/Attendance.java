@@ -20,14 +20,6 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendar_id")
-    private Calendar calendar;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Enumerated(EnumType.STRING)
     private AttendanceIssueType attendanceIssueType;
 
@@ -37,6 +29,15 @@ public class Attendance {
 
     @Column(columnDefinition = "TINYINT(1)")
     private boolean creationWaiting;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "calendar_id")
+    private Calendar calendar;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
     @Builder
     private Attendance(
@@ -55,6 +56,5 @@ public class Attendance {
         user.addAttendance(this);
         calendar.addAttendance(this);
     }
-
 
 }

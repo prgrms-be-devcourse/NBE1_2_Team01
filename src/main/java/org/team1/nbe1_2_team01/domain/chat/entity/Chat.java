@@ -19,6 +19,10 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String content;
+
+    private LocalDateTime createdAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
@@ -26,15 +30,12 @@ public class Chat {
     })
     private Participant participant;
 
-    private String content;
-
-    private LocalDateTime createdAt;
 
     @Builder
     private Chat(
-            Participant participant,
             String content,
-            LocalDateTime createdAt) {
+            LocalDateTime createdAt,
+            Participant participant) {
         this.participant = participant;
         this.content = content;
         this.createdAt = createdAt;

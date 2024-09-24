@@ -22,6 +22,14 @@ public class Comment {
     @Column(name = "comment_id")
     private Long id;
 
+    private String content;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -30,13 +38,6 @@ public class Comment {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    private String content;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     @Builder
     private Comment(User user, Board board, String content) {

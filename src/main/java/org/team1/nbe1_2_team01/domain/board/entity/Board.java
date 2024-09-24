@@ -24,6 +24,16 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
+    private String content;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belonging_id")
     private Belonging belonging;
@@ -39,27 +49,22 @@ public class Board {
     @OneToMany(mappedBy = "board")
     private List<Comment> comments = new ArrayList<>();
 
-    private String title;
-
-    private String content;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder
     private Board(
+            Belonging belonging,
+            Category category,
             User user,
             String title,
-                  String content,
-                  LocalDateTime createdAt,
-                  LocalDateTime updatedAt) {
+            String content) {
+        this.belonging = belonging;
+        this.category = category;
         this.user = user;
-        user.addBoard(this);
         this.title = title;
         this.content = content;
+        user.addBoard(this);
+        category.addBoards(this);
+        belonging.addBoards(this);
     }
 
     public void addComment(Comment comment) {

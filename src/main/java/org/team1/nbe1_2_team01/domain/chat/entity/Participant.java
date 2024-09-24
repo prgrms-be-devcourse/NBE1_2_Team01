@@ -26,6 +26,14 @@ public class Participant {
     @Column(name = "channel_id")
     private Long channelId;
 
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean isCreator;
+
+    private LocalDateTime participatedAt;
+
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean isParticipated;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -37,13 +45,6 @@ public class Participant {
     @OneToMany(mappedBy = "participant")
     private List<Chat> chats = new ArrayList<>();
 
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean isCreator;
-
-    private LocalDateTime participatedAt;
-
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean isParticipated;
 
     @Builder
     private Participant(User user,
