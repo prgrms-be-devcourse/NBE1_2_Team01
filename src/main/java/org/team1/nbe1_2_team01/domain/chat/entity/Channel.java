@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,6 +23,6 @@ public class Channel {
 
     private LocalDateTime createdAt;
 
-//    @OneToMany(mappedBy = "participant")
-//    private Participant participant;
+    @OneToMany(mappedBy = "channel")
+    private List<Participant> participants = new ArrayList<>();
 }
