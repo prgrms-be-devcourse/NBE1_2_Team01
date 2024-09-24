@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.group.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,4 +33,14 @@ public class Team {
     @OneToMany(mappedBy = "team")
     private List<Belonging> belongings = new ArrayList<>();
 
+    @Builder
+    private Team(TeamType teamType,
+                 String name,
+                 boolean creationWaiting,
+                 boolean deletionWaiting) {
+        this.teamType = teamType;
+        this.name = name;
+        this.creationWaiting = creationWaiting;
+        this.deletionWaiting = deletionWaiting;
+    }
 }

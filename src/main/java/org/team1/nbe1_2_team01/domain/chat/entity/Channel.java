@@ -21,6 +21,6 @@ public class Channel {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "participant")
-    private Participant participant;
+//    @OneToMany(mappedBy = "participant")
+//    private Participant participant;
 }

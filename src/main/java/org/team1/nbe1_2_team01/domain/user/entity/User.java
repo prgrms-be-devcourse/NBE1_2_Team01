@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,16 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
-
+    @Builder
+    private User(String username,
+                String password,
+                String email,
+                String name,
+                Role role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.name = name;
+        this.role = role;
+    }
 }

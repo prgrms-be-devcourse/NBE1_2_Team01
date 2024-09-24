@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.calendar.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,12 @@ public class Schedule {
 
     private LocalDateTime scheduledAt;
 
+    @Builder
+    private Schedule(String name,
+                     ScheduleType scheduleType,
+                     LocalDateTime scheduledAt) {
+        this.name = name;
+        this.scheduleType = scheduleType;
+        this.scheduledAt = scheduledAt;
+    }
 }

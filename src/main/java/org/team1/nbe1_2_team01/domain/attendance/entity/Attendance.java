@@ -2,13 +2,13 @@ package org.team1.nbe1_2_team01.domain.attendance.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -38,4 +38,14 @@ public class Attendance {
     @Column(columnDefinition = "TINYINT(1)")
     private boolean creationWaiting;
 
+    @Builder
+    private Attendance(AttendanceIssueType attendanceIssueType,
+                       LocalDate absentDay,
+                       String content, boolean
+                                   creationWaiting) {
+        this.attendanceIssueType = attendanceIssueType;
+        this.absentDay = absentDay;
+        this.content = content;
+        this.creationWaiting = creationWaiting;
+    }
 }

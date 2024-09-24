@@ -30,4 +30,5 @@ public class Calendar {
     @OneToMany(mappedBy = "calendar")
     private List<Attendance> attendances = new ArrayList<>();
 
+
 }

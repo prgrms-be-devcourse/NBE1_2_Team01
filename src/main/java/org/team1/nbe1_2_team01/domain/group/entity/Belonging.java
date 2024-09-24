@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.group.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
@@ -40,4 +41,8 @@ public class Belonging {
     @OneToMany(mappedBy = "belonging")
     private List<Board> boards = new ArrayList<>();
 
+    @Builder
+    private Belonging(String course) {
+        this.course = course;
+    }
 }

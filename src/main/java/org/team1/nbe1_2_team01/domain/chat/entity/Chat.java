@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.chat.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
@@ -26,4 +27,10 @@ public class Chat {
 
     private LocalDateTime createdAt;
 
+    @Builder
+    private Chat(String content,
+                 LocalDateTime createdAt) {
+        this.content = content;
+        this.createdAt = createdAt;
+    }
 }

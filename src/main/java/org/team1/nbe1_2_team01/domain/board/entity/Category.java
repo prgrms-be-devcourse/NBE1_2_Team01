@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.board.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
@@ -28,4 +29,8 @@ public class Category {
 
     private String name;
 
+    @Builder
+    private Category(String name) {
+        this.name = name;
+    }
 }
