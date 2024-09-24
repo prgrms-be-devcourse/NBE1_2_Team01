@@ -31,4 +31,11 @@ public class Calendar {
     private List<Attendance> attendances = new ArrayList<>();
 
 
+    public void addSchedule(Schedule schedule) {
+        this.schedules.add(schedule);
+    }
+
+    public void addAttendance(Attendance attendance) {
+        this.attendances.add(attendance);
+    }
 }

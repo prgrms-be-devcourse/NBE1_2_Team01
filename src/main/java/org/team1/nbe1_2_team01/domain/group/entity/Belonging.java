@@ -45,4 +45,8 @@ public class Belonging {
     private Belonging(String course) {
         this.course = course;
     }
+
+    public void assignTeam(Team team){
+        this.team = team;
+    }
 }

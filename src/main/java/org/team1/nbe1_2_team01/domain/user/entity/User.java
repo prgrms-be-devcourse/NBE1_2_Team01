@@ -66,4 +66,20 @@ public class User {
         this.name = name;
         this.role = role;
     }
+
+    public void addBoard(Board board) {
+        this.boards.add(board);
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
+
+    public void addAttendance(Attendance attendance) {
+        this.attendances.add(attendance);
+    }
+
+    public void addParticipant(Participant participant) {
+        this.participants.add(participant);
+    }
 }

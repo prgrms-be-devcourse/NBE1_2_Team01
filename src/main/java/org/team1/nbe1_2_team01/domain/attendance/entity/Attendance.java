@@ -39,13 +39,22 @@ public class Attendance {
     private boolean creationWaiting;
 
     @Builder
-    private Attendance(AttendanceIssueType attendanceIssueType,
-                       LocalDate absentDay,
-                       String content, boolean
-                                   creationWaiting) {
+    private Attendance(
+            User user,
+            Calendar calendar,
+            AttendanceIssueType attendanceIssueType,
+            LocalDate absentDay,
+            String content,
+            boolean creationWaiting) {
+        this.user = user;
+        this.calendar = calendar;
         this.attendanceIssueType = attendanceIssueType;
         this.absentDay = absentDay;
         this.content = content;
         this.creationWaiting = creationWaiting;
+        user.addAttendance(this);
+        calendar.addAttendance(this);
     }
+
+
 }

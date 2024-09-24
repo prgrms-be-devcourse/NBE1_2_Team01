@@ -43,4 +43,10 @@ public class Team {
         this.creationWaiting = creationWaiting;
         this.deletionWaiting = deletionWaiting;
     }
+
+   // 연관 관계 편의 메소드
+    public void assignBelong(Belonging belonging){
+        this.belongings.add(belonging);
+        belonging.assignTeam(this);
+    }
 }

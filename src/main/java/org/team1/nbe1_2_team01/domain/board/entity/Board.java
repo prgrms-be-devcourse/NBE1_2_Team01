@@ -5,10 +5,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,23 +36,33 @@ public class Board {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "board")
+    private List<Comment> comments = new ArrayList<>();
+
     private String title;
 
     private String content;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder
-    private Board(String title,
+    private Board(
+            User user,
+            String title,
                   String content,
                   LocalDateTime createdAt,
                   LocalDateTime updatedAt) {
+        this.user = user;
+        user.addBoard(this);
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
 }

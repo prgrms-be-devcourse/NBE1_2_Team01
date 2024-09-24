@@ -25,4 +25,8 @@ public class Channel {
 
     @OneToMany(mappedBy = "channel")
     private List<Participant> participants = new ArrayList<>();
+
+    public void addParticipant(Participant participant) {
+        this.participants.add(participant);
+    }
 }

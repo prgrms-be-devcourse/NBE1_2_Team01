@@ -30,11 +30,15 @@ public class Schedule {
     private LocalDateTime scheduledAt;
 
     @Builder
-    private Schedule(String name,
-                     ScheduleType scheduleType,
-                     LocalDateTime scheduledAt) {
+    private Schedule(
+            Calendar calendar,
+            String name,
+            ScheduleType scheduleType,
+            LocalDateTime scheduledAt) {
+        this.calendar = calendar;
         this.name = name;
         this.scheduleType = scheduleType;
         this.scheduledAt = scheduledAt;
+        calendar.addSchedule(this);
     }
 }

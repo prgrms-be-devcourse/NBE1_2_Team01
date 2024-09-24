@@ -20,17 +20,24 @@ public class Chat {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id")
-    private Channel channel;
+    @JoinColumns({
+            @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            @JoinColumn(name = "channel_id", referencedColumnName = "channel_id")
+    })
+    private Participant participant;
 
     private String content;
 
     private LocalDateTime createdAt;
 
     @Builder
-    private Chat(String content,
-                 LocalDateTime createdAt) {
+    private Chat(
+            Participant participant,
+            String content,
+            LocalDateTime createdAt) {
+        this.participant = participant;
         this.content = content;
         this.createdAt = createdAt;
+        participant.addChat(this);
     }
 }

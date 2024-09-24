@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.time.LocalDateTime;
@@ -30,17 +32,19 @@ public class Comment {
 
     private String content;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Builder
-    private Comment(String content,
-                    LocalDateTime createdAt,
-                    LocalDateTime updatedAt) {
+    private Comment(User user, Board board, String content) {
+        this.user = user;
+        this.board = board;
         this.content = content;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        user.addComment(this);
+        board.addComment(this);
     }
 
 }
