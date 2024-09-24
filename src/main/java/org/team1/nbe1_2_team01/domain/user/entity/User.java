@@ -1,6 +1,7 @@
 package org.team1.nbe1_2_team01.domain.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,11 +26,14 @@ public class User {
     private Long id;
 
     @Column(length = 20)
+    @NotNull
     private String username;
 
+    @NotNull
     private String password;
 
     @Column(length = 50)
+    @NotNull
     private String email;
 
     @Column(length = 10)

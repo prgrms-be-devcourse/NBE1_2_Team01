@@ -1,6 +1,7 @@
 package org.team1.nbe1_2_team01.domain.group.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,9 +20,11 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private TeamType teamType;
 
+    @Column(length = 50)
     private String name;
 
     @Column(columnDefinition = "TINYINT(1)")

@@ -1,6 +1,7 @@
 package org.team1.nbe1_2_team01.domain.chat.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,8 @@ public class Channel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50)
+    @NotNull
     private String channelName;
 
     @CreationTimestamp
