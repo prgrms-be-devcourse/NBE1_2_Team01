@@ -1,7 +1,6 @@
 package org.team1.nbe1_2_team01.domain.board.comment.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
