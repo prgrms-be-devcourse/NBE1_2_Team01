@@ -1,5 +1,6 @@
 package org.team1.nbe1_2_team01.domain.board.comment.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,12 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
 
     @Override
     public Optional<List<CommentResponse>> getCommentsByBoardId(Long boardId, Pageable pageable) {
-        List<CommentResponse> fetchedList = queryFactory.select(Projections.constructor(CommentResponse.class,
+        List<Tuple> tuples = queryFactory.select(
                         comment.id,
                         user.username,
                         comment.content,
                         comment.createdAt
-                ))
+                )
                 .from(comment)
                 .innerJoin(user).on(comment.user.eq(user))
                 .where(comment.board.id.eq(boardId))
@@ -33,6 +34,13 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                 .orderBy(comment.createdAt.desc())
                 .fetch();
 
-        return Optional.of(fetchedList);
+        List<CommentResponse> comments = tuples.stream().map(tuple -> CommentResponse.of(
+                tuple.get(comment.id),
+                tuple.get(user.username),
+                tuple.get(comment.content),
+                tuple.get(comment.createdAt)
+        )).toList();
+
+        return Optional.of(comments);
     }
 }

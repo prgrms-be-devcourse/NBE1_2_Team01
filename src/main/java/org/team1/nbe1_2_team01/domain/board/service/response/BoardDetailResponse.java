@@ -12,11 +12,11 @@ import java.util.List;
 @Getter @ToString
 public class BoardDetailResponse {
 
-    private Long id;
-    private String title;
-    private String content;
-    private String writer;
-    private String createdAt;
+    private final Long id;
+    private final String title;
+    private final String content;
+    private final String writer;
+    private final String createdAt;
     private boolean isAdmin;
     private boolean isMine;
     private List<CommentResponse> comments;
