@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
-import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
 
@@ -93,23 +91,13 @@ public class JwtService {
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 
-    /**
-     * 헤더에서 RefreshToken 추출
-     * 토큰형식 : Bearer를 제외하고 순수 토큰만 가져오기 위해서
-     * 헤더를 가져온 후 "Bearer"를 삭제 후 반환
-     */
-    public Optional<String> extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(refreshHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
-    }
 
     /**
-     * 헤더에서 AccessToken 추출
+     * 헤더에서 Token 추출
      * 토큰형식 : Bearer를 제외하고 순수 토큰만 가져오기 위해서
      * 헤더를 가져온 후 "Bearer"를 삭제 후 반환
      */
-    public Optional<String> extractAccessToken(HttpServletRequest request) {
+    public Optional<String> extractToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(accessHeader))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
