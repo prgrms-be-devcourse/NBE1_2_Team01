@@ -32,6 +32,7 @@ public class Schedule {
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
 
+    private String description;
 
     @Builder
     private Schedule(
@@ -39,12 +40,14 @@ public class Schedule {
             String name,
             ScheduleType scheduleType,
             LocalDateTime startAt,
-            LocalDateTime endAt) {
+            LocalDateTime endAt,
+            String description) {
         this.calendar = calendar;
         this.name = name;
         this.scheduleType = scheduleType;
         this.startAt = startAt;
         this.endAt = endAt;
+        this.description = description;
         calendar.addSchedule(this);
     }
 }
