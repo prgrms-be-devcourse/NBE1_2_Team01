@@ -1,6 +1,7 @@
 package org.team1.nbe1_2_team01.domain.board.controller.dto;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,7 +11,10 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 @Getter @ToString
 public class NoticeRequest {
 
+    @NotNull(message = "제목은 필수 입력값입니다.")
     private String title;
+
+    @NotNull(message = "내용은 필수 입력값입니다.")
     private String content;
 
     @Builder
