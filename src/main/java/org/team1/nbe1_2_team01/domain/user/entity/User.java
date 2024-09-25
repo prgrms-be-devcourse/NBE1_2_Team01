@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
@@ -89,5 +90,9 @@ public class User {
 
     public void addBelonging(Belonging belonging) {
         this.belongings.add(belonging);
+    }
+
+    public void passwordEncode(PasswordEncoder passwordEncoder){
+        this.password = passwordEncoder.encode(this.password);
     }
 }
