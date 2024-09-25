@@ -7,4 +7,6 @@ import java.util.List;
 public interface CommentService {
 
     List<CommentResponse> getReviewsByPage(Long boardId, int page);
+
+    String deleteById(Long id);
 }

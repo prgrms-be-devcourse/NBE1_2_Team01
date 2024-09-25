@@ -24,6 +24,15 @@ public class CommentServiceImpl implements CommentService {
                 .orElseGet(ArrayList::new);
     }
 
+    @Override
+    @Transactional
+    public String deleteById(Long id) {
+        //삭제를 요청한 사용자가 자신의 댓글을 지우는 건지 확인하는 작업 필요.
+
+        commentRepository.deleteById(id);
+        return "댓글이 삭제되었습니다.";
+    }
+
     private Pageable getPageable(int page) {
         int PAGE_SIZE = 10;
         return PageRequest.of(page, PAGE_SIZE);
