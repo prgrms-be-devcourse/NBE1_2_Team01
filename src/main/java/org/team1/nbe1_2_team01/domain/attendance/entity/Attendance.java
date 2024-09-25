@@ -45,7 +45,6 @@ public class Attendance {
             String description,
             boolean creationWaiting) {
         this.user = user;
-        this.calendar = calendar;
         this.attendanceIssueType = attendanceIssueType;
         this.startAt = startAt;
         this.endAt = endAt;
