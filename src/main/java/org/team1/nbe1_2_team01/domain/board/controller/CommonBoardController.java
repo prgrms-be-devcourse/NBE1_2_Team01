@@ -39,6 +39,17 @@ public class CommonBoardController {
         return ResponseEntity.ok().body(boardService.addNewNotice(noticeRequest, getAuthentication()));
     }
 
+    /**
+     * 공지사항 상세 조회
+     * @param id
+     * @return
+     */
+    @GetMapping("/board/{id}")
+    public ResponseEntity<BoardDetailResponse> getBoardDetail(@PathVariable Long id) {
+        return ResponseEntity.ok().body(boardService.getBoardDetail(id, getAuthentication()));
+    }
+
+    //분리 필요
     private static Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }

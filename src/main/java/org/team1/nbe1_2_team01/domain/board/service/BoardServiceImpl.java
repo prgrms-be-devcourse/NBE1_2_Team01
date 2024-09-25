@@ -6,9 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.team1.nbe1_2_team01.domain.board.comment.repository.CommentRepository;
+import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
+import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.NoticeRequest;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
+import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
+import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
 
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final CommentService commentService;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,6 +55,20 @@ public class BoardServiceImpl implements BoardService {
 
         boardRepository.save(notice);
         return "공지사항을 등록했습니다.";
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BoardDetailResponse getBoardDetail(Long id, Authentication authentication) {
+        //게시글 정보를 가져와.
+        BoardDetailResponse boardDetailResponse = boardRepository.findBoardDetailExcludeComments(id)
+                .orElseThrow(() -> new NotFoundBoardException("게시글이 존재하지 않습니다."));
+
+        //게시글에 해당하는 리뷰를 가져와
+        List<CommentResponse> comments = commentService.getReviewsByPage(id, 0);
+        boardDetailResponse.addComments(comments);
+
+        return boardDetailResponse;
     }
 
     private Pageable getPageable(int page) {
