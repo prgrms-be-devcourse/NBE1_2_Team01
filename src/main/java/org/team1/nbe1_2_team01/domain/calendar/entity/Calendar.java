@@ -28,9 +28,6 @@ public class Calendar {
     @OneToMany(mappedBy = "calendar")
     private List<Schedule> schedules = new ArrayList<>();
 
-    @OneToMany(mappedBy = "calendar")
-    private List<Attendance> attendances = new ArrayList<>();
-
     @Builder
     private Calendar(Belonging belonging) {
         this.belonging = belonging;
@@ -39,8 +36,5 @@ public class Calendar {
     public void addSchedule(Schedule schedule) {
         this.schedules.add(schedule);
     }
-
-    public void addAttendance(Attendance attendance) {
-        this.attendances.add(attendance);
-    }
+    
 }
