@@ -47,7 +47,6 @@ public class Team {
         this.deletionWaiting = deletionWaiting;
     }
 
-
     public void assignBelonging(Belonging belonging){
         this.belongings.add(belonging);
         belonging.assignTeam(this);
