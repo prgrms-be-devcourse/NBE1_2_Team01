@@ -13,6 +13,8 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 @Getter @ToString
 public class BoardRequest {
 
+    private Long categoryId;
+
     @NotNull(message = "제목은 필수 입력값입니다.")
     @NotBlank(message = "내용을 입력해주세요.")
     private String title;
@@ -21,13 +23,11 @@ public class BoardRequest {
     @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
-    private Long id;
 
-    @Builder
-    private BoardRequest(String title, String content, Long id) {
+    private BoardRequest(String title, String content, Long categoryId) {
         this.title = title;
         this.content = content;
-        this.id = id;
+        this.categoryId = categoryId;
     }
 
     public Board toEntity(User user, Category category) {
