@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateCommand;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 @Entity
@@ -71,6 +72,13 @@ public class Attendance {
         if (startAt.isAfter(endAt)) {
             throw new IllegalArgumentException("출결 시작 시간이 끝 시간보다 나중일 수 없습니다.");
         }
+    }
+
+    public void update(AttendanceUpdateCommand attendanceUpdateCommand) {
+        this.attendanceIssueType = attendanceUpdateCommand.attendanceIssueType();
+        this.startAt = attendanceUpdateCommand.startAt();
+        this.endAt = attendanceUpdateCommand.endAt();
+        this.description = attendanceUpdateCommand.description();
     }
 
     public void approve() {

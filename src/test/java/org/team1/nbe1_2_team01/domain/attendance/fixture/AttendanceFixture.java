@@ -3,6 +3,7 @@ package org.team1.nbe1_2_team01.domain.attendance.fixture;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
 import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceCreateCommand;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateCommand;
 import org.team1.nbe1_2_team01.domain.common.stub.FixedDateTimeHolder;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
@@ -39,12 +40,22 @@ public class AttendanceFixture {
                 .build();
     }
 
+    public static AttendanceUpdateCommand 외출_요청_수정_명령_생성() {
+        return AttendanceUpdateCommand.builder()
+                .id(1L)
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(new FixedDateTimeHolder(13, 0).getDate())
+                .endAt(new FixedDateTimeHolder(16, 0).getDate())
+                .description("외출사유")
+                .build();
+    }
+
     public static Attendance 출결_생성_외출(User user) {
         return Attendance.builder()
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
-                .startAt(new FixedDateTimeHolder(12, 30).getDate())
-                .endAt(new FixedDateTimeHolder(15, 0).getDate())
+                .startAt(new FixedDateTimeHolder(14, 0).getDate())
+                .endAt(new FixedDateTimeHolder(16, 0).getDate())
                 .description("외출사유")
                 .build();
     }
