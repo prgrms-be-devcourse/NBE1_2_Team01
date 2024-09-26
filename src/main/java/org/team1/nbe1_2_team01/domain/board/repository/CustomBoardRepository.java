@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface CustomBoardRepository {
 
-    Optional<List<BoardResponse>> findAllCommonBoard(CommonBoardType type, Pageable pageable);
+    Optional<List<BoardResponse>> findAllCommonBoard(CommonBoardType type, long belongId, Pageable pageable);
 
     Optional<BoardDetailResponse> findBoardDetailExcludeComments(Long id);
 }
