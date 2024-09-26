@@ -20,7 +20,9 @@ public class AttendanceService {
      */
     @Transactional
     public Attendance registAttendance(AttendanceCreateCommand attendanceCreateCommand) {
-        Attendance attendance = attendanceCreateCommand.toEntity();
+        // 이미 user에 맞는 출결 요청 내역이 있다면 예외 발생
+
+        var attendance = attendanceCreateCommand.toEntity();
 
         attendanceRepository.save(attendance);
         return attendance;

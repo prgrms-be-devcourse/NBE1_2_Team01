@@ -15,7 +15,7 @@ public class AttendanceTest {
     @Test
     void 출결_정보_생성() {
         // when
-        Attendance attendance = 출결_생성(유저_생성());
+        var attendance = 출결_생성(유저_생성());
 
         // then
         assertThat(attendance).isNotNull();
@@ -38,7 +38,7 @@ public class AttendanceTest {
     @Test
     void 관리자는_출결_정보를_승인한다() {
         // given
-        Attendance attendance = 출결_생성(관리자_생성());
+        var attendance = 출결_생성(관리자_생성());
 
         // when
         attendance.approve();
@@ -50,7 +50,7 @@ public class AttendanceTest {
     @Test
     void 출결이_이미_승인되었다면_예외를_발생시킨다() {
         // given
-        Attendance attendance = 출결_생성(관리자_생성());
+        var attendance = 출결_생성(관리자_생성());
         attendance.approve();
 
         // when & then
