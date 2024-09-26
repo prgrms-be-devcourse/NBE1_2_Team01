@@ -6,10 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.team1.nbe1_2_team01.domain.board.comment.repository.CommentRepository;
 import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.NoticeRequest;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
@@ -39,7 +38,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public String addNewNotice(NoticeRequest noticeRequest, Authentication authentication) {
+    public String addNewNotice(BoardRequest noticeRequest, Authentication authentication) {
         //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
         authentication.getPrincipal();
 
