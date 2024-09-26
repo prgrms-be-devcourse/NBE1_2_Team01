@@ -31,12 +31,12 @@ public class CommentController {
 
     /**
      * 게시글 삭제
-     * @param id 댓글 번호
+     * @param commentId 댓글 번호
      * @return
      */
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
-        return ResponseEntity.ok().body(commentService.deleteById(id));
+    @DeleteMapping
+    public ResponseEntity<String> deleteComment(@RequestBody Long commentId) {
+        return ResponseEntity.ok().body(commentService.deleteById(commentId));
     }
 
     /**
