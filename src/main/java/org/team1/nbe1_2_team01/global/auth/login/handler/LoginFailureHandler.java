@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.global.auth.handler;
+package org.team1.nbe1_2_team01.global.auth.login.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

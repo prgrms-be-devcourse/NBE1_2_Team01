@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.global.auth.jwt;
+package org.team1.nbe1_2_team01.global.auth.jwt.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
-import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
 

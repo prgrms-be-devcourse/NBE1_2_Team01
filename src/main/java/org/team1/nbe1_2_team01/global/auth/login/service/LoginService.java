@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.global.auth.login;
+package org.team1.nbe1_2_team01.global.auth.login.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
