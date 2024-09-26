@@ -47,24 +47,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .orElse(null);
 
         if(refreshToken !=null){
-            checkAccessTokenAndAuthentication(request, response, filterChain);
+            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
             return;
         }
 
         if (refreshToken == null) {
             checkAccessTokenAndAuthentication(request, response, filterChain);
         }
-    }
-
-    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                                  FilterChain filterChain) throws ServletException, IOException {
-        jwtService.extractAccessToken(request)
-                .filter(jwtService::isTokenValid)
-                .ifPresent(accessToken -> jwtService.extractUsername(accessToken)
-                        .ifPresent(username -> userRepository.findByUsername(username)
-                                .ifPresent(this::saveAuthentication)));
-
-        filterChain.doFilter(request, response);
     }
 
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
@@ -82,6 +71,19 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         userRepository.saveAndFlush(user);
         return reIssuedRefreshToken;
     }
+
+
+    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                                  FilterChain filterChain) throws ServletException, IOException {
+        jwtService.extractAccessToken(request)
+                .filter(jwtService::isTokenValid)
+                .ifPresent(accessToken -> jwtService.extractUsername(accessToken)
+                        .ifPresent(username -> userRepository.findByUsername(username)
+                                .ifPresent(this::saveAuthentication)));
+
+        filterChain.doFilter(request, response);
+    }
+
 
     public void saveAuthentication(User user) {
         String password = user.getPassword();
