@@ -16,6 +16,8 @@ import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.team1.nbe1_2_team01.domain.board.constants.Message.*;
+
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
@@ -36,7 +38,7 @@ public class CommentServiceImpl implements CommentService {
         //삭제를 요청한 사용자가 자신의 댓글을 지우는 건지 확인하는 작업 필요.
 
         commentRepository.deleteById(id);
-        return "댓글이 삭제되었습니다.";
+        return DELETE_COMMENT_COMPLETED.getMessage();
     }
 
     @Override
@@ -44,11 +46,11 @@ public class CommentServiceImpl implements CommentService {
     public String addComment(CommentRequest commentRequest) {
         //유저 정보(미완), board정보 가져오기(완)
         Board findBoard = boardRepository.findById(commentRequest.getBoardId())
-                .orElseThrow(() -> new NotFoundBoardException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundBoardException(NOT_EXIST_BOARD.getMessage()));
 
         Comment comment = commentRequest.toEntity(null, findBoard);
         commentRepository.save(comment);
-        return "댓글을 등록했습니다.";
+        return ADD_BOARD_COMPLETED.getMessage();
     }
 
     private Pageable getPageable(int page) {
