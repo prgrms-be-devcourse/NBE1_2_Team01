@@ -1,6 +1,12 @@
 package org.team1.nbe1_2_team01.domain.user.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum Role {
-    ROLE_ADMIN,
-    ROLE_USER
+    ADMIN("ROLE_ADMIN"),
+    USER("ROLE_USER");
+    private final String key;
 }
