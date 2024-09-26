@@ -5,8 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
 import org.team1.nbe1_2_team01.domain.board.service.BoardService;
+import org.team1.nbe1_2_team01.domain.board.service.CategoryService;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
 
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping("/notice")
-    public ResponseEntity<List<BoardResponse>> getNoticeList(@RequestParam(name = "p", defaultValue = "0") int page) {
+    public ResponseEntity<List<BoardResponse>> getBoardList(@RequestParam(name = "p", defaultValue = "0") int page) {
         return ResponseEntity.ok().body(boardService.getNoticeList(page));
     }
 
@@ -35,7 +37,7 @@ public class CommonBoardController {
      * @return
      */
     @PostMapping("/notice")
-    public ResponseEntity<?> addNewNotice(@RequestBody BoardRequest noticeRequest) {
+    public ResponseEntity<?> addBoard(@RequestBody BoardRequest noticeRequest) {
         return ResponseEntity.ok().body(boardService.addNewNotice(noticeRequest));
     }
 
