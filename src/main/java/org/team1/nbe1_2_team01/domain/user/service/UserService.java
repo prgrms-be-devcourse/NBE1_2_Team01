@@ -28,6 +28,7 @@ public class UserService {
                 .username(userSignUpDto.username())
                 .password(userSignUpDto.password())
                 .email(userSignUpDto.email())
+                .name(userSignUpDto.name())
                 .role(Role.USER)
                 .build();
         user.passwordEncode(passwordEncoder);
