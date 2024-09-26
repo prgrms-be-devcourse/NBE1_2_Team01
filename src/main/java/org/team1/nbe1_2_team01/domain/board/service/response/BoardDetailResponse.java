@@ -34,4 +34,19 @@ public class BoardDetailResponse {
         this.comments = comments;
     }
 
+    public static BoardDetailResponse of(
+            Long id,
+            String title,
+            String content,
+            String writer,
+            LocalDateTime createdAt
+    ) {
+        return BoardDetailResponse.builder()
+                .id(id)
+                .title(title)
+                .content(content)
+                .writer(writer)
+                .createdAt(createdAt)
+                .build();
+    }
 }

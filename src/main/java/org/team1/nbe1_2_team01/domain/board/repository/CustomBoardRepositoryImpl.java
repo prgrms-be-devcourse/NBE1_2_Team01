@@ -1,7 +1,6 @@
 package org.team1.nbe1_2_team01.domain.board.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
-import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 
 import java.util.List;
@@ -17,7 +15,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.team1.nbe1_2_team01.domain.board.entity.QBoard.board;
-import static org.team1.nbe1_2_team01.domain.board.entity.QCategory.category;
 import static org.team1.nbe1_2_team01.domain.board.entity.QComment.comment;
 import static org.team1.nbe1_2_team01.domain.user.entity.QUser.user;
 
@@ -68,16 +65,28 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
 
     @Override
     public Optional<BoardDetailResponse> findBoardDetailExcludeComments(Long id) {
-        BoardDetailResponse boardDetailResponse = queryFactory.select(Projections.constructor(BoardDetailResponse.class,
+        Tuple tuple = queryFactory.select(
                         board.id,
                         board.title,
                         board.content,
                         user.username,
-                        board.createdAt))
+                        board.createdAt)
                 .from(board)
                 .innerJoin(user).on(board.user.eq(user))
                 .where(board.id.eq(id))
                 .fetchOne();
+
+        if (tuple == null) {
+            return Optional.empty(); // 결과가 없을 경우 빈 Optional 반환
+        }
+
+        BoardDetailResponse boardDetailResponse = BoardDetailResponse.of(
+                tuple.get(board.id),
+                tuple.get(board.title),
+                tuple.get(board.content),
+                tuple.get(user.username),
+                tuple.get(board.createdAt)
+        );
         return Optional.ofNullable(boardDetailResponse);
     }
 }
