@@ -13,5 +13,5 @@ public interface BoardService {
 
     String addNewNotice(BoardRequest noticeRequest, Authentication authentication);
 
-    BoardDetailResponse getBoardDetail(Long id, Authentication authentication);
+    BoardDetailResponse getBoardDetailById(Long id);
 }

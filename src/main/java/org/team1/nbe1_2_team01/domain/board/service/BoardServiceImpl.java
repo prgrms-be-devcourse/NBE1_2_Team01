@@ -58,7 +58,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional(readOnly = true)
-    public BoardDetailResponse getBoardDetail(Long id, Authentication authentication) {
+    public BoardDetailResponse getBoardDetailById(Long id) {
         //게시글 정보를 가져와.
         BoardDetailResponse boardDetailResponse = boardRepository.findBoardDetailExcludeComments(id)
                 .orElseThrow(() -> new NotFoundBoardException("게시글이 존재하지 않습니다."));
