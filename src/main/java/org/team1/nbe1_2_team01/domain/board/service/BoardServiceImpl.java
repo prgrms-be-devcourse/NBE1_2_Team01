@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
@@ -38,9 +39,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public String addNewNotice(BoardRequest noticeRequest, Authentication authentication) {
+    public String addNewNotice(BoardRequest noticeRequest) {
         //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
-        authentication.getPrincipal();
+        getAuthentication().getPrincipal();
 
         //사용자의 정보와 소속을 가져와야겠네
 
@@ -73,5 +74,13 @@ public class BoardServiceImpl implements BoardService {
     private Pageable getPageable(int page) {
         int PAGE_SIZE = 10;
         return PageRequest.of(page, PAGE_SIZE);
+    }
+
+    /**
+     * 이거 공용 메서드로 있으면 편할거 같은데..
+     * @return
+     */
+    private static Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

@@ -2,8 +2,6 @@ package org.team1.nbe1_2_team01.domain.board.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
 import org.team1.nbe1_2_team01.domain.board.service.BoardService;
@@ -38,7 +36,7 @@ public class CommonBoardController {
      */
     @PostMapping("/notice")
     public ResponseEntity<?> addNewNotice(@RequestBody BoardRequest noticeRequest) {
-        return ResponseEntity.ok().body(boardService.addNewNotice(noticeRequest, getAuthentication()));
+        return ResponseEntity.ok().body(boardService.addNewNotice(noticeRequest));
     }
 
     /**
@@ -47,12 +45,7 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping("/board/{id}")
-    public ResponseEntity<BoardDetailResponse> getBoardDetail(@PathVariable Long id) {
-        return ResponseEntity.ok().body(boardService.getBoardDetail(id, getAuthentication()));
-    }
-
-    //분리 필요
-    private static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<BoardDetailResponse> getBoardDetailById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(boardService.getBoardDetailById(id));
     }
 }

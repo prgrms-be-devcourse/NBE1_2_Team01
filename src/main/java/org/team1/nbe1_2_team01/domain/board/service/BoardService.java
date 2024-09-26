@@ -11,7 +11,7 @@ public interface BoardService {
 
     List<BoardResponse> getNoticeList(int page);
 
-    String addNewNotice(BoardRequest noticeRequest, Authentication authentication);
+    String addNewNotice(BoardRequest noticeRequest);
 
     BoardDetailResponse getBoardDetailById(Long id);
 }
