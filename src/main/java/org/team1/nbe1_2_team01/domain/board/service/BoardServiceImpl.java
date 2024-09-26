@@ -3,16 +3,16 @@ package org.team1.nbe1_2_team01.domain.board.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
+import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
+import org.team1.nbe1_2_team01.domain.board.service.extractor.UserExtractor;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
 
@@ -28,30 +28,27 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BoardResponse> getNoticeList(int page) {
+    public List<BoardResponse> getCommonBoardList(String type, int page) {
         //security 쪽에서 검증을 해줄진 모르겠지만, 사용자의 정보를 받아와야 할 수도 있음
+
+        //Belonging 정보 가져오기
 
         //pageable 생성
         Pageable pageable = getPageable(page);
         //쿼리로 데이터 가져오기.
-        return boardRepository.findAllNotices(pageable)
+        return boardRepository.findAllCommonBoard(CommonBoardType.getType(type), pageable)
                 .orElseGet(ArrayList::new);
     }
 
     @Override
-    public String addNewNotice(BoardRequest noticeRequest) {
+    public String addCommonBoard(BoardRequest noticeRequest) {
         //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
-        getAuthentication().getPrincipal();
+        UserExtractor.extract();
 
         //사용자의 정보와 소속을 가져와야겠네
 
         //공지사항을 저장한다.
-        Board notice = Board.builder()
-                .user(null)
-                .belonging(null)
-                .title(noticeRequest.getTitle())
-                .content(noticeRequest.getContent())
-                .build();
+        Board notice = noticeRequest.toEntity(null, null);
 
         boardRepository.save(notice);
         return "공지사항을 등록했습니다.";
@@ -74,13 +71,5 @@ public class BoardServiceImpl implements BoardService {
     private Pageable getPageable(int page) {
         int PAGE_SIZE = 10;
         return PageRequest.of(page, PAGE_SIZE);
-    }
-
-    /**
-     * 이거 공용 메서드로 있으면 편할거 같은데..
-     * @return
-     */
-    private static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

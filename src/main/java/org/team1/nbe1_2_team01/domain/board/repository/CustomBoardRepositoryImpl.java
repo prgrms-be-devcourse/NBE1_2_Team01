@@ -2,11 +2,14 @@ package org.team1.nbe1_2_team01.domain.board.repository;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 
 import java.util.List;
@@ -25,15 +28,10 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Optional<List<BoardResponse>> findAllNotices(Pageable pageable) {
+    public Optional<List<BoardResponse>> findAllCommonBoard(CommonBoardType type, Pageable pageable) {
         //inner join와 left join의 차이? 일단 두고 보자. + 나중을 위해 쿼리 튜닝 필요
         //Querydsl로 데이터를 Tuple로 가져옴
-        List<Tuple> results = queryFactory
-                .select(board.id, board.title, user.username, board.createdAt, comment.count().nullif(0L))
-                .from(board)
-                .innerJoin(user).on(board.user.eq(user))
-                .leftJoin(comment).on(comment.board.eq(board))
-                .where(user.role.eq(Role.ADMIN))
+        List<Tuple> results = buildBoardQueryByType(type)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .groupBy(board.id, board.title, user.username, board.createdAt)
@@ -52,6 +50,20 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
                 .collect(Collectors.toList());
 
         return Optional.of(notices);
+    }
+
+    private JPAQuery<Tuple> buildBoardQueryByType(CommonBoardType type) {
+        JPAQuery<Tuple> commonQuery = queryFactory
+                .select(board.id, board.title, user.username, board.createdAt, comment.count().nullif(0L))
+                .from(board)
+                .innerJoin(user).on(board.user.eq(user))
+                .leftJoin(comment).on(comment.board.eq(board));
+
+        if(type.equals(CommonBoardType.NOTICE)) {
+            return commonQuery.where(user.role.eq(Role.ADMIN));
+        }
+
+        return commonQuery.where(user.role.eq(Role.USER));
     }
 
     @Override

@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @Getter @ToString
 public class BoardResponse {
 
-    private Long id;
-    private String title;
-    private String writer;
-    private String categoryName;
-    private String createdAt;
-    private Long commentCount;
+    private final Long id;
+    private final String title;
+    private final String writer;
+    private final String categoryName;
+    private final String createdAt;
+    private final Long commentCount;
 
     @Builder
     private BoardResponse(Long id,
