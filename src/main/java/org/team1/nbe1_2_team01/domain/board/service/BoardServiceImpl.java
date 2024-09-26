@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
+import org.team1.nbe1_2_team01.domain.board.constants.Message;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardDeleteRequest;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
@@ -35,23 +37,24 @@ public class BoardServiceImpl implements BoardService {
 
         //pageable 생성
         Pageable pageable = getPageable(page);
+
         //쿼리로 데이터 가져오기.
-        return boardRepository.findAllCommonBoard(CommonBoardType.getType(type), pageable)
+        return boardRepository.findAllCommonBoard(CommonBoardType.getType(type), 0, pageable)
                 .orElseGet(ArrayList::new);
     }
 
     @Override
-    public String addCommonBoard(BoardRequest noticeRequest) {
+    public String addCommonBoard(BoardRequest boardRequest) {
         //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
         UserExtractor.extract();
 
         //사용자의 정보와 소속을 가져와야겠네
 
-        //공지사항을 저장한다.
-        Board notice = noticeRequest.toEntity(null, null);
+        //공지사항 or 스터디 모집글을 저장한다.
+        Board newBoard = boardRequest.toEntity(null, null);
 
-        boardRepository.save(notice);
-        return "공지사항을 등록했습니다.";
+        boardRepository.save(newBoard);
+        return Message.getAddMessage(boardRequest.isNotice());
     }
 
     @Override
@@ -66,6 +69,15 @@ public class BoardServiceImpl implements BoardService {
         boardDetailResponse.addComments(comments);
 
         return boardDetailResponse;
+    }
+
+    @Override
+    @Transactional
+    public String deleteBoardById(BoardDeleteRequest request) {
+        //내가 작성한 게시글인지 확인?
+
+        boardRepository.deleteById(request.boardId());
+        return Message.getDeleteMessage(request.isNotice());
     }
 
     private Pageable getPageable(int page) {
