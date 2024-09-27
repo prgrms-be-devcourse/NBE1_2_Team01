@@ -16,7 +16,7 @@ import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.team1.nbe1_2_team01.domain.board.constants.Message.*;
+import static org.team1.nbe1_2_team01.domain.board.constants.MessageContent.*;
 
 @Service
 @RequiredArgsConstructor

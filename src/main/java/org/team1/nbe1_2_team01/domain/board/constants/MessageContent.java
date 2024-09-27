@@ -3,9 +3,10 @@ package org.team1.nbe1_2_team01.domain.board.constants;
 import lombok.Getter;
 
 @Getter
-public enum Message {
+public enum MessageContent {
 
     ADD_BOARD_COMPLETED("을 등록했습니다"),
+    UPDATE_BOARD_COMPLETED("을 수정했습니다"),
     DELETE_BOARD_COMPLETED("이 삭제되었습니다."),
 
     ADD_COMMENT_COMPLETED("댓글을 등록했습니다."),
@@ -16,7 +17,7 @@ public enum Message {
     private final String message;
 
 
-    Message(String message) {
+    MessageContent(String message) {
         this.message = message;
     }
 
@@ -33,6 +34,10 @@ public enum Message {
 
     public static String getDeleteMessage(boolean isNotice) {
         return getBoardType(isNotice) + DELETE_BOARD_COMPLETED.getMessage();
+    }
+
+    public static String getUpdateMessage(boolean isNotice) {
+        return getBoardType(isNotice) + UPDATE_BOARD_COMPLETED.getMessage();
     }
 
 }
