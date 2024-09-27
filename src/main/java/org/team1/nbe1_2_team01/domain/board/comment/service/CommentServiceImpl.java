@@ -2,7 +2,6 @@ package org.team1.nbe1_2_team01.domain.board.comment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.comment.controller.dto.CommentRequest;
@@ -24,11 +23,13 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
+    private static final int PAGE_SIZE = 10;
 
     @Override
     @Transactional(readOnly = true)
     public List<CommentResponse> getReviewsByPage(Long boardId, int page) {
-        return commentRepository.getCommentsByBoardId(boardId, getPageable(page))
+        PageRequest pageable = PageRequest.of(page, PAGE_SIZE);
+        return commentRepository.getCommentsByBoardId(boardId, pageable)
                 .orElseGet(ArrayList::new);
     }
 
@@ -51,10 +52,5 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRequest.toEntity(null, findBoard);
         commentRepository.save(comment);
         return ADD_BOARD_COMPLETED.getMessage();
-    }
-
-    private Pageable getPageable(int page) {
-        int PAGE_SIZE = 10;
-        return PageRequest.of(page, PAGE_SIZE);
     }
 }

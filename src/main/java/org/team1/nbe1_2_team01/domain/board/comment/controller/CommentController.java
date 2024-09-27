@@ -24,9 +24,12 @@ public class CommentController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> getComments(@RequestParam(name = "p") int page,
-                                                             @RequestParam("boardId") Long boardId) {
-        return ResponseEntity.ok().body(commentService.getReviewsByPage(boardId, page));
+    public ResponseEntity<List<CommentResponse>> getComments(
+            @RequestParam(name = "p") int page,
+            @RequestParam("boardId") Long boardId
+    ) {
+        return ResponseEntity.ok()
+                .body(commentService.getReviewsByPage(boardId, page));
     }
 
     /**
@@ -36,7 +39,8 @@ public class CommentController {
      */
     @DeleteMapping
     public ResponseEntity<String> deleteComment(@RequestBody Long commentId) {
-        return ResponseEntity.ok().body(commentService.deleteById(commentId));
+        return ResponseEntity.ok()
+                .body(commentService.deleteById(commentId));
     }
 
     /**
@@ -46,6 +50,7 @@ public class CommentController {
      */
     @PostMapping
     public ResponseEntity<String> addComment(@RequestBody CommentRequest commentRequest) {
-        return ResponseEntity.ok().body(commentService.addComment(commentRequest));
+        return ResponseEntity.ok()
+                .body(commentService.addComment(commentRequest));
     }
 }

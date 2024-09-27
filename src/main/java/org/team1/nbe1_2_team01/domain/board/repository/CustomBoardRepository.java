@@ -4,7 +4,6 @@ import org.springframework.data.domain.Pageable;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
-import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 
 import java.util.List;
 import java.util.Optional;

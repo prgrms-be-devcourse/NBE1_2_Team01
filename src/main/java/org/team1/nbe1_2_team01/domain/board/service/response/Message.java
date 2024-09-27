@@ -8,5 +8,5 @@ import lombok.ToString;
 @RequiredArgsConstructor
 public class Message {
 
-    private final String message;
+    private final String value;
 }

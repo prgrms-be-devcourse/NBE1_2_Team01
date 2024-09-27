@@ -31,9 +31,12 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<BoardResponse>> getCommonBoardList(@RequestParam(name = "p", defaultValue = "0") int page,
-                                                                  @RequestParam(name = "type") String type) {
-        return ResponseEntity.ok().body(boardService.getCommonBoardList(type, page));
+    public ResponseEntity<List<BoardResponse>> getCommonBoardList(
+            @RequestParam(defaultValue = "0") int page, //page 를 좀 더 직관적으로
+            @RequestParam String type
+    ) {
+        return ResponseEntity.ok()
+                .body(boardService.getCommonBoardList(type, page));
     }
 
     /**
@@ -43,8 +46,11 @@ public class CommonBoardController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Message> addCommonBoard(@RequestBody @Valid BoardRequest boardRequest) {
-        return ResponseEntity.ok().body(boardService.addCommonBoard(boardRequest));
+    public ResponseEntity<Message> addCommonBoard(
+            @RequestBody @Valid BoardRequest boardRequest
+    ) {
+        return ResponseEntity.ok()
+                .body(boardService.addCommonBoard(boardRequest));
     }
 
     /**
@@ -54,19 +60,25 @@ public class CommonBoardController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<BoardDetailResponse> getBoardDetailById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(boardService.getBoardDetailById(id));
+        return ResponseEntity.ok()
+                .body(boardService.getBoardDetailById(id));
     }
 
     @PatchMapping
-    public ResponseEntity<Message> updateBoard(@RequestBody @Valid BoardUpdateRequest updateRequest) {
-        URI uri = URI.create(BASE_URL + "/" + updateRequest.getBoardId());
+    public ResponseEntity<Message> updateBoard(
+            @RequestBody @Valid BoardUpdateRequest updateRequest
+    ) {
+        URI uri = URI.create(BASE_URL + "/" + updateRequest.boardId());
 
         return ResponseEntity.created(uri)
                 .body(boardService.updateBoard(updateRequest));
     }
 
     @DeleteMapping
-    public ResponseEntity<Message> deleteBoard(@RequestBody BoardDeleteRequest deleteRequest) {
-        return ResponseEntity.ok().body(boardService.deleteBoardById(deleteRequest));
+    public ResponseEntity<Message> deleteBoard(
+            @RequestBody BoardDeleteRequest deleteRequest
+    ) {
+        return ResponseEntity.ok()
+                .body(boardService.deleteBoardById(deleteRequest));
     }
 }

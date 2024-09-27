@@ -73,6 +73,7 @@ public class Board {
 
 
     public void updateBoard(BoardUpdateRequest updateRequest) {
+        //이 부분 타협 가능성?
         String newTitle = updateRequest.getTitle();
         String newContent = updateRequest.getContent();
 
@@ -80,14 +81,8 @@ public class Board {
             throw new BoardNotUpdatedException("게시글이 수정되지 않았습니다.");
         }
 
-        if(!this.title.equals(newTitle)) {
-            this.title = newTitle;
-        }
-
-        if(!this.content.equals(newContent)) {
-            this.content = newContent;
-        }
-
+        this.title = newTitle;
+        this.content = newContent;
         this.updatedAt = LocalDateTime.now();
     }
 }

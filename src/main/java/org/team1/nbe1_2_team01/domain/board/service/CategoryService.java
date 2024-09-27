@@ -10,7 +10,7 @@ public interface CategoryService {
 
     List<CategoryResponse> getAllCategoryByBelongings(Long teamId);
 
-    String addCategory(CategoryRequest categoryRequest);
+    Message addCategory(CategoryRequest categoryRequest);
 
     Message deleteCategory(Long id);
 }
