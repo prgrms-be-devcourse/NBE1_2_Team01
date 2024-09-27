@@ -36,5 +36,11 @@ public class Calendar {
     public void addSchedule(Schedule schedule) {
         this.schedules.add(schedule);
     }
-    
+
+    public static Calendar createCalendarOf(Belonging belonging) {
+        return Calendar.builder()
+                .belonging(belonging)
+                .build();
+    }
+
 }

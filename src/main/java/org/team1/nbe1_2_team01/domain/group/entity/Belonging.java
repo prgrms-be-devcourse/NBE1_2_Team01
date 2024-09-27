@@ -35,7 +35,6 @@ public class Belonging {
     @JoinColumn(name = "team_id")
     private Team team;
 
-
     @OneToMany(mappedBy = "belonging")
     private List<Board> boards = new ArrayList<>();
 
@@ -46,7 +45,15 @@ public class Belonging {
         this.user = user;
         this.course = course;
         this.isOwner = isOwner;
-        user.addBelonging(this);
+        if (user != null) user.addBelonging(this);
+    }
+
+    public static Belonging createBelongingOf(boolean isOwner, String course, User user) {
+        return Belonging.builder()
+                .isOwner(isOwner)
+                .course(course)
+                .user(user)
+                .build();
     }
 
     public void assignTeam(Team team){
