@@ -21,7 +21,6 @@ public class Participant {
     @Id
     @Column(name = "user_id")
     private Long userId;
-
     @Id
     @Column(name = "channel_id")
     private Long channelId;
@@ -35,25 +34,24 @@ public class Participant {
     private boolean isParticipated;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id")
+    @JoinColumn(name = "channel_id", insertable = false, updatable = false)
     private Channel channel;
 
-    @OneToMany(mappedBy = "participant")
+    @OneToMany(mappedBy = "participant", fetch = FetchType.EAGER)
     private List<Chat> chats = new ArrayList<>();
-
 
     @Builder
     private Participant(User user,
-                       Channel channel,
-                       boolean isCreator,
-                       LocalDateTime participatedAt,
-                       boolean isParticipated) {
-        this.user = user;
-        this.channel = channel;
+                        Channel channel,
+                        boolean isCreator,
+                        LocalDateTime participatedAt,
+                        boolean isParticipated) {
+        this.userId = user.getId();  // User ID 설정
+        this.channelId = channel.getId();  // Channel ID 설정
         this.isCreator = isCreator;
         this.participatedAt = participatedAt;
         this.isParticipated = isParticipated;

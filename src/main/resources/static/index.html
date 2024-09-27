@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOMP WebSocket Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+</head>
+<body>
+<h1>STOMP WebSocket Chat</h1>
+
+<div>
+    <h2>Create a Chat Channel</h2>
+    <input type="text" id="channelNameInput" placeholder="Channel Name" />
+    <input type="number" id="creatorUserIdInput" placeholder="Creator User ID" />
+    <button id="createChannelButton">Create Channel</button>
+</div>
+
+<div>
+    <h2>Invite to a Chat Channel</h2>
+    <input type="number" id="inviteChannelIdInput" placeholder="Channel ID" />
+    <input type="number" id="inviterUserIdInput" placeholder="Inviter User ID" /> <!-- 초대하는 사람 ID -->
+    <input type="number" id="inviteeUserIdInput" placeholder="Invitee User ID" /> <!-- 초대받는 사람 ID -->
+    <button id="inviteButton">Invite User to Channel</button>
+</div>
+
+
+<div>
+    <h2>Chat</h2>
+    <div id="messages" style="border: 1px solid #ccc; height: 200px; overflow-y: scroll; padding: 10px;"></div>
+    <input type="number" id="messageChannelIdInput" placeholder="Channel ID" />
+<!--    <input type="number" id="userIdInput2" placeholder="User ID" /> &lt;!&ndash; 사용자 ID 입력 필드 추가 &ndash;&gt;-->
+    <input type="text" id="messageInput" placeholder="Enter your message..." />
+    <button id="sendMessageButton">Send Message</button>
+</div>
+
+<script>
+    const wsUrl = 'ws://localhost:8080/stomp-endpoint';
+    const client = Stomp.over(new WebSocket(wsUrl));
+    let currentChannelId = '';
+
+    client.connect({}, (frame) => {
+        console.log('Connected: ' + frame);
+
+
+        let currentUserId; // 사용자 ID를 저장할 전역 변수
+
+
+        // Invite Button Click Event
+        document.getElementById('inviteButton').onclick = function() {
+            const channelId = document.getElementById('inviteChannelIdInput').value;
+            const inviteUserId = document.getElementById('inviterUserIdInput').value; // 초대하는 사람 (생성자)
+            const participantId = document.getElementById('inviteeUserIdInput').value; // 초대받는 사람
+
+            if (channelId && inviteUserId && participantId) {
+                // AJAX 요청을 사용하여 채널에 초대
+                fetch('/participants/invite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        channelId: channelId,
+                        inviteUserId: inviteUserId,
+                        participantId: participantId
+                    }), // JSON 형식으로 데이터 전송
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        // 성공적으로 초대된 경우
+                        currentUserId = participantId; // 초대받은 사용자 ID를 저장
+                        document.getElementById('messageChannelIdInput').value = channelId; // Set channel ID for message sending
+                        alert(`User ${participantId} invited to channel ${data.channelId}`);
+                    })
+                    .catch(error => {
+                        alert(`Error: ${error.message}`);
+                    });
+            } else {
+                alert('Please enter Channel ID, Inviter User ID, and Invitee User ID');
+            }
+        };
+
+
+
+
+        // Create Channel Button Click Event
+        document.getElementById('createChannelButton').onclick = function() {
+            const channelName = document.getElementById('channelNameInput').value;
+            const creatorUserId = document.getElementById('creatorUserIdInput').value;
+
+            // 입력 값이 유효한지 확인
+            if (channelName && creatorUserId) {
+                // POST 요청으로 채널 생성
+                fetch('/channel/createChannel', { // 적절한 API 엔드포인트로 변경
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        channelName: channelName,
+                        creatorUserId: creatorUserId
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // 채널 생성 성공 시 처리
+                        alert(`Channel '${data.channelName}' created successfully!`);
+                    })
+                    .catch(error => {
+                        console.error('Error creating channel:', error);
+                        alert('Error creating channel: ' + error.message);
+                    });
+            } else {
+                alert('Please enter both channel name and creator user ID');
+            }
+        };
+
+        // Send Message Button Click Event
+        document.getElementById('sendMessageButton').onclick = function() {
+            const messageContent = document.getElementById('messageInput').value;
+            const channelId = document.getElementById('messageChannelIdInput').value;
+
+            if (channelId && messageContent && currentUserId) {
+                const chatMessage = {
+                    userId: currentUserId, // 저장된 사용자 ID 사용
+                    content: messageContent,
+                    channelId: channelId // 채널 ID를 메시지에 포함
+                };
+                console.log(`채널 ${channelId}에서 사용자 ${currentUserId}로 메시지를 전송합니다.`);
+                client.send(`/app/chat/${channelId}`, { 'Content-Type': 'application/json' }, JSON.stringify(chatMessage));
+                document.getElementById('messageInput').value = '';
+            } else {
+                alert('메시지를 입력하고 먼저 채널에 참여하세요.');
+            }
+        };
+
+    }, (error) => {
+        console.error('WebSocket connection error: ' + error);
+    });
+
+    // Function to display received messages
+    function showMessage(message) {
+        const messagesDiv = document.getElementById("messages");
+        const messageElement = document.createElement("div");
+        messageElement.innerText = `${message.content} (from User ID: ${message.userId})`;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto scroll to bottom
+    }
+</script>
+</body>
+</html>
