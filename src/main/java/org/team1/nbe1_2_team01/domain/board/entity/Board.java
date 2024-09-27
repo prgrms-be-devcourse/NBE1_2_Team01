@@ -74,8 +74,8 @@ public class Board {
 
     public void updateBoard(BoardUpdateRequest updateRequest) {
         //이 부분 타협 가능성?
-        String newTitle = updateRequest.getTitle();
-        String newContent = updateRequest.getContent();
+        String newTitle = updateRequest.title();
+        String newContent = updateRequest.content();
 
         if(this.title.equals(newTitle) && this.content.equals(newContent)) {
             throw new BoardNotUpdatedException("게시글이 수정되지 않았습니다.");
