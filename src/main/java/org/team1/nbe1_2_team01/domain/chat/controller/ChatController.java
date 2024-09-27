@@ -3,19 +3,22 @@ package org.team1.nbe1_2_team01.domain.chat.controller;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChannelDTO;
+import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChatDTO;
 import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChatMessageDTO;
 import org.team1.nbe1_2_team01.domain.chat.entity.Chat;
 import org.team1.nbe1_2_team01.domain.chat.service.ChatService;
 import org.team1.nbe1_2_team01.domain.chat.service.ParticipantService;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,5 +49,16 @@ public class ChatController {
             System.out.println("여기 걸린거여 ");
         }
         return messageDTO;
+    }
+
+    @GetMapping("/{channelId}/chats")
+    public ResponseEntity<List<ChatDTO>> getChatsByChannelId(@PathVariable("channelId") Long channelId) {
+        System.out.println("Received channelId: " + channelId); // 로그 추가
+
+        List<Chat> chats = chatService.getChatsByChannelId(channelId);
+        List<ChatDTO> chatDTOS = chats.stream()
+                .map(chat -> new ChatDTO(chat.getId(), chat.getContent(), chat.getParticipant().getUser().getName(), chat.getCreatedAt()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(chatDTOS);
     }
 }

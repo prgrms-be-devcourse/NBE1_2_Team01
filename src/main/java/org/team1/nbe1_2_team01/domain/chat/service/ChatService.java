@@ -10,6 +10,7 @@ import org.team1.nbe1_2_team01.domain.chat.repository.ChatRepository;
 import org.team1.nbe1_2_team01.domain.chat.repository.ParticipantRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +38,10 @@ public class ChatService {
                 .createdAt(LocalDateTime.now())
                 .participant(participant)
                 .build());
+    }
+
+    // 채팅 불러오기
+    public List<Chat> getChatsByChannelId(Long channelId) {
+        return chatRepository.findByParticipant_Channel_Id(channelId);
     }
 }
