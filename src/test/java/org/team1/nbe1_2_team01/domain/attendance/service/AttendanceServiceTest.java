@@ -7,10 +7,10 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.외출_요청_등록_명령_생성;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.외출_요청_수정_명령_생성;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.출결_생성_외출;
-import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.유저_생성;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAddAttendanceCommand_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createUpdateAttendanceCommand_ABSENT;
+import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.NoSuchElementException;
@@ -21,7 +21,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
+import org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
+import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -30,17 +32,19 @@ public class AttendanceServiceTest {
     @Mock
     private AttendanceRepository attendanceRepository;
 
-    @InjectMocks
-    private AttendanceService attendanceService;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
-    private AttendanceAdminService attendanceAdminService;
+    private AttendanceService attendanceService;
 
     @Test
     void 출결_요청_등록() {
         // given
-        var createCommand = 외출_요청_등록_명령_생성(유저_생성());
-        when(attendanceRepository.save(any(Attendance.class))).thenReturn(출결_생성_외출(유저_생성()));
+        var user = createUser();
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
+        var createCommand = createAddAttendanceCommand_ABSENT(user);
+        when(attendanceRepository.save(any(Attendance.class))).thenReturn(createAttendance_ABSENT(user));
 
         // when
         var actualAttendance = attendanceService.registAttendance(createCommand);
@@ -52,8 +56,8 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_수정() {
         // given
-        var updateCommand = 외출_요청_수정_명령_생성();
-        var attendance = 출결_생성_외출(유저_생성());
+        var updateCommand = createUpdateAttendanceCommand_ABSENT();
+        var attendance = createAttendance_ABSENT(createUser());
         when(attendanceRepository.findById(any())).thenReturn(Optional.ofNullable(attendance));
 
         // when
@@ -66,7 +70,7 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_수정_시_출결_요청_데이터가_없다면_예외를_발생시킨다() {
         // given
-        var updateCommand = 외출_요청_수정_명령_생성();
+        var updateCommand = createUpdateAttendanceCommand_ABSENT();
         when(attendanceRepository.findById(updateCommand.id())).thenReturn(Optional.empty());
 
         // when & then
@@ -101,11 +105,13 @@ public class AttendanceServiceTest {
     @Test
     void 출결_승인() {
         // given
-        var attendance = 출결_생성_외출(유저_생성());
+        var attendanceId = 1L;
+        var attendance = AttendanceFixture.createAttendance(createUser());
+        when(attendanceRepository.findById(attendanceId)).thenReturn(Optional.of(attendance));
         when(attendanceRepository.save(any(Attendance.class))).thenReturn(any());
 
         // when
-        var updatedAttendance = attendanceAdminService.approveAttendance(attendance);
+        var updatedAttendance = attendanceService.approveAttendance(attendanceId);
 
         // then
         assertThat(updatedAttendance.isCreationWaiting()).isFalse();
@@ -114,13 +120,13 @@ public class AttendanceServiceTest {
     @Test
     void 출결_반려() {
         // given
-        var attendance = 출결_생성_외출(유저_생성());
-        doNothing().when(attendanceRepository).delete(any(Attendance.class));
+        var attendanceId = 1L;
+        doNothing().when(attendanceRepository).deleteById(attendanceId);
 
         // when
-        attendanceAdminService.rejectAttendance(attendance);
+        attendanceService.rejectAttendance(attendanceId);
 
         // then
-        verify(attendanceRepository).delete(any(Attendance.class));
+        verify(attendanceRepository).deleteById(attendanceId);
     }
 }

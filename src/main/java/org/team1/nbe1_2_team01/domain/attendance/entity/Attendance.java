@@ -16,7 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateCommand;
+import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 @Entity
@@ -30,6 +30,7 @@ public class Attendance {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private AttendanceIssueType attendanceIssueType;
 
     private LocalDateTime startAt;
@@ -52,8 +53,6 @@ public class Attendance {
             LocalDateTime startAt,
             LocalDateTime endAt,
             String description) {
-        validateAttendTime(startAt, endAt);
-
         this.user = user;
         this.attendanceIssueType = attendanceIssueType;
         this.startAt = startAt;
@@ -63,22 +62,11 @@ public class Attendance {
         user.addAttendance(this);
     }
 
-    private void validateAttendTime(LocalDateTime startAt, LocalDateTime endAt) {
-        if (startAt.getHour() < 9 || startAt.getHour() >= 18
-            || endAt.getHour() < 9 || endAt.getHour() >= 18) {
-            throw new IllegalArgumentException("출결 이슈는 9시에서 17시 59분 사이여야 합니다.");
-        }
-
-        if (startAt.isAfter(endAt)) {
-            throw new IllegalArgumentException("출결 시작 시간이 끝 시간보다 나중일 수 없습니다.");
-        }
-    }
-
-    public void update(AttendanceUpdateCommand attendanceUpdateCommand) {
-        this.attendanceIssueType = attendanceUpdateCommand.attendanceIssueType();
-        this.startAt = attendanceUpdateCommand.startAt();
-        this.endAt = attendanceUpdateCommand.endAt();
-        this.description = attendanceUpdateCommand.description();
+    public void update(UpdateAttendanceCommand updateAttendanceCommand) {
+        this.attendanceIssueType = updateAttendanceCommand.attendanceIssueType();
+        this.startAt = updateAttendanceCommand.startAt();
+        this.endAt = updateAttendanceCommand.endAt();
+        this.description = updateAttendanceCommand.description();
     }
 
     public void approve() {
