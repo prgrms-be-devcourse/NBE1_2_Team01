@@ -24,30 +24,23 @@ public class Schedule {
     @Enumerated(value = EnumType.STRING)
     private ScheduleType scheduleType;
 
-    private LocalDateTime startAt;
-
-    private LocalDateTime endAt;
+    private LocalDateTime scheduledAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
 
-    private String description;
 
     @Builder
     private Schedule(
             Calendar calendar,
             String name,
             ScheduleType scheduleType,
-            LocalDateTime startAt,
-            LocalDateTime endAt,
-            String description) {
+            LocalDateTime scheduledAt) {
         this.calendar = calendar;
         this.name = name;
         this.scheduleType = scheduleType;
-        this.startAt = startAt;
-        this.endAt = endAt;
-        this.description = description;
+        this.scheduledAt = scheduledAt;
         calendar.addSchedule(this);
     }
 }
