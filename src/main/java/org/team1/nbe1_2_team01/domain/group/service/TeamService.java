@@ -83,4 +83,8 @@ public class TeamService {
         return newTeam;
     }
 
+    public List<Team> creationWaitingStudyTeamList() {
+        return teamRepository.findByCreationWaiting(true);
+    }
+
 }

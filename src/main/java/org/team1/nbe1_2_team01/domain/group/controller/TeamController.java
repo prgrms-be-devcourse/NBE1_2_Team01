@@ -44,4 +44,22 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류");
     }
 
+    @GetMapping("/waiting")
+    public ResponseEntity<?> getCreationWaitingStudyTeams() {
+        List<Team> teams = teamService.creationWaitingStudyTeamList();
+
+        List<TeamResponse> response = new ArrayList<>();
+
+        for (Team t : teams) {
+            response.add(TeamResponse.of(t));
+        }
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
+        return ResponseEntity.ok().body(belongingService.courseUserList(course));
+    }
+
 }
