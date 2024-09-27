@@ -14,6 +14,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -87,4 +88,11 @@ public class TeamService {
         return teamRepository.findByCreationWaiting(true);
     }
 
+    public Team studyTeamApprove(Long teamId) {
+        Optional<Team> team = teamRepository.findById(teamId);
+
+        team.get().setCreationWaiting(false);
+
+        return teamRepository.save(team.get());
+    }
 }

@@ -57,6 +57,13 @@ public class TeamController {
         return ResponseEntity.ok().body(response);
     }
 
+    @PatchMapping("/approve/{teamId}")
+    public ResponseEntity<?> approveStudyTeam(@PathVariable Long teamId) {
+        Team team = teamService.studyTeamApprove(teamId);
+
+        return ResponseEntity.ok().body(team);
+    }
+
     @GetMapping
     public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
         return ResponseEntity.ok().body(belongingService.courseUserList(course));

@@ -2,10 +2,7 @@ package org.team1.nbe1_2_team01.domain.group.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +25,11 @@ public class Team {
     private String name;
 
     @Column(columnDefinition = "TINYINT(1)")
+    @Setter
     private boolean creationWaiting;
 
     @Column(columnDefinition = "TINYINT(1)")
+    @Setter
     private boolean deletionWaiting;
 
     @OneToMany(mappedBy = "team")
