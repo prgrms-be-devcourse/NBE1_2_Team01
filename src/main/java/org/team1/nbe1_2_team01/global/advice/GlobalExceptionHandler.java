@@ -6,13 +6,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.team1.nbe1_2_team01.domain.board.exception.BoardNotUpdatedException;
-import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
-import org.team1.nbe1_2_team01.domain.board.exception.NotFoundTypeException;
 import org.team1.nbe1_2_team01.global.util.ExceptionTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,9 +20,7 @@ public class GlobalExceptionHandler {
      * (다른 에러코드를 보낼 필요가 있다면 메서드 추가 생성 가능)
      */
     @ExceptionHandler({
-            NotFoundBoardException.class,
-            NotFoundTypeException.class,
-            BoardNotUpdatedException.class,
+            NoSuchElementException.class,
             IllegalArgumentException.class
     })
     public ResponseEntity<ExceptionTemplate> handleBoardExceptions(RuntimeException e) {
