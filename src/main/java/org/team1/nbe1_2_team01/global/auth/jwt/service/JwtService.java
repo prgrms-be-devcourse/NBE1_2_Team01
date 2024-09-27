@@ -45,9 +45,9 @@ public class JwtService {
         Date now = new Date();
         Claims claims = Jwts.claims();
         claims.put(USERNAME_CLAIM, username);
+        claims.setExpiration(new Date(now.getTime() + accessTokenExpirationPeriod));
         return Jwts.builder()
                 .setSubject(ACCESS_TOKEN_SUBJECT)
-                .setExpiration(new Date(now.getTime() + accessTokenExpirationPeriod))
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
@@ -56,19 +56,15 @@ public class JwtService {
 
     public String createRefreshToken() {
         Date now = new Date();
+        Claims claims = Jwts.claims();
+        claims.setExpiration(new Date(now.getTime() + refreshTokenExpirationPeriod));
         return Jwts.builder()
                 .setSubject(REFRESH_TOKEN_SUBJECT)
-                .setExpiration(new Date(now.getTime() + refreshTokenExpirationPeriod))
+                .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        response.setHeader(accessHeader, accessToken);
-        log.info("재발급된 Access Token : {}", accessToken);
-    }
 
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
@@ -112,15 +108,6 @@ public class JwtService {
 
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
         response.setHeader(refreshHeader, refreshToken);
-    }
-
-
-    public void updateRefreshToken(String username, String refreshToken) {
-        userRepository.findByUsername(username)
-                .ifPresentOrElse(
-                        user -> user.updateRefreshToken(refreshToken),
-                        () -> new IllegalArgumentException("일치하는 회원이 없습니다.")
-                );
     }
 
 
