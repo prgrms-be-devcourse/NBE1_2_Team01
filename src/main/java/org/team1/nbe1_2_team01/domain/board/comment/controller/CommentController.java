@@ -30,7 +30,7 @@ public class CommentController {
     }
 
     /**
-     * 게시글 삭제
+     * 댓글 삭제
      * @param commentId 댓글 번호
      * @return
      */
