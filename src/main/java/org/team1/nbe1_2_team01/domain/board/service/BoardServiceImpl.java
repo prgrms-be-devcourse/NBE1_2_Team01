@@ -8,15 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
-import org.team1.nbe1_2_team01.domain.board.constants.Message;
+import org.team1.nbe1_2_team01.domain.board.constants.MessageContent;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardDeleteRequest;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.board.service.extractor.UserExtractor;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public String addCommonBoard(BoardRequest boardRequest) {
+    public Message addCommonBoard(BoardRequest boardRequest) {
         //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
         UserExtractor.extract();
 
@@ -54,7 +56,7 @@ public class BoardServiceImpl implements BoardService {
         Board newBoard = boardRequest.toEntity(null, null);
 
         boardRepository.save(newBoard);
-        return Message.getAddMessage(boardRequest.isNotice());
+        return new Message(MessageContent.getAddMessage(boardRequest.isNotice()));
     }
 
     @Override
@@ -73,11 +75,21 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public String deleteBoardById(BoardDeleteRequest request) {
+    public Message deleteBoardById(BoardDeleteRequest request) {
         //내가 작성한 게시글인지 확인?
 
         boardRepository.deleteById(request.boardId());
-        return Message.getDeleteMessage(request.isNotice());
+        return new Message(MessageContent.getDeleteMessage(request.isNotice()));
+    }
+
+    @Override
+    @Transactional
+    public Message updateBoard(BoardUpdateRequest updateRequest) {
+        Board findBoard = boardRepository.findById(updateRequest.getBoardId())
+                .orElseThrow(() -> new NotFoundBoardException("게시글이 존재하지 않습니다."));
+
+        findBoard.updateBoard(updateRequest);
+        return new Message(MessageContent.getUpdateMessage(updateRequest.getIsNotice()));
     }
 
     private Pageable getPageable(int page) {

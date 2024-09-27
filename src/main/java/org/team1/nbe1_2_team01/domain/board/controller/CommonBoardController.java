@@ -1,14 +1,18 @@
 package org.team1.nbe1_2_team01.domain.board.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardDeleteRequest;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
 import org.team1.nbe1_2_team01.domain.board.service.BoardService;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.Message;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -17,6 +21,7 @@ import java.util.List;
 public class CommonBoardController {
 
     private final BoardService boardService;
+    private static final String BASE_URL = "/api/v1/board";
 
     /**
      * 게시글 목록 조회 api
@@ -38,7 +43,7 @@ public class CommonBoardController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<?> addCommonBoard(@RequestBody BoardRequest boardRequest) {
+    public ResponseEntity<Message> addCommonBoard(@RequestBody @Valid BoardRequest boardRequest) {
         return ResponseEntity.ok().body(boardService.addCommonBoard(boardRequest));
     }
 
@@ -52,8 +57,14 @@ public class CommonBoardController {
         return ResponseEntity.ok().body(boardService.getBoardDetailById(id));
     }
 
+    @PatchMapping
+    public ResponseEntity<Message> updateBoard(@RequestBody @Valid BoardUpdateRequest updateRequest) {
+        return ResponseEntity.created(URI.create("/"+updateRequest.getBoardId()))
+                .body(boardService.updateBoard(updateRequest));
+    }
+
     @PostMapping("/delete")
-    public ResponseEntity<String> deleteBoard(@RequestBody BoardDeleteRequest deleteRequest) {
+    public ResponseEntity<Message> deleteBoard(@RequestBody BoardDeleteRequest deleteRequest) {
         return ResponseEntity.ok().body(boardService.deleteBoardById(deleteRequest));
     }
 }
