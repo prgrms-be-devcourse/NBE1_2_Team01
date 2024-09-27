@@ -1,14 +1,23 @@
 package org.team1.nbe1_2_team01.domain.attendance.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
+import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,9 +30,11 @@ public class Attendance {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private AttendanceIssueType attendanceIssueType;
 
     private LocalDateTime startAt;
+
     private LocalDateTime endAt;
 
     private String description;
@@ -35,22 +46,33 @@ public class Attendance {
     @JoinColumn(name = "user_id")
     private User user;
 
-
     @Builder
     private Attendance(
             User user,
             AttendanceIssueType attendanceIssueType,
             LocalDateTime startAt,
             LocalDateTime endAt,
-            String description,
-            boolean creationWaiting) {
+            String description) {
         this.user = user;
         this.attendanceIssueType = attendanceIssueType;
         this.startAt = startAt;
         this.endAt = endAt;
         this.description = description;
-        this.creationWaiting = creationWaiting;
+        this.creationWaiting = true;
         user.addAttendance(this);
     }
 
+    public void update(UpdateAttendanceCommand updateAttendanceCommand) {
+        this.attendanceIssueType = updateAttendanceCommand.attendanceIssueType();
+        this.startAt = updateAttendanceCommand.startAt();
+        this.endAt = updateAttendanceCommand.endAt();
+        this.description = updateAttendanceCommand.description();
+    }
+
+    public void approve() {
+        if (!creationWaiting) {
+            throw new IllegalArgumentException("이미 승인되었습니다.");
+        }
+        creationWaiting = false;
+    }
 }
