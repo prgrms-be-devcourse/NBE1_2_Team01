@@ -59,11 +59,13 @@ public class CommonBoardController {
 
     @PatchMapping
     public ResponseEntity<Message> updateBoard(@RequestBody @Valid BoardUpdateRequest updateRequest) {
-        return ResponseEntity.created(URI.create("/"+updateRequest.getBoardId()))
+        URI uri = URI.create(BASE_URL + "/" + updateRequest.getBoardId());
+
+        return ResponseEntity.created(uri)
                 .body(boardService.updateBoard(updateRequest));
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<Message> deleteBoard(@RequestBody BoardDeleteRequest deleteRequest) {
         return ResponseEntity.ok().body(boardService.deleteBoardById(deleteRequest));
     }
