@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,16 +23,13 @@ public class Attendance {
     @Enumerated(EnumType.STRING)
     private AttendanceIssueType attendanceIssueType;
 
-    private LocalDate absentDay;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
 
-    private String content;
+    private String description;
 
     @Column(columnDefinition = "TINYINT(1)")
     private boolean creationWaiting;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendar_id")
-    private Calendar calendar;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -42,19 +39,18 @@ public class Attendance {
     @Builder
     private Attendance(
             User user,
-            Calendar calendar,
             AttendanceIssueType attendanceIssueType,
-            LocalDate absentDay,
-            String content,
+            LocalDateTime startAt,
+            LocalDateTime endAt,
+            String description,
             boolean creationWaiting) {
         this.user = user;
-        this.calendar = calendar;
         this.attendanceIssueType = attendanceIssueType;
-        this.absentDay = absentDay;
-        this.content = content;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.description = description;
         this.creationWaiting = creationWaiting;
         user.addAttendance(this);
-        calendar.addAttendance(this);
     }
 
 }
