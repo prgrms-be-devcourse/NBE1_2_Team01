@@ -1,12 +1,11 @@
 package org.team1.nbe1_2_team01.domain.board.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
+import org.team1.nbe1_2_team01.domain.board.exception.BoardNotUpdatedException;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
@@ -70,5 +69,25 @@ public class Board {
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
+    }
+
+
+    public void updateBoard(BoardUpdateRequest updateRequest) {
+        String newTitle = updateRequest.getTitle();
+        String newContent = updateRequest.getContent();
+
+        if(this.title.equals(newTitle) && this.content.equals(newContent)) {
+            throw new BoardNotUpdatedException("게시글이 수정되지 않았습니다.");
+        }
+
+        if(!this.title.equals(newTitle)) {
+            this.title = newTitle;
+        }
+
+        if(!this.content.equals(newContent)) {
+            this.content = newContent;
+        }
+
+        this.updatedAt = LocalDateTime.now();
     }
 }
