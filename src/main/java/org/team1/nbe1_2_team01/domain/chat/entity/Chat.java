@@ -42,9 +42,4 @@ public class Chat {
         this.createdAt = createdAt;
         participant.addChat(this);
     }
-
-    /*@PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }*/
 }
