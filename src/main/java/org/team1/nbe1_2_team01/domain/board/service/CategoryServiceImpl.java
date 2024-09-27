@@ -7,6 +7,7 @@ import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryRequest;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.extractor.UserExtractor;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.Message;
 
 import java.util.List;
 
@@ -35,5 +36,12 @@ public class CategoryServiceImpl implements CategoryService {
         //게시글 저장
         categoryRepository.save(categoryRequest.toEntity(null));
         return "카테고리를 등록했습니다.";
+    }
+
+    @Override
+    @Transactional
+    public Message deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
+        return new Message("카테고리를 삭제했습니다.");
     }
 }

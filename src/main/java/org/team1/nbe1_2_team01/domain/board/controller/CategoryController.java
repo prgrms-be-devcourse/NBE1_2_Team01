@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryRequest;
 import org.team1.nbe1_2_team01.domain.board.service.CategoryService;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.Message;
 
 import java.util.List;
 
@@ -34,5 +35,11 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<String> addCategory(@RequestBody CategoryRequest categoryRequest) {
         return ResponseEntity.ok().body(categoryService.addCategory(categoryRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Message> deleteCategory(@PathVariable Long id) {
+        return ResponseEntity.ok().body(categoryService.deleteCategory(id));
+
     }
 }
