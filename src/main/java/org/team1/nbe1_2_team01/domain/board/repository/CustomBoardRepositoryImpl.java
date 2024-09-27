@@ -12,7 +12,6 @@ import org.team1.nbe1_2_team01.domain.user.entity.Role;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.team1.nbe1_2_team01.domain.board.entity.QBoard.board;
 import static org.team1.nbe1_2_team01.domain.board.entity.QComment.comment;
@@ -36,7 +35,7 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
                 .orderBy(board.createdAt.desc())
                 .fetch();
 
-        List<BoardResponse> notices = results.stream()
+        List<BoardResponse> boards = results.stream()
                 .map(tuple -> BoardResponse.of(
                         tuple.get(board.id),
                         tuple.get(board.title),
@@ -45,14 +44,19 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
                         tuple.get(board.createdAt),
                         tuple.get(comment.count())
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
-        return Optional.of(notices);
+        return Optional.of(boards);
     }
 
     private JPAQuery<Tuple> buildBoardQueryByType(CommonBoardType type) {
         JPAQuery<Tuple> commonQuery = queryFactory
-                .select(board.id, board.title, user.username, board.createdAt, comment.count().nullif(0L))
+                .select(
+                    board.id,
+                    board.title,
+                    user.username,
+                    board.createdAt,
+                    comment.count())
                 .from(board)
                 .innerJoin(user).on(board.user.eq(user))
                 .leftJoin(comment).on(comment.board.eq(board));
