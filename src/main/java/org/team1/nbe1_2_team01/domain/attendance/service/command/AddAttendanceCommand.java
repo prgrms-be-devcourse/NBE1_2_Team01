@@ -9,7 +9,6 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 @Builder
 public record AddAttendanceCommand(
-        String username,
         AttendanceIssueType attendanceIssueType,
         LocalDateTime startAt,
         LocalDateTime endAt,

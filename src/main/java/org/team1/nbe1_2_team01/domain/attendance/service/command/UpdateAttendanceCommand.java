@@ -8,7 +8,6 @@ import org.team1.nbe1_2_team01.domain.attendance.service.validation.AttendanceVa
 @Builder
 public record UpdateAttendanceCommand(
         Long id,
-        String username,
         AttendanceIssueType attendanceIssueType,
         LocalDateTime startAt,
         LocalDateTime endAt,

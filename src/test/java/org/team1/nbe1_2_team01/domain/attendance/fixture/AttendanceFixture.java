@@ -43,7 +43,6 @@ public class AttendanceFixture {
     // AddAttendanceCommand Fixture
     public static AddAttendanceCommand createAddAttendanceCommand(int startHour, int startMinute, int endHour, int endMinute) {
         return AddAttendanceCommand.builder()
-                .username("user")
                 .attendanceIssueType(AttendanceIssueType.LATE)
                 .startAt(new FixedDateTimeHolder(startHour, startMinute).getDate())
                 .endAt(new FixedDateTimeHolder(endHour, endMinute).getDate())
@@ -51,9 +50,8 @@ public class AttendanceFixture {
                 .build();
     }
 
-    public static AddAttendanceCommand createAddAttendanceCommand_ABSENT(User user) {
+    public static AddAttendanceCommand createAddAttendanceCommand_ABSENT() {
         return AddAttendanceCommand.builder()
-                .username(user.getUsername())
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(new FixedDateTimeHolder(14, 0).getDate())
                 .endAt(new FixedDateTimeHolder(16, 0).getDate())

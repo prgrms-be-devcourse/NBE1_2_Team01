@@ -23,11 +23,14 @@ public class AttendanceService {
 
     /**
      * 출결 요청 등록
+     * @param username - 현재 요청 유저 이름
      * @param addAttendanceCommand - 출결 요청 등록 필요 데이터
      * @return attendance - 등록된 출결 요청
      */
-    public Attendance registAttendance(AddAttendanceCommand addAttendanceCommand) {
-        var user = userRepository.findByUsername(addAttendanceCommand.username())
+    public Attendance registAttendance(
+            String username,
+            AddAttendanceCommand addAttendanceCommand) {
+        var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
 
         if (attendanceRepository.findByUserIdAndStartAt(user.getId(), LocalDate.now()).isPresent()) {
@@ -42,10 +45,17 @@ public class AttendanceService {
 
     /**
      * 출결 요청 수정
+     * @param username - 현재 요청 유저 이름
      * @param updateAttendanceCommand - 출결 요청 수정 데이터
      * @return attendance - 수정된 출결 요청
      */
-    public Attendance updateAttendance(UpdateAttendanceCommand updateAttendanceCommand) {
+    public Attendance updateAttendance(
+            String username,
+            UpdateAttendanceCommand updateAttendanceCommand
+    ) {
+        // 자신의 출결 요청인지 확인 -> 인증 과정을 거쳤는데 예외 처리를 할 필요가 있는지?
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
         var attendance = attendanceRepository.findById(updateAttendanceCommand.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 

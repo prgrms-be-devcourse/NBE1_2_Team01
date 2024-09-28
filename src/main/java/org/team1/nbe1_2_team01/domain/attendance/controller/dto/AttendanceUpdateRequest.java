@@ -12,10 +12,9 @@ public record AttendanceUpdateRequest(
         String description
 ) {
 
-    public UpdateAttendanceCommand toCommand(String username) {
+    public UpdateAttendanceCommand toCommand() {
         return UpdateAttendanceCommand.builder()
                 .id(id)
-                .username(username)
                 .attendanceIssueType(attendanceIssueType)
                 .startAt(startAt)
                 .endAt(endAt)

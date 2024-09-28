@@ -16,9 +16,8 @@ public record AttendanceCreateRequest(
         String description
 ) {
 
-    public AddAttendanceCommand toCommand(String username) {
+    public AddAttendanceCommand toCommand() {
         return AddAttendanceCommand.builder()
-                .username(username)
                 .attendanceIssueType(attendanceIssueType)
                 .startAt(startAt)
                 .endAt(endAt)
