@@ -9,6 +9,7 @@ import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.Message;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,11 +21,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategoryByBelongings(Long teamId) {
-        //사용자의 소속 데이터를 가져와(팀장의 소속 번호를 가져와야할거 같은데?)
-
-        return categoryRepository.findAllByBelonging_Id(null).stream()
-                .map(CategoryResponse::of)
-                .toList();
+        //사용자의 소속 데이터를 가져와(팀장의 소속 번호를 가져와야할거 같은데?
+        return categoryRepository.getAllCategoryByTeamId(teamId)
+                .orElseGet(ArrayList::new);
     }
 
     @Override

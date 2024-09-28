@@ -10,17 +10,20 @@ public class CategoryResponse {
 
     private final Long id;
     private final String name;
+    private final Long boardCount;
 
     @Builder
-    private CategoryResponse(Long id, String name) {
+    private CategoryResponse(Long id, String name, Long boardCount) {
         this.id = id;
         this.name = name;
+        this.boardCount = boardCount;
     }
 
-    public static CategoryResponse of(Category category) {
+    public static CategoryResponse of(Long categoryId, String name, Long count) {
         return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
+                .id(categoryId)
+                .name(name)
+                .boardCount(count)
                 .build();
     }
 }
