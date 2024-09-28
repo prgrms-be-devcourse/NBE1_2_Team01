@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface BoardService {
 
-    List<BoardResponse> getCommonBoardList(String type, int page);
+    List<BoardResponse> getCommonBoardList(Long courseLid, String type, int page);
 
     Message addCommonBoard(BoardRequest noticeRequest);
 
@@ -20,4 +20,7 @@ public interface BoardService {
     Message deleteBoardById(BoardDeleteRequest id);
 
     Message updateBoard(BoardUpdateRequest updateRequest);
+
+    List<BoardResponse> getTeamBoardListByType(Long belongingId, Long categoryId, int page);
+
 }

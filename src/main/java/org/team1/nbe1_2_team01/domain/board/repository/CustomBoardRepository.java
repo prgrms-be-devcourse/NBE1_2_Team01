@@ -13,4 +13,6 @@ public interface CustomBoardRepository {
     Optional<List<BoardResponse>> findAllCommonBoard(CommonBoardType type, long belongId, Pageable pageable);
 
     Optional<BoardDetailResponse> findBoardDetailExcludeComments(Long id);
+
+    Optional<List<BoardResponse>> findAllTeamBoardDByType(Long belongingId, Long categoryId, Pageable pageable);
 }
