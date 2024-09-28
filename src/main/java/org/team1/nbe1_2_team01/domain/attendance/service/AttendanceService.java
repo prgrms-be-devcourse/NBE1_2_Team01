@@ -7,10 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
+import org.team1.nbe1_2_team01.domain.attendance.exception.AccessDeniedException;
 import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.command.AddAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @Service
@@ -59,6 +61,10 @@ public class AttendanceService {
         var attendance = attendanceRepository.findById(updateAttendanceCommand.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
+        checkOwnership(user, attendance);
+        // 자신의 소속인지 확인
+
+        // 업데이트 수행
         attendance.update(updateAttendanceCommand);
         return attendance;
     }
@@ -68,6 +74,8 @@ public class AttendanceService {
      * @param attendanceId - 출결 요청 식별자
      */
     public void deleteAttendance(Long attendanceId) {
+        // 자신의 출결 요청인지 확인
+
         try {
             attendanceRepository.deleteById(attendanceId);
         } catch (EntityNotFoundException e) {
@@ -99,6 +107,20 @@ public class AttendanceService {
             attendanceRepository.deleteById(attendanceId);
         } catch (EntityNotFoundException e) {
             throw new NoSuchElementException("출결 요청을 찾을 수 없습니다.");
+        }
+    }
+
+    /**
+     * 출결 소유 확인
+     * @param currentUser - 현재 요청 user
+     * @param attendance - 실제 출결
+     */
+    private void checkOwnership(User currentUser, Attendance attendance) {
+        Long currentUserId = currentUser.getId();
+        Long attendanceUserId = attendance.getUser().getId();
+
+        if (!currentUserId.equals(attendanceUserId)) {
+            throw new AccessDeniedException("접근할 수 없습니다.");
         }
     }
 }

@@ -15,8 +15,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     List<Attendance> findAllByUser(User user);
 
-    List<Attendance> findAllByUserIdAndCreationWaitingIsFalse(Long userId);
-
+    // 자신의 출결 요청이 이미 있는지 검증하기 위한 쿼리
     @Query("SELECT a FROM Attendance a WHERE a.user.id = :userId AND DATE(a.startAt) = :startAt")
     Optional<Attendance> findByUserIdAndStartAt(@Param("userId") Long userId, @Param("startAt") LocalDate startAt);
+
+    // 출결 요청이 자신의 것인지 검증하기 위한 쿼리
+    Optional<Long> findAttendanceIdByUserId(Long userId);
 }

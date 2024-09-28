@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAddAttendanceCommand_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createUpdateAttendanceCommand_ABSENT;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import jakarta.persistence.EntityNotFoundException;
