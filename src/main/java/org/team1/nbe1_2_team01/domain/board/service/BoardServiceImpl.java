@@ -19,6 +19,11 @@ import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
+import org.team1.nbe1_2_team01.domain.user.entity.Role;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.ArrayList;
@@ -34,36 +39,44 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentService commentService;
+    private final BelongingRepository belongingRepository;
+    private final UserRepository userRepository;
+
     private static final int PAGE_SIZE = 10;
 
     @Override
     @Transactional(readOnly = true)
-    public List<BoardResponse> getCommonBoardList(String type, int page) {
-        //security 쪽에서 검증을 해줄진 모르겠지만, 사용자의 정보를 받아와야 할 수도 있음
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        log.info("currentUsername = {}", currentUsername);
-        //Belonging 정보 가져오기
-
+    public List<BoardResponse> getCommonBoardList(Long courseLid, String type, int page) {
         //pageable 생성
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 
         //쿼리로 데이터 가져오기.
         CommonBoardType boardType = CommonBoardType.getType(type);
-        return boardRepository.findAllCommonBoard(boardType, 0, pageable)
+        return boardRepository.findAllCommonBoard(boardType, courseLid, pageable)
                 .orElseGet(ArrayList::new);
     }
 
     @Override
     public Message addCommonBoard(BoardRequest boardRequest) {
-        //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
+        User user = getUser();
+        if(boardRequest.isNotice() && user.getRole().equals(Role.USER)) {
+            throw new IllegalArgumentException("관리자만 이용가능합니다.");
+        }
 
-        //사용자의 정보와 소속을 가져와야겠네
+        Long courseId = boardRequest.getCourseId();
+        Belonging course = belongingRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("소속이 존재하지 않습니다"));
 
-        //공지사항 or 스터디 모집글을 저장한다.
-        Board newBoard = boardRequest.toEntity(null, null);
-
+        Board newBoard = boardRequest.toEntity(user, null, course);
         boardRepository.save(newBoard);
+
         return new Message(MessageContent.getAddMessage(boardRequest.isNotice()));
+    }
+
+    private User getUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername(); //id를 반환
+        return userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
     }
 
     @Override
@@ -97,5 +110,12 @@ public class BoardServiceImpl implements BoardService {
         findBoard.updateBoard(updateRequest);
         String updateMessage = MessageContent.getUpdateMessage(updateRequest.isNotice());
         return new Message(updateMessage);
+    }
+
+    @Override
+    public List<BoardResponse> getTeamBoardListByType(Long belongingId, Long categoryId, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        return boardRepository.findAllTeamBoardDByType(belongingId, categoryId, pageable)
+                .orElseGet(ArrayList::new);
     }
 }

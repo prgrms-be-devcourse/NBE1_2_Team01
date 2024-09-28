@@ -32,11 +32,12 @@ public class CommonBoardController {
      */
     @GetMapping
     public ResponseEntity<List<BoardResponse>> getCommonBoardList(
-            @RequestParam(defaultValue = "0") int page, //page 를 좀 더 직관적으로
-            @RequestParam String type
+            @RequestParam Long courseId,
+            @RequestParam String type,
+            @RequestParam(defaultValue = "0") int page
     ) {
         return ResponseEntity.ok()
-                .body(boardService.getCommonBoardList(type, page));
+                .body(boardService.getCommonBoardList(courseId, type, page));
     }
 
     /**

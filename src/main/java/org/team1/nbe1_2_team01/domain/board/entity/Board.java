@@ -63,7 +63,11 @@ public class Board {
         this.title = title;
         this.content = content;
         user.addBoard(this);
-        category.addBoards(this);
+
+        if(category != null) {
+            category.addBoards(this);
+        }
+
         belonging.addBoards(this);
     }
 
