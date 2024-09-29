@@ -1,8 +1,6 @@
 package org.team1.nbe1_2_team01.domain.board.service;
 
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardDeleteRequest;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.Message;
@@ -11,9 +9,9 @@ import java.util.List;
 
 public interface BoardService {
 
-    List<BoardResponse> getCommonBoardList(Long courseLid, String type, int page);
+    List<BoardResponse> getCommonBoardList(BoardListRequest boardListRequest);
 
-    Message addCommonBoard(BoardRequest noticeRequest);
+    Message addBoard(BoardRequest noticeRequest);
 
     BoardDetailResponse getBoardDetailById(Long id);
 
@@ -21,6 +19,6 @@ public interface BoardService {
 
     Message updateBoard(BoardUpdateRequest updateRequest);
 
-    List<BoardResponse> getTeamBoardListByType(Long belongingId, Long categoryId, int page);
+    List<BoardResponse> getTeamBoardListByType(TeamBoardListRequest teamBoardListRequest);
 
 }
