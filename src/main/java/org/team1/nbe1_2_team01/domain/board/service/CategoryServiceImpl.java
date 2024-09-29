@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.constants.MessageContent;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryRequest;
+import org.team1.nbe1_2_team01.domain.board.entity.Category;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +20,11 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final BelongingRepository belongingRepository;
 
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategoryByBelongings(Long teamId) {
-        //사용자의 소속 데이터를 가져와(팀장의 소속 번호를 가져와야할거 같은데?
         return categoryRepository.getAllCategoryByTeamId(teamId)
                 .orElseGet(ArrayList::new);
     }
@@ -29,10 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public Message addCategory(CategoryRequest categoryRequest) {
-        //사용자의 소속을 가져와.
+        Belonging belonging = belongingRepository.findById(categoryRequest.teamId())
+                .orElseThrow(() -> new IllegalArgumentException("팀이 존재하지 않습니다."));
 
-        //게시글 저장
-        categoryRepository.save(categoryRequest.toEntity(null));
+        Category newCategory = categoryRequest.toEntity(belonging);
+        categoryRepository.save(newCategory);
         String addMessage = MessageContent.ADD_CATEGORY_COMPLETED.getMessage();
         return new Message(addMessage);
     }

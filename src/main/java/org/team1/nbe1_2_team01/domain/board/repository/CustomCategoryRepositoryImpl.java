@@ -23,16 +23,16 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
                         board.count().as("boardCount")
                 )
                 .from(category)
-                .innerJoin(board).on(board.category.eq(category))
+                .leftJoin(board).on(board.category.eq(category))
                 .where(category.belonging.id.eq(teamId))
                 .groupBy(category.id, category.name)
-                .orderBy(board.count().desc())
+                .orderBy(category.id.asc())
                 .fetch();
 
         List<CategoryResponse> responseList = fetchedList.stream().map(tuple -> CategoryResponse.of(
                 tuple.get(category.id),
                 tuple.get(category.name),
-                tuple.get(board.count())
+                Optional.ofNullable(tuple.get(board.count())).orElse(0L)
         )).toList();
 
         return Optional.of(responseList);
