@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.team1.nbe1_2_team01.domain.attendance.exception.AccessDeniedException;
 import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
@@ -60,6 +61,13 @@ public class Attendance {
         this.description = description;
         this.creationWaiting = true;
         user.addAttendance(this);
+    }
+
+    public void validateRegister(Long currentUserId) {
+        Long registerId = user.getId();
+        if (!registerId.equals(currentUserId)) {
+            throw new AccessDeniedException("접근할 수 없습니다.");
+        }
     }
 
     public void update(UpdateAttendanceCommand updateAttendanceCommand) {
