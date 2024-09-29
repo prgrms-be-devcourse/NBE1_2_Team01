@@ -17,21 +17,18 @@ public class BoardDetailResponse {
     private final String content;
     private final String writer;
     private final String createdAt;
-    private boolean isAdmin;
-    private boolean isMine;
-    private List<CommentResponse> comments;
+    private final boolean isAdmin;
+    private final boolean isMine;
 
     @Builder
-    private BoardDetailResponse(Long id, String title, String content, String writer, LocalDateTime createdAt) {
+    private BoardDetailResponse(Long id, String title, String content, String writer, LocalDateTime createdAt, boolean isAdmin, boolean isMine) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.createdAt = DateTimeToStringConverter.convert(createdAt);
-    }
-
-    public void addComments(List<CommentResponse> comments) {
-        this.comments = comments;
+        this.isAdmin = isAdmin;
+        this.isMine = isMine;
     }
 
     public static BoardDetailResponse of(
@@ -39,7 +36,10 @@ public class BoardDetailResponse {
             String title,
             String content,
             String writer,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            boolean isAdmin,
+            boolean isMine
+
     ) {
         return BoardDetailResponse.builder()
                 .id(id)
@@ -47,6 +47,8 @@ public class BoardDetailResponse {
                 .content(content)
                 .writer(writer)
                 .createdAt(createdAt)
+                .isAdmin(isAdmin)
+                .isMine(isMine)
                 .build();
     }
 }
