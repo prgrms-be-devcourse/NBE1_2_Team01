@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/teams")
 @RequiredArgsConstructor
 public class TeamController {
+    // TODO: /teams/project 이하 엔드포인트들은 ADMIN 토큰 필요하도록 하기
 
     private final TeamService teamService;
     private final BelongingService belongingService;
@@ -93,6 +94,24 @@ public class TeamController {
     public ResponseEntity<?> addStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
             return ResponseEntity.ok().body(teamService.studyTeamAddMember(teamId, teamMemberAddRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/project/{teamId}/member")
+    public ResponseEntity<?> deleteProjectTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+        try {
+            return ResponseEntity.ok().body(teamService.projectTeamDeleteMember(teamId, teamMemberAddRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/study/{teamId}/member")
+    public ResponseEntity<?> deleteStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+        try {
+            return ResponseEntity.ok().body(teamService.studyTeamDeleteMember(teamId, teamMemberAddRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

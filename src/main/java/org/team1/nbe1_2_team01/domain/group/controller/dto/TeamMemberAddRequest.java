@@ -7,7 +7,6 @@ import java.util.List;
 @Data
 public class TeamMemberAddRequest {
 
-    String course;
     List<Long> userIds;
 
 }

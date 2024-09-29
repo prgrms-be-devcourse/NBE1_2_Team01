@@ -183,7 +183,7 @@ public class TeamService {
                 throw new RuntimeException("이미 해당 팀에 존재하던 회원이 포함되어 있습니다.");
             }
 
-            Belonging belonging = Belonging.createBelongingOf(false, teamMemberAddRequest.getCourse(), u);
+            Belonging belonging = Belonging.createBelongingOf(false, allBelongingsWithTeam.get(0).getCourse(), u);
             belonging.assignTeam(team);
             newBelongings.add(belonging);
         }
@@ -210,11 +210,66 @@ public class TeamService {
                 throw new RuntimeException("이미 해당 팀에 존재하던 회원이 포함되어 있습니다.");
             }
 
-            Belonging belonging = Belonging.createBelongingOf(false, teamMemberAddRequest.getCourse(), u);
+            Belonging belonging = Belonging.createBelongingOf(false, allBelongingsWithTeam.get(0).getCourse(), u);
             belonging.assignTeam(team);
             newBelongings.add(belonging);
         }
 
         return belongingRepository.saveAll(newBelongings).stream().map(BelongingResponse::of).toList();
     }
+
+    @Transactional
+    public String projectTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
+        List<Long> userIds = users.stream().map(User::getId).toList();
+
+        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        if (allBelongings.isEmpty()) {
+            throw new RuntimeException("존재하지 않는 팀입니다.");
+        }
+        if (!allBelongings.get(0).getTeam().getTeamType().name().equals("PROJECT")) throw new RuntimeException("프로젝트 팀에 대한 요청이 아닙니다.");
+
+        Long leaderId = null;
+        for (Belonging b : allBelongings) {
+            if (b.isOwner()) {
+                leaderId = b.getUser().getId();
+            }
+        }
+        if (userIds.contains(leaderId)) {
+            throw new RuntimeException("팀장은 삭제할 수 없습니다.");
+        }
+
+        int deleted = belongingRepository.deleteBelongings(teamId, userIds);
+
+        return "삭제된 개수는 " + deleted;
+    }
+
+    @Transactional
+    public String studyTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+        // TODO: Authorization 헤더 보고, 팀장이 요청한 게 아니면 예외
+
+        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
+        List<Long> userIds = users.stream().map(User::getId).toList();
+
+        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        if (allBelongings.isEmpty()) {
+            throw new RuntimeException("존재하지 않는 팀입니다.");
+        }
+        if (!allBelongings.get(0).getTeam().getTeamType().name().equals("STUDY")) throw new RuntimeException("스터디 팀에 대한 요청이 아닙니다.");
+
+        Long leaderId = null;
+        for (Belonging b : allBelongings) {
+            if (b.isOwner()) {
+                leaderId = b.getUser().getId();
+            }
+        }
+        if (userIds.contains(leaderId)) {
+            throw new RuntimeException("팀장은 삭제할 수 없습니다.");
+        }
+
+        int deleted = belongingRepository.deleteBelongings(teamId, userIds);
+
+        return "삭제된 개수는 " + deleted;
+    }
+
 }
