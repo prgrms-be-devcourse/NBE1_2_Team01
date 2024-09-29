@@ -5,8 +5,9 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,81 +27,77 @@ public class AttendanceController {
     /**
      * 출결 요청 등록
      * @param attendanceCreateRequest - 출결 요청 생성에 필요한 데이터
-     * @return
+     * @return - 등록된 attendance id url 반환
      */
     @PostMapping("/register")
     public ResponseEntity<Attendance> registAttendance(
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {
         String username = SecurityUtil.getCurrentUsername();
-        var attendance = attendanceService.registAttendance(username, attendanceCreateRequest.toCommand());
+        var attendanceId = attendanceService.registAttendance(username, attendanceCreateRequest.toCommand());
         return ResponseEntity
-                .created(URI.create("/attendance/" + attendance.getId()))
-                .body(attendance);
+                .created(URI.create("/attendance/" + attendanceId))
+                .build();
     }
 
     /**
      * 출결 요청 수정
-     * @param attendanceUpdateRequest
-     * @return
+     * @param attendanceUpdateRequest - 출결 요청 수정에 필요한 데이터
+     * @return -
      */
-    @PutMapping("/update")
+    @PatchMapping("/{id}")
     public ResponseEntity<Attendance> updateAttendance(
+            @PathVariable("id") Long attendanceId,
             @RequestBody @Valid AttendanceUpdateRequest attendanceUpdateRequest
     ) {
         String username = SecurityUtil.getCurrentUsername();
 
-        var attendance = attendanceService.updateAttendance(username, attendanceUpdateRequest.toCommand());
+        attendanceService.updateAttendance(username, attendanceUpdateRequest.toCommand(attendanceId));
         return ResponseEntity
-                .created(URI.create("/attendance/" + attendance.getId()))
-                .body(attendance);
+                .ok().build();
     }
 
     /**
      * 출결 요청 삭제
-     * @param attendanceId
-     * @return
+     * @param attendanceId - 삭제할 출결 요청 id
+     * @return - no content
      */
-    @DeleteMapping("/delete")
+    @DeleteMapping("/{id}}")
     public ResponseEntity<String> deleteAttendance(
-            @RequestBody Long attendanceId
+            @PathVariable("id") Long attendanceId
     ) {
         String username = SecurityUtil.getCurrentUsername();
 
-        attendanceService.deleteAttendance(attendanceId);
+        attendanceService.deleteAttendance(username, attendanceId);
         return ResponseEntity
-                .ok("성공적으로 삭제되었습니다.");
+                .noContent().build();
     }
 
     /**
      * 출결 요청 승인
-     * @param attendanceId
+     * @param attendanceId - 승인할 출결 요청 id
      * @return
      */
-    @PostMapping("/admin/approve")
+    @PostMapping("/admin/{id}/approve")
     public ResponseEntity<Attendance> approveAttendance(
-            @RequestBody Long attendanceId
+            @PathVariable("id") Long attendanceId
     ) {
-        String username = SecurityUtil.getCurrentUsername();
-
-        var approvedAttendance = attendanceService.approveAttendance(attendanceId);
+        attendanceService.approveAttendance(attendanceId);
         return ResponseEntity
-                .ok(approvedAttendance);
+                .ok().build();
     }
 
     /**
      * 출결 요청 반려
-     * @param attendanceId
+     * @param attendanceId - 반려할 출결 요청 id
      * @return
      */
-    @PostMapping("/admin/reject")
+    @PostMapping("/admin/{id}/reject")
     public ResponseEntity<String> rejectAttendance(
-            @RequestBody Long attendanceId
+            @PathVariable("id") Long attendanceId
     ) {
-        String username = SecurityUtil.getCurrentUsername();
-
         attendanceService.rejectAttendance(attendanceId);
         return ResponseEntity
-                .ok("성공적으로 반려되었습니다.");
+                .noContent().build();
     }
 }
