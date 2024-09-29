@@ -12,6 +12,7 @@ public class AttendanceFixture {
     // Attendance Fixture
     public static Attendance createAttendance(User user) {
         return Attendance.builder()
+                .id(1L)
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.LATE)
                 .startAt(new FixedDateTimeHolder(12, 30).getDate())
@@ -22,6 +23,7 @@ public class AttendanceFixture {
 
     public static Attendance createAttendance(User user, int startHour, int startMinute, int endHour, int endMinute) {
         return Attendance.builder()
+                .id(1L)
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.LATE)
                 .startAt(new FixedDateTimeHolder(startHour, startMinute).getDate())
@@ -32,6 +34,7 @@ public class AttendanceFixture {
 
     public static Attendance createAttendance_ABSENT(User user) {
         return Attendance.builder()
+                .id(1L)
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(new FixedDateTimeHolder(14, 0).getDate())

@@ -49,11 +49,13 @@ public class Attendance {
 
     @Builder
     private Attendance(
+            Long id,
             User user,
             AttendanceIssueType attendanceIssueType,
             LocalDateTime startAt,
             LocalDateTime endAt,
             String description) {
+        this.id = id;
         this.user = user;
         this.attendanceIssueType = attendanceIssueType;
         this.startAt = startAt;

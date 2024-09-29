@@ -9,6 +9,7 @@ import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.command.AddAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @Service
@@ -21,64 +22,59 @@ public class AttendanceService {
 
     /**
      * 출결 요청 등록
-     * @param username - 현재 요청 유저 이름
+     * @param registerId - 현재 요청 유저 id
      * @param addAttendanceCommand - 출결 요청 등록 필요 데이터
      * @return attendanceId - 등록된 출결 요청 id
      */
     public Long registAttendance(
-            String username,
+            Long registerId,
             AddAttendanceCommand addAttendanceCommand
     ) {
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
-
         // 오늘 등록된 요청이 있는지 확인
-        attendanceRepository.findByUserIdAndStartAt(user.getId(), LocalDate.now())
+        attendanceRepository.findByUserIdAndStartAt(registerId, LocalDate.now())
                 .ifPresent(attendance -> {
                     throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
                 });
 
-        var attendance = addAttendanceCommand.toEntity(user);
-        attendanceRepository.save(attendance);
+        var register = new User(registerId);
+        var attendance = addAttendanceCommand.toEntity(register);
+        var savedAttendance = attendanceRepository.save(attendance);
 
-        return attendance.getId();
+        return savedAttendance.getId();
     }
 
     /**
      * 출결 요청 수정
-     * @param username - 현재 요청 유저 이름
+     * @param currentUserId - 현재 요청 유저 id
      * @param updateAttendanceCommand - 출결 요청 수정 데이터
      */
     public void updateAttendance(
-            String username,
+            Long currentUserId,
             UpdateAttendanceCommand updateAttendanceCommand
     ) {
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
         var attendance = attendanceRepository.findById(updateAttendanceCommand.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
-        attendance.validateRegister(user.getId());
+        attendance.validateRegister(currentUserId);
 
         attendance.update(updateAttendanceCommand);
     }
 
     /**
      * 출결 요청 삭제
-     * @param username - 현재 요청 유저 이름
+     * @param currentUserId - 현재 요청 유저 id
      * @param attendanceId - 출결 요청 식별자
      */
     public void deleteAttendance(
-            String username, Long attendanceId
+            Long currentUserId,
+            Long attendanceId
     ) {
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
         var attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
-        attendance.validateRegister(user.getId());
+        attendance.validateRegister(currentUserId);
 
-        attendanceRepository.deleteById(attendanceId);
+        attendanceRepository.delete(attendance);
     }
 
     /**
