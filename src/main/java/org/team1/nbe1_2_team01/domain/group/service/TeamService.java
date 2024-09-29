@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamCreateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamNameUpdateRequest;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
@@ -144,6 +145,22 @@ public class TeamService {
         team.get().setCreationWaiting(false);
 
         return teamRepository.save(team.get());
+    }
+
+    @Transactional
+    public String projectTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
+        int res = teamRepository.updateProjectTeamNameById(teamId, teamNameUpdateRequest.getName());
+        if (res == 0) throw new RuntimeException("수정 중 오류 발생");
+
+        return ("수정 완료. 수정된 튜플 개수는 " + res);
+    }
+
+    @Transactional
+    public String studyTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
+        int res = teamRepository.updateStudyTeamNameById(teamId, teamNameUpdateRequest.getName());
+        if (res == 0) throw new RuntimeException("수정 중 오류 발생");
+
+        return ("수정 완료. 수정된 튜플 개수는 " + res);
     }
 
 }

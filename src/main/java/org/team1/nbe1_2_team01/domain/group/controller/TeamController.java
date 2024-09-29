@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamCreateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamNameUpdateRequest;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamResponse;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.service.BelongingService;
@@ -51,10 +52,28 @@ public class TeamController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/approve/{teamId}")
+    @PatchMapping("/approval/{teamId}")
     public ResponseEntity<?> approveStudyTeam(@PathVariable Long teamId) {
         try {
             return ResponseEntity.ok().body(teamService.studyTeamApprove(teamId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/project/{teamId}/name")
+    public ResponseEntity<?> updateProjectTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
+        try {
+            return ResponseEntity.ok().body(teamService.projectTeamNameUpdate(teamId, teamNameUpdateRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/study/{teamId}/name")
+    public ResponseEntity<?> updateStudyTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
+        try {
+            return ResponseEntity.ok().body(teamService.studyTeamNameUpdate(teamId, teamNameUpdateRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

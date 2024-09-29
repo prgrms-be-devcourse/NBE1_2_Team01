@@ -22,6 +22,7 @@ public class Team {
     private TeamType teamType;
 
     @Column(length = 50)
+    @Setter
     private String name;
 
     @Column(columnDefinition = "TINYINT(1)")
