@@ -31,4 +31,6 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     )
     int deleteBelongings(@Param("teamId") Long teamId, @Param("userIds") List<Long> userIds);
 
+    Belonging findByTeamIdAndIsOwner(Long teamId, boolean isOwner);
+
 }

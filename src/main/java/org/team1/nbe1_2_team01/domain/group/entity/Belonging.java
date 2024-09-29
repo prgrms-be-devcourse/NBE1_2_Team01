@@ -43,7 +43,11 @@ public class Belonging {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToMany(mappedBy = "belonging")
+    @OneToMany(
+            mappedBy = "belonging",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private List<Board> boards = new ArrayList<>();
 
     @Builder

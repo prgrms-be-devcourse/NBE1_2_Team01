@@ -272,4 +272,20 @@ public class TeamService {
         return "삭제된 개수는 " + deleted;
     }
 
+    @Transactional
+    public void projectTeamDelete(Long teamId) {
+        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamId, true);
+        calendarRepository.deleteByBelonging(ownerBelonging);
+
+        teamRepository.deleteById(teamId);
+    }
+
+    @Transactional
+    public void studyTeamDelete(Long teamId) {
+        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamId, true);
+        calendarRepository.deleteByBelonging(ownerBelonging);
+
+        teamRepository.deleteById(teamId);
+    }
+
 }

@@ -20,4 +20,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("UPDATE Team t SET t.name = :name WHERE t.id = :id AND t.teamType = 'STUDY'")
     int updateStudyTeamNameById(@Param("id") Long id, @Param("name") String name);
 
+    void deleteById(Long id);
+
 }

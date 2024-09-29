@@ -117,6 +117,28 @@ public class TeamController {
         }
     }
 
+    @DeleteMapping("/project/{teamId}")
+    public ResponseEntity<?> deleteProjectTeam(@PathVariable Long teamId) {
+        // TODO: 예외처리
+        try {
+            teamService.projectTeamDelete(teamId);
+            return ResponseEntity.ok().body("삭제 완료");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/study/{teamId}")
+    public ResponseEntity<?> deleteStudyTeam(@PathVariable Long teamId) {
+        // TODO: 예외처리
+        try {
+            teamService.studyTeamDelete(teamId);
+            return ResponseEntity.ok().body("삭제 완료");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
         return ResponseEntity.ok().body(belongingService.courseUserList(course));

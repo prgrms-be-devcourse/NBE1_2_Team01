@@ -33,7 +33,11 @@ public class Team {
     @Setter
     private boolean deletionWaiting;
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(
+            mappedBy = "team",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private List<Belonging> belongings = new ArrayList<>();
 
     @Builder
