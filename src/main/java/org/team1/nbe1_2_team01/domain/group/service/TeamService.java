@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
+import org.team1.nbe1_2_team01.domain.group.controller.dto.BelongingResponse;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamCreateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamMemberAddRequest;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamNameUpdateRequest;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
@@ -163,4 +165,56 @@ public class TeamService {
         return ("수정 완료. 수정된 튜플 개수는 " + res);
     }
 
+    @Transactional
+    public List<BelongingResponse> projectTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
+
+        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        if (allBelongingsWithTeam.isEmpty()) {
+            throw new RuntimeException("존재하지 않는 팀입니다.");
+        }
+        Team team = allBelongingsWithTeam.get(0).getTeam();
+        if (!team.getTeamType().name().equals("PROJECT")) throw new RuntimeException("프로젝트 팀에 대한 요청이 아닙니다.");
+        List<Long> existingUserIds = allBelongingsWithTeam.stream().map(Belonging::getUser).map(User::getId).toList();
+
+        List<Belonging> newBelongings = new ArrayList<>();
+        for (User u : users) {
+            if (existingUserIds.contains(u.getId())) {
+                throw new RuntimeException("이미 해당 팀에 존재하던 회원이 포함되어 있습니다.");
+            }
+
+            Belonging belonging = Belonging.createBelongingOf(false, teamMemberAddRequest.getCourse(), u);
+            belonging.assignTeam(team);
+            newBelongings.add(belonging);
+        }
+
+        return belongingRepository.saveAll(newBelongings).stream().map(BelongingResponse::of).toList();
+    }
+
+    @Transactional
+    public List<BelongingResponse> studyTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
+
+        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        if (allBelongingsWithTeam.isEmpty()) {
+            throw new RuntimeException("존재하지 않는 팀입니다.");
+        }
+        Team team = allBelongingsWithTeam.get(0).getTeam();
+        if (!team.getTeamType().name().equals("STUDY")) throw new RuntimeException("스터디 팀에 대한 요청이 아닙니다.");
+        // TODO: Authorization 헤더 보고, 팀장이 요청한 게 아니면 예외
+        List<Long> existingUserIds = allBelongingsWithTeam.stream().map(Belonging::getUser).map(User::getId).toList();
+
+        List<Belonging> newBelongings = new ArrayList<>();
+        for (User u : users) {
+            if (existingUserIds.contains(u.getId())) {
+                throw new RuntimeException("이미 해당 팀에 존재하던 회원이 포함되어 있습니다.");
+            }
+
+            Belonging belonging = Belonging.createBelongingOf(false, teamMemberAddRequest.getCourse(), u);
+            belonging.assignTeam(team);
+            newBelongings.add(belonging);
+        }
+
+        return belongingRepository.saveAll(newBelongings).stream().map(BelongingResponse::of).toList();
+    }
 }

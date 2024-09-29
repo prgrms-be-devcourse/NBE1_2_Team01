@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamCreateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamMemberAddRequest;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamNameUpdateRequest;
 import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamResponse;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
@@ -74,6 +75,24 @@ public class TeamController {
     public ResponseEntity<?> updateStudyTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
         try {
             return ResponseEntity.ok().body(teamService.studyTeamNameUpdate(teamId, teamNameUpdateRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/project/{teamId}/member")
+    public ResponseEntity<?> addProjectTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+        try {
+            return ResponseEntity.ok().body(teamService.projectTeamAddMember(teamId, teamMemberAddRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/study/{teamId}/member")
+    public ResponseEntity<?> addStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+        try {
+            return ResponseEntity.ok().body(teamService.studyTeamAddMember(teamId, teamMemberAddRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

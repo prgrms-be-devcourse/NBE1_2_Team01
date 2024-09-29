@@ -16,4 +16,11 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
 
     boolean existsByCourse(String course);
 
+    @Query("select b " +
+            "from Belonging b " +
+            "join b.team t " +
+            "join b.user u " +
+            "where t.id = :teamId")
+    List<Belonging> findAllByTeamIdWithTeam(@Param("teamId") Long teamId);
+
 }
