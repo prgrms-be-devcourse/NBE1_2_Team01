@@ -31,7 +31,7 @@ public class TeamController {
                 Team team = teamService.studyTeamCreate(teamCreateRequest);
                 return ResponseEntity.ok().body(TeamResponse.of(team));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("팀 타입이 필요합니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("팀 타입이 필요합니다.");
             }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -53,9 +53,11 @@ public class TeamController {
 
     @PatchMapping("/approve/{teamId}")
     public ResponseEntity<?> approveStudyTeam(@PathVariable Long teamId) {
-        Team team = teamService.studyTeamApprove(teamId);
-
-        return ResponseEntity.ok().body(team);
+        try {
+            return ResponseEntity.ok().body(teamService.studyTeamApprove(teamId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping

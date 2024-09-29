@@ -133,6 +133,14 @@ public class TeamService {
     public Team studyTeamApprove(Long teamId) {
         Optional<Team> team = teamRepository.findById(teamId);
 
+        if (team.isEmpty()) {
+            throw new RuntimeException("존재하지 않는 팀입니다.");
+        }
+
+        if (!team.get().isCreationWaiting()) {
+            throw new RuntimeException("승인 대기중인 팀이 아닙니다.");
+        }
+
         team.get().setCreationWaiting(false);
 
         return teamRepository.save(team.get());
