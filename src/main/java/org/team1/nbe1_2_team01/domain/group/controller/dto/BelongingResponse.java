@@ -21,8 +21,8 @@ public class BelongingResponse {
     public static BelongingResponse of(Belonging belonging) {
         return BelongingResponse.builder()
                 .id(belonging.getId())
-                .userId(belonging.getUser().getId())
-                .teamId(belonging.getTeam().getId())
+                .userId(belonging.getUser() != null ? belonging.getUser().getId() : null)
+                .teamId(belonging.getTeam() != null ? belonging.getTeam().getId() : null)
                 .build();
     }
 }

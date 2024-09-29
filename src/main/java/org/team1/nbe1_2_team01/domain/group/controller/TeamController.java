@@ -34,14 +34,8 @@ public class TeamController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("팀 타입이 필요합니다.");
             }
         } catch (RuntimeException e) {
-            if (e.getMessage().equals("u")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저가 존재하지 않습니다.");
-            } else if (e.getMessage().equals("c")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("코스가 존재하지 않습니다.");
-            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류");
     }
 
     @GetMapping("/waiting")
