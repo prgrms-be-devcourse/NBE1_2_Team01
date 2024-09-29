@@ -23,8 +23,11 @@ public class CategoryController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getCategories(@RequestParam("team") Long teamId) {
-        return ResponseEntity.ok().body(categoryService.getAllCategoryByBelongings(teamId));
+    public ResponseEntity<List<CategoryResponse>> getCategories(
+            @RequestParam("team") Long teamId
+    ) {
+        return ResponseEntity.ok()
+                .body(categoryService.getAllCategoryByBelongings(teamId));
     }
 
     /**
@@ -33,13 +36,19 @@ public class CategoryController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Message> addCategory(@RequestBody CategoryRequest categoryRequest) {
-        return ResponseEntity.ok().body(categoryService.addCategory(categoryRequest));
+    public ResponseEntity<Message> addCategory(
+            @RequestBody CategoryRequest categoryRequest
+    ) {
+        return ResponseEntity.ok()
+                .body(categoryService.addCategory(categoryRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Message> deleteCategory(@PathVariable Long id) {
-        return ResponseEntity.ok().body(categoryService.deleteCategory(id));
+    public ResponseEntity<Message> deleteCategory(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok()
+                .body(categoryService.deleteCategory(id));
 
     }
 }

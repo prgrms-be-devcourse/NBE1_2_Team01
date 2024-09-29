@@ -4,9 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardDeleteRequest;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.service.BoardService;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
@@ -24,20 +22,32 @@ public class CommonBoardController {
     private static final String BASE_URL = "/api/v1/board";
 
     /**
-     * 게시글 목록 조회 api
+     * 공통 게시글 목록 조회 api
      * (CommonType 유형에 따라 공지사항, 스터디 모집글 분리,
      * 추후에 CommonType을 Category에 넣어도 될 것 같음.)
-     * @param page 페이지 번호
+     * @param boardListRequest
      * @return
      */
     @GetMapping
     public ResponseEntity<List<BoardResponse>> getCommonBoardList(
-            @RequestParam Long courseId,
-            @RequestParam String type,
-            @RequestParam(defaultValue = "0") int page
+            @ModelAttribute BoardListRequest boardListRequest
     ) {
         return ResponseEntity.ok()
-                .body(boardService.getCommonBoardList(courseId, type, page));
+                .body(boardService.getCommonBoardList(boardListRequest));
+    }
+
+    /**
+     * 팀 내에서 카테고리에 맞는 게시글 리스트 조회
+     * 만약 categoryId가 null이면, 전체 카테고리 데이터 가져옴
+     * @param request
+     * @return
+     */
+    @GetMapping("/team")
+    public ResponseEntity<List<BoardResponse>> getTeamBoardList(
+            @ModelAttribute TeamBoardListRequest request
+    ) {
+        return ResponseEntity.ok()
+                .body(boardService.getTeamBoardListByType(request));
     }
 
     /**
@@ -51,7 +61,7 @@ public class CommonBoardController {
             @RequestBody @Valid BoardRequest boardRequest
     ) {
         return ResponseEntity.ok()
-                .body(boardService.addCommonBoard(boardRequest));
+                .body(boardService.addBoard(boardRequest));
     }
 
     /**
@@ -60,7 +70,9 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<BoardDetailResponse> getBoardDetailById(@PathVariable Long id) {
+    public ResponseEntity<BoardDetailResponse> getBoardDetailById(
+            @PathVariable Long id
+    ) {
         return ResponseEntity.ok()
                 .body(boardService.getBoardDetailById(id));
     }
