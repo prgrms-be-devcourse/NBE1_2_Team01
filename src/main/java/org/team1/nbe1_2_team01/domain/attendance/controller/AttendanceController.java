@@ -2,10 +2,12 @@ package org.team1.nbe1_2_team01.domain.attendance.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
+import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
@@ -25,7 +28,34 @@ import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final AttendanceQueryService attendanceQueryService;
     private final UserRepository userRepository;
+
+    /**
+     * 자신의 출결 요청 보기
+     * @return 자신의 출결 요청 리스트
+     */
+    @GetMapping
+    public ResponseEntity<List<Attendance>> getMyAttendances() {
+        var currentUserId = getCurrentUserId();
+
+        List<Attendance> myAttendances = attendanceQueryService.getMyAttendances(currentUserId);
+        return ResponseEntity.ok(myAttendances);
+    }
+
+    /**
+     * 자신의 출결 요청 상세 보기
+     *
+     */
+    @GetMapping("{id}")
+    public ResponseEntity<Attendance> getMyAttendance(
+            @PathVariable("id") Long attendanceId
+    ) {
+        var currentUserId = getCurrentUserId();
+
+        var myAttendance = attendanceQueryService.getByIdAndUserId(attendanceId, currentUserId);
+        return ResponseEntity.ok(myAttendance);
+    }
 
     /**
      * 출결 요청 등록
@@ -48,7 +78,6 @@ public class AttendanceController {
     /**
      * 출결 요청 수정
      * @param attendanceUpdateRequest 출결 요청 수정에 필요한 데이터
-     * @return
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Attendance> updateAttendance(
@@ -66,7 +95,6 @@ public class AttendanceController {
     /**
      * 출결 요청 삭제
      * @param attendanceId 삭제할 출결 요청 id
-     * @return no content
      */
     @DeleteMapping("/{id}}")
     public ResponseEntity<String> deleteAttendance(
@@ -75,34 +103,6 @@ public class AttendanceController {
         var currentUserId = getCurrentUserId();
 
         attendanceService.deleteAttendance(currentUserId, attendanceId);
-        return ResponseEntity
-                .noContent().build();
-    }
-
-    /**
-     * 출결 요청 승인
-     * @param attendanceId 승인할 출결 요청 id
-     * @return
-     */
-    @PostMapping("/admin/{id}/approve")
-    public ResponseEntity<Attendance> approveAttendance(
-            @PathVariable("id") Long attendanceId
-    ) {
-        attendanceService.approveAttendance(attendanceId);
-        return ResponseEntity
-                .ok().build();
-    }
-
-    /**
-     * 출결 요청 반려
-     * @param attendanceId 반려할 출결 요청 id
-     * @return
-     */
-    @PostMapping("/admin/{id}/reject")
-    public ResponseEntity<String> rejectAttendance(
-            @PathVariable("id") Long attendanceId
-    ) {
-        attendanceService.rejectAttendance(attendanceId);
         return ResponseEntity
                 .noContent().build();
     }
