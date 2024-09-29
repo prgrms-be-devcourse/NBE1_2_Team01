@@ -77,7 +77,6 @@ public class Board {
 
 
     public void updateBoard(BoardUpdateRequest updateRequest) {
-        //이 부분 타협 가능성?
         String newTitle = updateRequest.title();
         String newContent = updateRequest.content();
 
