@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
+import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
@@ -20,7 +22,7 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final UserRepository userRepository;
 
-    public Long registAttendance(
+    public AttendanceIdResponse registAttendance(
             String registerName,
             AttendanceCreateRequest attendanceCreateRequest
     ) {
@@ -35,21 +37,22 @@ public class AttendanceService {
         var attendance = attendanceCreateRequest.toEntity(register);
         var savedAttendance = attendanceRepository.save(attendance);
 
-        return savedAttendance.getId();
+        return AttendanceIdResponse.from(savedAttendance.getId());
     }
 
-    public void updateAttendance(
+    public AttendanceIdResponse updateAttendance(
             String currentUsername,
             AttendanceUpdateRequest attendanceUpdateRequest
     ) {
-        User currentUser = getCurrentUser(currentUsername);
-
         var attendance = attendanceRepository.findById(attendanceUpdateRequest.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
+        User currentUser = getCurrentUser(currentUsername);
         attendance.validateRegister(currentUser.getId());
 
         attendance.update(attendanceUpdateRequest);
+
+        return AttendanceIdResponse.from(attendance.getId());
     }
 
     public void deleteAttendance(
@@ -66,9 +69,13 @@ public class AttendanceService {
         attendanceRepository.delete(attendance);
     }
 
-    public void approveAttendance(Long attendanceId) {
-        attendanceRepository.findById(attendanceId)
-                .ifPresent(attendance -> attendance.approve());
+    public AttendanceIdResponse approveAttendance(Long attendanceId) {
+        Attendance attendance = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
+
+        attendance.approve();
+
+        return AttendanceIdResponse.from(attendance.getId());
     }
 
     public void rejectAttendance(Long attendanceId) {
