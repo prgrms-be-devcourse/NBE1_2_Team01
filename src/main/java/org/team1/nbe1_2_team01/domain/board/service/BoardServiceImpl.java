@@ -9,7 +9,6 @@ import org.team1.nbe1_2_team01.domain.board.constants.MessageContent;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.entity.Category;
-import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
@@ -20,12 +19,13 @@ import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.team1.nbe1_2_team01.domain.board.constants.MessageContent.NOT_EXIST_BOARD;
 
 @Slf4j
 @Service
@@ -57,12 +57,12 @@ public class BoardServiceImpl implements BoardService {
     public Message addBoard(BoardRequest boardRequest) {
         User user = getUser();
         if(boardRequest.isNotice() && user.getRole().equals(Role.USER)) {
-            throw new IllegalArgumentException("관리자만 이용가능합니다.");
+            throw new AppException(ErrorCode.NOT_ADMIN_USER);
         }
 
         Long belongingId = boardRequest.belongingId();
         Belonging course = belongingRepository.findById(belongingId)
-                .orElseThrow(() -> new IllegalArgumentException("소속이 존재하지 않습니다"));
+                .orElseThrow(() -> new AppException(ErrorCode.BELONGING_NOT_FOUND));
 
         //CategoryService에 있으면 좋을 코드일거 같은데 임시로 넣어놨습니다.
         Category category = null;
@@ -80,14 +80,14 @@ public class BoardServiceImpl implements BoardService {
     private User getUser() {
         String currentUsername = SecurityUtil.getCurrentUsername(); //id를 반환
         return userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Override
     @Transactional(readOnly = true)
     public BoardDetailResponse getBoardDetailById(Long id) {
         return boardRepository.findBoardDetailExcludeComments(id)
-                .orElseThrow(() -> new NotFoundBoardException(NOT_EXIST_BOARD.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Message updateBoard(BoardUpdateRequest updateRequest) {
         Board findBoard = boardRepository.findById(updateRequest.boardId())
-                .orElseThrow(() -> new NotFoundBoardException(NOT_EXIST_BOARD.getMessage()));
+                .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
 
         findBoard.updateBoard(updateRequest);
         String updateMessage = MessageContent.getUpdateMessage(updateRequest.isNotice());
