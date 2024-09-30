@@ -1,8 +1,8 @@
-package org.team1.nbe1_2_team01.domain.user.controller.dto;
+package org.team1.nbe1_2_team01.domain.user.controller.request;
 
 import jakarta.validation.constraints.*;
 
-public record UserSignUpDto(
+public record UserSignUpRequest(
 
         @NotBlank(message = "아이디는 필수 입력 값입니다.")
         @Size(min = 5, max = 20, message = "아이디는 5자 이상, 20자 이하여야 합니다.")

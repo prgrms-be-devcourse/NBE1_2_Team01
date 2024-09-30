@@ -4,10 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.team1.nbe1_2_team01.domain.user.controller.dto.UserSignUpDto;
+import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.EMAIL_ALREADY_EXISTS;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -17,21 +22,22 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long signUp(UserSignUpDto userSignUpDto) {
-        if (userRepository.findByUsername(userSignUpDto.username()).isPresent()) {
-            throw new IllegalArgumentException(userSignUpDto.username() + "는 이미 존재하는 아이디 입니다.");
+    public UserIdResponse signUp(UserSignUpRequest userSignUpRequest) {
+        if (userRepository.findByUsername(userSignUpRequest.username()).isPresent()) {
+            throw new AppException(USERNAME_ALREADY_EXISTS.withArgs(userSignUpRequest.username()));
         }
-        if (userRepository.findByEmail(userSignUpDto.email()).isPresent()) {
-            throw new IllegalArgumentException(userSignUpDto.email() + "는 이미 존재하는 이메일 입니다.");
+        if (userRepository.findByEmail(userSignUpRequest.email()).isPresent()) {
+            throw new AppException(EMAIL_ALREADY_EXISTS.withArgs(userSignUpRequest.email()));
         }
         User user = User.builder()
-                .username(userSignUpDto.username())
-                .password(userSignUpDto.password())
-                .email(userSignUpDto.email())
-                .name(userSignUpDto.name())
+                .username(userSignUpRequest.username())
+                .password(userSignUpRequest.password())
+                .email(userSignUpRequest.email())
+                .name(userSignUpRequest.name())
                 .role(Role.USER)
                 .build();
         user.passwordEncode(passwordEncoder);
-        return userRepository.save(user).getId();
+        Long id = userRepository.save(user).getId();
+        return new UserIdResponse(id);
     }
 }
