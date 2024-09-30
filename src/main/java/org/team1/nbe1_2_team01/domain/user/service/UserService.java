@@ -1,20 +1,22 @@
 package org.team1.nbe1_2_team01.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
+import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.EMAIL_ALREADY_EXISTS;
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXISTS;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,4 +51,30 @@ public class UserService {
         String currentUsername = SecurityUtil.getCurrentUsername();
         refreshTokenRepository.deleteById(currentUsername);
     }
+
+    @Transactional
+    public UserIdResponse update(UserUpdateRequest userUpdateRequest) {
+        User user = userRepository.findById(userUpdateRequest.id())
+                .orElseThrow(() -> new AppException(USER_NOT_FOUND));
+        if (userUpdateRequest.name() != null && !userUpdateRequest.name().isEmpty()) {
+            user.updateName(userUpdateRequest.name());
+        }
+        if (userUpdateRequest.password() != null && !userUpdateRequest.password().isEmpty()) {
+            user.updatePassword(userUpdateRequest.password());
+            user.passwordEncode(passwordEncoder);
+        }
+        return new UserIdResponse(user.getId());
+    }
+
+    public UserDetailsResponse getCurrentUserDetails() {
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다."));
+
+        return new UserDetailsResponse(user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getName());
+    }
+
 }
