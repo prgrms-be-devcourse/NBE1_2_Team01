@@ -25,6 +25,7 @@ import org.team1.nbe1_2_team01.global.auth.login.handler.LoginFailureHandler;
 import org.team1.nbe1_2_team01.global.auth.login.handler.LoginSuccessHandler;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
 import org.team1.nbe1_2_team01.global.auth.login.service.LoginService;
+import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final LoginService loginService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final ObjectMapper objectMapper;
 
     @Bean
@@ -70,7 +72,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userRepository);
+        return new LoginSuccessHandler(jwtService, refreshTokenRepository);
     }
 
     @Bean
@@ -80,7 +82,7 @@ public class SecurityConfig {
 
     @Bean
     JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        return new JwtAuthenticationProcessingFilter(jwtService, userRepository);
+        return new JwtAuthenticationProcessingFilter(jwtService, userRepository, refreshTokenRepository);
     }
 
     @Bean

@@ -43,7 +43,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private String refreshToken;
 
     @OneToMany(mappedBy = "user")
     private List<Belonging> belongings = new ArrayList<>();
@@ -98,7 +97,4 @@ public class User {
         this.password = passwordEncoder.encode(this.password);
     }
 
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 }
