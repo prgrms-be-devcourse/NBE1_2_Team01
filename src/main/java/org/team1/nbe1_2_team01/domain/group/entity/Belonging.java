@@ -67,10 +67,6 @@ public class Belonging {
         if (user != null) user.addBelonging(this);
     }
 
-    public Belonging(Long id) {
-        this.id = id;
-    }
-
     public static Belonging createBelongingOf(boolean isOwner, String course, User user) {
         return Belonging.builder()
                 .isOwner(isOwner)
