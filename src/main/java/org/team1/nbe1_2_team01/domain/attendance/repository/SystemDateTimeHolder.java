@@ -1,6 +1,8 @@
 package org.team1.nbe1_2_team01.domain.attendance.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.springframework.stereotype.Component;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 
@@ -8,7 +10,17 @@ import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 public class SystemDateTimeHolder implements DateTimeHolder {
 
     @Override
-    public LocalDateTime getDate() {
+    public LocalDateTime getDateTime() {
         return LocalDateTime.now();
+    }
+
+    @Override
+    public LocalDate getDate() {
+        return LocalDate.now();
+    }
+
+    @Override
+    public LocalTime getTime() {
+        return LocalTime.now();
     }
 }

@@ -7,12 +7,12 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceCreateRequest_ABSENT;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceUpdateRequest_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
-import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
+import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
+import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
+import org.team1.nbe1_2_team01.domain.common.stub.FixedDateTimeHolder;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
@@ -33,6 +36,9 @@ public class AttendanceServiceTest {
 
     @Mock
     private AttendanceRepository attendanceRepository;
+
+    @Mock
+    private DateTimeHolder dateTimeHolder = new FixedDateTimeHolder(2024, 9, 30, 12, 30);
 
     @Mock
     private UserRepository userRepository;
@@ -53,7 +59,7 @@ public class AttendanceServiceTest {
     void 출결_요청_등록() {
         // given
         var createRequest = createAttendanceCreateRequest_ABSENT();
-        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), LocalDate.now())).thenReturn(Optional.empty());
+        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).thenReturn(Optional.empty());
         var attendance = Mockito.spy(createAttendance_ABSENT(user));
         when(attendanceRepository.save(any(Attendance.class))).thenReturn(attendance);
         when(attendance.getId()).thenReturn(1L);
@@ -63,6 +69,18 @@ public class AttendanceServiceTest {
 
         // then
         assertThat(createdAttendanceId).isNotNull();
+    }
+
+    @Test
+    void 출결_요청_등록_시_이미_등록된_요청이_있다면_예외를_발생시킨다() {
+        // given
+        var createRequest = createAttendanceCreateRequest_ABSENT();
+        var attendance = createAttendance(user);
+        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).thenReturn(Optional.of(attendance));
+
+        // when & then
+        assertThatThrownBy(() -> attendanceService.registAttendance(user.getUsername(), createRequest))
+                .isInstanceOf(AlreadyExistException.class);
     }
 
     @Test

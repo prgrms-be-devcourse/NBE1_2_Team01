@@ -4,6 +4,7 @@ import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreate
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
+import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 import org.team1.nbe1_2_team01.domain.common.stub.FixedDateTimeHolder;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
@@ -14,8 +15,8 @@ public class AttendanceFixture {
         return Attendance.builder()
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.LATE)
-                .startAt(new FixedDateTimeHolder(12, 30).getDate())
-                .endAt(new FixedDateTimeHolder(15, 0).getDate())
+                .startAt(createDateTimeHolder(12, 30).getDateTime())
+                .endAt(createDateTimeHolder(15, 0).getDateTime())
                 .description("설명")
                 .build();
     }
@@ -24,8 +25,8 @@ public class AttendanceFixture {
         return Attendance.builder()
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.LATE)
-                .startAt(new FixedDateTimeHolder(startHour, startMinute).getDate())
-                .endAt(new FixedDateTimeHolder(endHour, endMinute).getDate())
+                .startAt(createDateTimeHolder(startHour, startMinute).getDateTime())
+                .endAt(createDateTimeHolder(endHour, endMinute).getDateTime())
                 .description("설명")
                 .build();
     }
@@ -34,8 +35,8 @@ public class AttendanceFixture {
         return Attendance.builder()
                 .user(user)
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
-                .startAt(new FixedDateTimeHolder(14, 0).getDate())
-                .endAt(new FixedDateTimeHolder(16, 0).getDate())
+                .startAt(createDateTimeHolder(14, 0).getDateTime())
+                .endAt(createDateTimeHolder(16, 0).getDateTime())
                 .description("외출사유")
                 .build();
     }
@@ -44,8 +45,8 @@ public class AttendanceFixture {
     public static AttendanceCreateRequest createAttendanceCreateRequest(int startHour, int startMinute, int endHour, int endMinute) {
         return AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.LATE)
-                .startAt(new FixedDateTimeHolder(startHour, startMinute).getDate())
-                .endAt(new FixedDateTimeHolder(endHour, endMinute).getDate())
+                .startAt(createDateTimeHolder(startHour, startMinute).getDateTime())
+                .endAt(createDateTimeHolder(endHour, endMinute).getDateTime())
                 .description("설명")
                 .build();
     }
@@ -53,8 +54,8 @@ public class AttendanceFixture {
     public static AttendanceCreateRequest createAttendanceCreateRequest_ABSENT() {
         return AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
-                .startAt(new FixedDateTimeHolder(14, 0).getDate())
-                .endAt(new FixedDateTimeHolder(16, 0).getDate())
+                .startAt(createDateTimeHolder(14, 0).getDateTime())
+                .endAt(createDateTimeHolder(16, 0).getDateTime())
                 .description("외출사유")
                 .build();
     }
@@ -64,9 +65,14 @@ public class AttendanceFixture {
         return AttendanceUpdateRequest.builder()
                 .id(1L)
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
-                .startAt(new FixedDateTimeHolder(13, 0).getDate())
-                .endAt(new FixedDateTimeHolder(16, 0).getDate())
+                .startAt(createDateTimeHolder(13, 0).getDateTime())
+                .endAt(createDateTimeHolder(16, 0).getDateTime())
                 .description("외출사유")
                 .build();
+    }
+
+    // FixedDateTimeHolder
+    public static DateTimeHolder createDateTimeHolder(int hour, int minute) {
+        return new FixedDateTimeHolder(2024, 9, 30, hour, minute);
     }
 }

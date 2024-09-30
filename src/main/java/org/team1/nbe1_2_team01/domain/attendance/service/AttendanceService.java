@@ -1,6 +1,5 @@
 package org.team1.nbe1_2_team01.domain.attendance.service;
 
-import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdate
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
+import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
@@ -20,6 +20,7 @@ import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final DateTimeHolder dateTimeHolder;
     private final UserRepository userRepository;
 
     public AttendanceIdResponse registAttendance(
@@ -37,7 +38,7 @@ public class AttendanceService {
     }
 
     private void validateAlreadyRegistToday(User register) {
-        attendanceRepository.findByUserIdAndStartAt(register.getId(), LocalDate.now())
+        attendanceRepository.findByUserIdAndStartAt(register.getId(), dateTimeHolder.getDate())
                 .ifPresent(attendance -> {
                     throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
                 });
