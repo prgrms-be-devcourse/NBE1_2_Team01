@@ -1,6 +1,5 @@
 package org.team1.nbe1_2_team01.domain.group.service;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.group.repository.TeamRepository;
-import org.team1.nbe1_2_team01.domain.user.entity.QUser;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
@@ -30,7 +28,6 @@ public class TeamService {
     public final UserRepository userRepository;
     public final BelongingRepository belongingRepository;
     public final CalendarRepository calendarRepository;
-    private final JPAQueryFactory jpaQueryFactory;
 
     @Transactional
     public Team projectTeamCreate(TeamCreateRequest teamCreateRequest) {
@@ -114,11 +111,8 @@ public class TeamService {
     }
 
     private List<User> checkUsers(List<Long> userIds) {
-        QUser user = QUser.user;
-        List<User> users = jpaQueryFactory
-                .selectFrom(user)
-                .where(user.id.in(userIds))
-                .fetch();
+        List<User> users = userRepository.findAllUsersByIdList(userIds);
+
         List<Long> foundUserIds = users.stream().map(User::getId).toList();
         for (Long userId : userIds) {
             if (!foundUserIds.contains(userId)) {
@@ -133,6 +127,7 @@ public class TeamService {
         return teamRepository.findByCreationWaiting(true);
     }
 
+    @Transactional
     public Team studyTeamApprove(Long teamId) {
         Optional<Team> team = teamRepository.findById(teamId);
 
