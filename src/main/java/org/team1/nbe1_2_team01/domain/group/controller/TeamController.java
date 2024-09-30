@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.team1.nbe1_2_team01.domain.group.controller.request.TeamCreateRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.request.TeamMemberAddRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.request.TeamNameUpdateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.request.*;
 import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.service.BelongingService;
@@ -45,85 +43,85 @@ public class TeamController {
         return ResponseEntity.ok().body(teamService.creationWaitingStudyTeamList());
     }
 
-    @PatchMapping("/approval/{teamId}")
-    public ResponseEntity<?> approveStudyTeam(@PathVariable Long teamId) {
+    @PatchMapping("/approval")
+    public ResponseEntity<?> approveStudyTeam(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamApprove(teamId));
+            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamApprove(teamApprovalUpdateRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @PatchMapping("/project/{teamId}/name")
-    public ResponseEntity<?> updateProjectTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
+    @PatchMapping("/project/name")
+    public ResponseEntity<?> updateProjectTeamName(@RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(teamService.projectTeamNameUpdate(teamId, teamNameUpdateRequest));
+            return ResponseEntity.status(HttpStatus.OK).body(teamService.projectTeamNameUpdate(teamNameUpdateRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @PatchMapping("/study/{teamId}/name")
-    public ResponseEntity<?> updateStudyTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
+    @PatchMapping("/study/name")
+    public ResponseEntity<?> updateStudyTeamName(@RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamNameUpdate(teamId, teamNameUpdateRequest));
+            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamNameUpdate(teamNameUpdateRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @PostMapping("/project/{teamId}/member")
-    public ResponseEntity<?> addProjectTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+    @PostMapping("/project/member")
+    public ResponseEntity<?> addProjectTeamMember(@RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.projectTeamAddMember(teamId, teamMemberAddRequest));
+            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.projectTeamAddMember(teamMemberAddRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @PostMapping("/study/{teamId}/member")
-    public ResponseEntity<?> addStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+    @PostMapping("/study/member")
+    public ResponseEntity<?> addStudyTeamMember(@RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.studyTeamAddMember(teamId, teamMemberAddRequest));
+            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.studyTeamAddMember(teamMemberAddRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/project/{teamId}/member")
-    public ResponseEntity<?> deleteProjectTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+    @DeleteMapping("/project/member")
+    public ResponseEntity<?> deleteProjectTeamMember(@RequestBody TeamMemberDeleteRequest teamMemberDeleteRequest) {
         try {
-            teamService.projectTeamDeleteMember(teamId, teamMemberAddRequest);
+            teamService.projectTeamDeleteMember(teamMemberDeleteRequest);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/study/{teamId}/member")
-    public ResponseEntity<?> deleteStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+    @DeleteMapping("/study/member")
+    public ResponseEntity<?> deleteStudyTeamMember(@RequestBody TeamMemberDeleteRequest teamMemberDeleteRequest) {
         try {
-            teamService.studyTeamDeleteMember(teamId, teamMemberAddRequest);
+            teamService.studyTeamDeleteMember(teamMemberDeleteRequest);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/project/{teamId}")
-    public ResponseEntity<?> deleteProjectTeam(@PathVariable Long teamId) {
+    @DeleteMapping("/project")
+    public ResponseEntity<?> deleteProjectTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
         try {
-            teamService.projectTeamDelete(teamId);
+            teamService.projectTeamDelete(teamDeleteRequest);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/study/{teamId}")
-    public ResponseEntity<?> deleteStudyTeam(@PathVariable Long teamId) {
+    @DeleteMapping("/study")
+    public ResponseEntity<?> deleteStudyTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
         try {
-            teamService.studyTeamDelete(teamId);
+            teamService.studyTeamDelete(teamDeleteRequest);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

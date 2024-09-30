@@ -129,8 +129,8 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamIdResponse studyTeamApprove(Long teamId) {
-        Optional<Team> team = teamRepository.findById(teamId);
+    public TeamIdResponse studyTeamApprove(TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
+        Optional<Team> team = teamRepository.findById(teamApprovalUpdateRequest.getTeamId());
 
         if (team.isEmpty()) {
             throw new RuntimeException("존재하지 않는 팀입니다.");
@@ -146,26 +146,26 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamIdResponse projectTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
-        int res = teamRepository.updateProjectTeamNameById(teamId, teamNameUpdateRequest.getName());
+    public TeamIdResponse projectTeamNameUpdate(TeamNameUpdateRequest teamNameUpdateRequest) {
+        int res = teamRepository.updateProjectTeamNameById(teamNameUpdateRequest.getTeamId(), teamNameUpdateRequest.getName());
         if (res == 0) throw new RuntimeException("수정 중 오류 발생");
 
-        return new TeamIdResponse(teamId);
+        return new TeamIdResponse(teamNameUpdateRequest.getTeamId());
     }
 
     @Transactional
-    public TeamIdResponse studyTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
-        int res = teamRepository.updateStudyTeamNameById(teamId, teamNameUpdateRequest.getName());
+    public TeamIdResponse studyTeamNameUpdate(TeamNameUpdateRequest teamNameUpdateRequest) {
+        int res = teamRepository.updateStudyTeamNameById(teamNameUpdateRequest.getTeamId(), teamNameUpdateRequest.getName());
         if (res == 0) throw new RuntimeException("수정 중 오류 발생");
 
-        return new TeamIdResponse(teamId);
+        return new TeamIdResponse(teamNameUpdateRequest.getTeamId());
     }
 
     @Transactional
-    public List<BelongingIdResponse> projectTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public List<BelongingIdResponse> projectTeamAddMember(TeamMemberAddRequest teamMemberAddRequest) {
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
 
-        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamMemberAddRequest.getTeamId());
         if (allBelongingsWithTeam.isEmpty()) {
             throw new RuntimeException("존재하지 않는 팀입니다.");
         }
@@ -188,10 +188,10 @@ public class TeamService {
     }
 
     @Transactional
-    public List<BelongingIdResponse> studyTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public List<BelongingIdResponse> studyTeamAddMember(TeamMemberAddRequest teamMemberAddRequest) {
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
 
-        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamMemberAddRequest.getTeamId());
         if (allBelongingsWithTeam.isEmpty()) {
             throw new RuntimeException("존재하지 않는 팀입니다.");
         }
@@ -215,11 +215,11 @@ public class TeamService {
     }
 
     @Transactional
-    public void projectTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
-        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
+    public void projectTeamDeleteMember(TeamMemberDeleteRequest teamMemberDeleteRequest) {
+        List<User> users = checkUsers(teamMemberDeleteRequest.getUserIds());
         List<Long> userIds = users.stream().map(User::getId).toList();
 
-        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamMemberDeleteRequest.getTeamId());
         if (allBelongings.isEmpty()) {
             throw new RuntimeException("존재하지 않는 팀입니다.");
         }
@@ -235,17 +235,17 @@ public class TeamService {
             throw new RuntimeException("팀장은 삭제할 수 없습니다.");
         }
 
-        int deleted = belongingRepository.deleteBelongings(teamId, userIds);
+        int deleted = belongingRepository.deleteBelongings(teamMemberDeleteRequest.getTeamId(), userIds);
     }
 
     @Transactional
-    public void studyTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public void studyTeamDeleteMember(TeamMemberDeleteRequest teamMemberDeleteRequest) {
         // TODO: Authorization 헤더 보고, 팀장이 요청한 게 아니면 예외
 
-        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
+        List<User> users = checkUsers(teamMemberDeleteRequest.getUserIds());
         List<Long> userIds = users.stream().map(User::getId).toList();
 
-        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamId);
+        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamMemberDeleteRequest.getTeamId());
         if (allBelongings.isEmpty()) {
             throw new RuntimeException("존재하지 않는 팀입니다.");
         }
@@ -261,25 +261,25 @@ public class TeamService {
             throw new RuntimeException("팀장은 삭제할 수 없습니다.");
         }
 
-        int deleted = belongingRepository.deleteBelongings(teamId, userIds);
+        int deleted = belongingRepository.deleteBelongings(teamMemberDeleteRequest.getTeamId(), userIds);
     }
 
     @Transactional
-    public void projectTeamDelete(Long teamId) {
+    public void projectTeamDelete(TeamDeleteRequest teamDeleteRequest) {
         // TODO: 예외처리
 
-        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamId, true);
+        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamDeleteRequest.getTeamId(), true);
         calendarRepository.deleteByBelonging(ownerBelonging);
-        teamRepository.deleteById(teamId);
+        teamRepository.deleteById(teamDeleteRequest.getTeamId());
     }
 
     @Transactional
-    public void studyTeamDelete(Long teamId) {
+    public void studyTeamDelete(TeamDeleteRequest teamDeleteRequest) {
         // TODO: 예외처리
 
-        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamId, true);
+        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamDeleteRequest.getTeamId(), true);
         calendarRepository.deleteByBelonging(ownerBelonging);
-        teamRepository.deleteById(teamId);
+        teamRepository.deleteById(teamDeleteRequest.getTeamId());
     }
 
 }
