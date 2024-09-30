@@ -11,10 +11,13 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
+import org.team1.nbe1_2_team01.global.auth.redis.RefreshToken;
+import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 
 import java.io.IOException;
 
@@ -31,6 +34,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -58,18 +62,22 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
 
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        userRepository.findByRefreshToken(refreshToken)
-                .ifPresent(user -> {
+        refreshTokenRepository.findByRefreshToken(refreshToken)
+                .ifPresent(token->{
+                    String username = token.getUsername();
+                    User user = userRepository.findByUsername(username)
+                            .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
                     String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getUsername()),
-                            reIssuedRefreshToken);
+                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(username), reIssuedRefreshToken);
+                    RefreshToken redis = new RefreshToken(reIssuedRefreshToken, username);
+                    refreshTokenRepository.save(redis);
                 });
     }
 
     private String reIssueRefreshToken(User user) {
         String reIssuedRefreshToken = jwtService.createRefreshToken();
-        user.updateRefreshToken(reIssuedRefreshToken);
-        userRepository.saveAndFlush(user);
+        RefreshToken redis = new RefreshToken(reIssuedRefreshToken, user.getUsername());
+        refreshTokenRepository.save(redis);
         return reIssuedRefreshToken;
     }
 
