@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
-import org.team1.nbe1_2_team01.global.auth.redis.RefreshToken;
+import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 
 import java.io.IOException;
