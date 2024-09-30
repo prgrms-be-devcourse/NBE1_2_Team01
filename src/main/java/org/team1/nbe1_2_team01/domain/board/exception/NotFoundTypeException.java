@@ -1,8 +1,11 @@
 package org.team1.nbe1_2_team01.domain.board.exception;
 
-public class NotFoundTypeException extends RuntimeException{
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
-    public NotFoundTypeException(final String message) {
-        super(message);
+public class NotFoundTypeException extends AppException {
+
+    public NotFoundTypeException(ErrorCode errorCode) {
+        super(errorCode);
     }
 }

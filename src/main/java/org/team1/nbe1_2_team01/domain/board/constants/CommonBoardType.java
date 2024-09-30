@@ -3,6 +3,8 @@ package org.team1.nbe1_2_team01.domain.board.constants;
 import lombok.Getter;
 import org.team1.nbe1_2_team01.domain.board.exception.NotFoundTypeException;
 
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.CATEGORY_NOT_FOUND;
+
 @Getter
 public enum CommonBoardType {
 
@@ -21,6 +23,6 @@ public enum CommonBoardType {
                 return enumType;
             }
         }
-        throw new NotFoundTypeException("존재하지 않는 카테고리입니다.");
+        throw new NotFoundTypeException(CATEGORY_NOT_FOUND);
     }
 }

@@ -1,99 +1,124 @@
 package org.team1.nbe1_2_team01.domain.board.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
-import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.constants.MessageContent;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardDeleteRequest;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardRequest;
-import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
-import org.team1.nbe1_2_team01.domain.board.exception.NotFoundBoardException;
+import org.team1.nbe1_2_team01.domain.board.entity.Category;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
-import org.team1.nbe1_2_team01.domain.board.service.extractor.UserExtractor;
+import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
-import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Message;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
+import org.team1.nbe1_2_team01.domain.user.entity.Role;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
+import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final CommentService commentService;
+    private final BelongingRepository belongingRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<BoardResponse> getCommonBoardList(String type, int page) {
-        //security 쪽에서 검증을 해줄진 모르겠지만, 사용자의 정보를 받아와야 할 수도 있음
-
-        //Belonging 정보 가져오기
-
-        //pageable 생성
-        Pageable pageable = getPageable(page);
+    public List<BoardResponse> getCommonBoardList(BoardListRequest boardListRequest) {
 
         //쿼리로 데이터 가져오기.
-        return boardRepository.findAllCommonBoard(CommonBoardType.getType(type), 0, pageable)
+        CommonBoardType boardType = CommonBoardType.getType(boardListRequest.type());
+
+        return boardRepository.findAllCommonBoard(
+                        boardType,
+                        boardListRequest.courseId(),
+                        boardListRequest.boardId()
+                )
                 .orElseGet(ArrayList::new);
     }
 
     @Override
-    public Message addCommonBoard(BoardRequest boardRequest) {
-        //해당 사용자가 관리자의 권한이 있는 지 검사, 관리자가 아니면 예외를 던진다.
-        UserExtractor.extract();
+    public Message addBoard(BoardRequest boardRequest) {
+        User user = getUser();
+        if(boardRequest.isNotice() && user.getRole().equals(Role.USER)) {
+            throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        }
 
-        //사용자의 정보와 소속을 가져와야겠네
+        Long belongingId = boardRequest.belongingId();
+        Belonging course = belongingRepository.findById(belongingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BELONGING_NOT_FOUND));
 
-        //공지사항 or 스터디 모집글을 저장한다.
-        Board newBoard = boardRequest.toEntity(null, null);
+        //CategoryService에 있으면 좋을 코드일거 같은데 임시로 넣어놨습니다.
+        Category category = null;
+        if(boardRequest.categoryId() != null) {
+            category = categoryRepository.findById(boardRequest.categoryId())
+                    .orElse(null);
+        }
 
+        Board newBoard = boardRequest.toEntity(user, category, course);
         boardRepository.save(newBoard);
+
         return new Message(MessageContent.getAddMessage(boardRequest.isNotice()));
+    }
+
+    private User getUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername(); //id를 반환
+        return userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Override
     @Transactional(readOnly = true)
     public BoardDetailResponse getBoardDetailById(Long id) {
-        //게시글 정보를 가져와.
-        BoardDetailResponse boardDetailResponse = boardRepository.findBoardDetailExcludeComments(id)
-                .orElseThrow(() -> new NotFoundBoardException("게시글이 존재하지 않습니다."));
-
-        //게시글에 해당하는 리뷰를 가져와
-        List<CommentResponse> comments = commentService.getReviewsByPage(id, 0);
-        boardDetailResponse.addComments(comments);
-
-        return boardDetailResponse;
+        return boardRepository.findBoardDetailExcludeComments(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     @Override
-    @Transactional
     public Message deleteBoardById(BoardDeleteRequest request) {
         //내가 작성한 게시글인지 확인?
 
         boardRepository.deleteById(request.boardId());
-        return new Message(MessageContent.getDeleteMessage(request.isNotice()));
+        String deleteMessage = MessageContent.getDeleteMessage(request.isNotice());
+        return new Message(deleteMessage);
     }
 
     @Override
-    @Transactional
     public Message updateBoard(BoardUpdateRequest updateRequest) {
-        Board findBoard = boardRepository.findById(updateRequest.getBoardId())
-                .orElseThrow(() -> new NotFoundBoardException("게시글이 존재하지 않습니다."));
+        Board findBoard = boardRepository.findById(updateRequest.boardId())
+                .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
 
         findBoard.updateBoard(updateRequest);
-        return new Message(MessageContent.getUpdateMessage(updateRequest.getIsNotice()));
+        String updateMessage = MessageContent.getUpdateMessage(updateRequest.isNotice());
+        return new Message(updateMessage);
     }
 
-    private Pageable getPageable(int page) {
-        int PAGE_SIZE = 10;
-        return PageRequest.of(page, PAGE_SIZE);
+    @Override
+    public List<BoardResponse> getTeamBoardListByType(TeamBoardListRequest request) {
+        Long belongingId = request.belongingId();
+        Long categoryId = request.categoryId();
+        Long boardId = request.boardId();
+
+        return boardRepository.findAllTeamBoardDByType(
+                        belongingId,
+                        categoryId,
+                        boardId)
+                .orElseGet(ArrayList::new);
     }
 }

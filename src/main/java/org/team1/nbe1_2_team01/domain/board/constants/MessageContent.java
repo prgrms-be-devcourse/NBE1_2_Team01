@@ -12,7 +12,8 @@ public enum MessageContent {
     ADD_COMMENT_COMPLETED("댓글을 등록했습니다."),
     DELETE_COMMENT_COMPLETED("댓글이 삭제되었습니다."),
 
-    NOT_EXIST_BOARD("해당 게시글이 존재하지 않습니다.");
+    ADD_CATEGORY_COMPLETED("카테고리를 등록했습니다."),
+    DELETE_CATEGORY_COMPLETED("카테고리가 삭제되었습니다.");
 
     private final String message;
 

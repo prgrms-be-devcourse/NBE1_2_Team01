@@ -1,17 +1,20 @@
 package org.team1.nbe1_2_team01.domain.board.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryRequest;
 import org.team1.nbe1_2_team01.domain.board.service.CategoryService;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
+import org.team1.nbe1_2_team01.global.util.Message;
+import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/category")
+@RequestMapping("/api/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -22,8 +25,12 @@ public class CategoryController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getCategories(@RequestParam("team") Long teamId) {
-        return ResponseEntity.ok().body(categoryService.getAllCategoryByBelongings(teamId));
+    public ResponseEntity<Response<List<CategoryResponse>>> getCategories(
+            @RequestParam Long teamId
+    ) {
+        List<CategoryResponse> categoryList = categoryService.getAllCategoryByBelongings(teamId);
+        return ResponseEntity.ok()
+                .body(Response.success(categoryList));
     }
 
     /**
@@ -32,7 +39,20 @@ public class CategoryController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<String> addCategory(@RequestBody CategoryRequest categoryRequest) {
-        return ResponseEntity.ok().body(categoryService.addCategory(categoryRequest));
+    public ResponseEntity<Response<Message>> addCategory(
+            @RequestBody @Valid CategoryRequest categoryRequest
+    ) {
+        Message message = categoryService.addCategory(categoryRequest);
+        return ResponseEntity.ok()
+                .body(Response.success(message));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Response<Message>> deleteCategory(
+            @PathVariable Long id
+    ) {
+        Message message = categoryService.deleteCategory(id);
+        return ResponseEntity.ok()
+                .body(Response.success(message));
     }
 }
