@@ -47,7 +47,7 @@ public class AttendanceQueryService {
     public AttendanceResponse getByIdAndUserId(Long attendanceId, String currentUsername) {
         User currentUser = getUserByUsername(currentUsername);
 
-        Attendance attendance = attendanceRepository.findAttendanceIdByUserId(attendanceId, currentUser.getId())
+        Attendance attendance = attendanceRepository.findByIdAndUserId(attendanceId, currentUser.getId())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
         return AttendanceResponse.from(attendance.getUser(), attendance);

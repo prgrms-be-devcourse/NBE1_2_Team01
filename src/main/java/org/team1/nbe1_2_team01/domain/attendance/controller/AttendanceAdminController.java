@@ -33,7 +33,7 @@ public class AttendanceAdminController {
     /**
      * 관리자 - 출결 요청 상세 내역 보기
      */
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AttendanceResponse> getAttendanceById(
             @PathVariable("id") long attendanceId
     ) {

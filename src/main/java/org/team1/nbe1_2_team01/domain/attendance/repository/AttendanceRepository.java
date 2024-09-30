@@ -15,7 +15,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     // GET
     List<Attendance> findAttendancesByUserId(Long userId);
 
-    Optional<Attendance> findAttendanceIdByUserId(Long attendanceId, Long userId);
+    Optional<Attendance> findByIdAndUserId(Long attendanceId, Long userId);
 
     // 자신의 출결 요청이 이미 있는지 검증하기 위한 쿼리
     @Query("SELECT a FROM Attendance a WHERE a.user.id = :userId AND DATE(a.startAt) = :startAt")
