@@ -4,25 +4,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAddAttendanceCommand_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceCreateRequest_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceUpdateRequest_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createUpdateAttendanceCommand_ABSENT;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture;
+import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
+import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
+import org.team1.nbe1_2_team01.domain.common.stub.FixedDateTimeHolder;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,88 +38,112 @@ public class AttendanceServiceTest {
     private AttendanceRepository attendanceRepository;
 
     @Mock
+    private DateTimeHolder dateTimeHolder = new FixedDateTimeHolder(2024, 9, 30, 12, 30);
+
+    @Mock
     private UserRepository userRepository;
 
     @InjectMocks
     private AttendanceService attendanceService;
 
+    User user;
+
+    @BeforeEach
+    void setUp() {
+        user = Mockito.spy(createUser());
+        lenient().when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        lenient().when(user.getId()).thenReturn(1L);
+    }
+
     @Test
     void 출결_요청_등록() {
         // given
-        var user = createUser();
-        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
-        var createCommand = createAddAttendanceCommand_ABSENT(user);
-        when(attendanceRepository.save(any(Attendance.class))).thenReturn(createAttendance_ABSENT(user));
+        var createRequest = createAttendanceCreateRequest_ABSENT();
+        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).thenReturn(Optional.empty());
+        var attendance = Mockito.spy(createAttendance_ABSENT(user));
+        when(attendanceRepository.save(any(Attendance.class))).thenReturn(attendance);
+        when(attendance.getId()).thenReturn(1L);
 
         // when
-        var actualAttendance = attendanceService.registAttendance(createCommand);
+        var createdAttendanceId = attendanceService.registAttendance(user.getUsername(), createRequest);
 
         // then
-        assertThat(actualAttendance).isNotNull();
+        assertThat(createdAttendanceId).isNotNull();
+    }
+
+    @Test
+    void 출결_요청_등록_시_이미_등록된_요청이_있다면_예외를_발생시킨다() {
+        // given
+        var createRequest = createAttendanceCreateRequest_ABSENT();
+        var attendance = createAttendance(user);
+        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).thenReturn(Optional.of(attendance));
+
+        // when & then
+        assertThatThrownBy(() -> attendanceService.registAttendance(user.getUsername(), createRequest))
+                .isInstanceOf(AlreadyExistException.class);
     }
 
     @Test
     void 출결_요청_수정() {
         // given
-        var updateCommand = createUpdateAttendanceCommand_ABSENT();
-        var attendance = createAttendance_ABSENT(createUser());
-        when(attendanceRepository.findById(any())).thenReturn(Optional.ofNullable(attendance));
+        var updateRequest = createAttendanceUpdateRequest_ABSENT();
+        var attendance = createAttendance_ABSENT(user);
+        when(attendanceRepository.findById(updateRequest.id())).thenReturn(Optional.of(attendance));
 
         // when
-        var updatedAttendance = attendanceService.updateAttendance(updateCommand);
+        attendanceService.updateAttendance(user.getUsername(), updateRequest);
 
         // then
-        assertThat(updatedAttendance.getStartAt()).isEqualTo(updateCommand.startAt());
+        assertThat(attendance.getStartAt()).isEqualTo(updateRequest.startAt());
     }
 
     @Test
     void 출결_요청_수정_시_출결_요청_데이터가_없다면_예외를_발생시킨다() {
         // given
-        var updateCommand = createUpdateAttendanceCommand_ABSENT();
-        when(attendanceRepository.findById(updateCommand.id())).thenReturn(Optional.empty());
+        var updateRequest = createAttendanceUpdateRequest_ABSENT();
+        when(attendanceRepository.findById(updateRequest.id())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.updateAttendance(updateCommand))
+        assertThatThrownBy(() -> attendanceService.updateAttendance(user.getUsername(), updateRequest))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void 출결_요청_삭제() {
         // given
-        var attendanceId = 1L;
-        doNothing().when(attendanceRepository).deleteById(attendanceId);
+        var attendance = createAttendance_ABSENT(user);
+        when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.of(attendance));
+        doNothing().when(attendanceRepository).delete(attendance);
 
         // when
-        attendanceService.deleteAttendance(attendanceId);
+        attendanceService.deleteAttendance(user.getUsername(), attendance.getId());
 
         // then
-        verify(attendanceRepository).deleteById(attendanceId);
+        verify(attendanceRepository).delete(attendance);
     }
 
     @Test
     void 출결_요청_삭제_시_출결_요청_데이터가_없다면_예외를_발생시킨다() {
         // given
-        var attendanceId = 1L;
-        doThrow(EntityNotFoundException.class).when(attendanceRepository).deleteById(attendanceId);
+        var attendance = createAttendance_ABSENT(user);
+        when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.deleteAttendance(attendanceId))
+        assertThatThrownBy(() -> attendanceService.deleteAttendance(user.getUsername(), attendance.getId()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void 출결_승인() {
         // given
-        var attendanceId = 1L;
-        var attendance = AttendanceFixture.createAttendance(createUser());
-        when(attendanceRepository.findById(attendanceId)).thenReturn(Optional.of(attendance));
-        when(attendanceRepository.save(any(Attendance.class))).thenReturn(any());
+        var attendance = createAttendance_ABSENT(user);
+        when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.of(attendance));
 
         // when
-        var updatedAttendance = attendanceService.approveAttendance(attendanceId);
+        attendanceService.approveAttendance(attendance.getId());
 
         // then
-        assertThat(updatedAttendance.isCreationWaiting()).isFalse();
+        assertThat(attendance.isCreationWaiting()).isFalse();
     }
 
     @Test

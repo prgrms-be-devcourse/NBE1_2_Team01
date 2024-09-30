@@ -1,16 +1,17 @@
 package org.team1.nbe1_2_team01.domain.attendance.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.AddAttendanceCommand;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
+import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
+import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @Service
@@ -19,76 +20,75 @@ import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final DateTimeHolder dateTimeHolder;
     private final UserRepository userRepository;
 
-    /**
-     * 출결 요청 등록
-     * @param addAttendanceCommand - 출결 요청 등록 필요 데이터
-     * @return attendance - 등록된 출결 요청
-     */
-    public Attendance registAttendance(AddAttendanceCommand addAttendanceCommand) {
-        var user = userRepository.findByUsername(addAttendanceCommand.username())
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+    public AttendanceIdResponse registAttendance(
+            String registerName,
+            AttendanceCreateRequest attendanceCreateRequest
+    ) {
+        User register = getCurrentUser(registerName);
 
-        if (attendanceRepository.findByUserIdAndStartAt(user.getId(), LocalDate.now()).isPresent()) {
-            throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
-        }
+        validateAlreadyRegistToday(register);
 
-        var attendance = addAttendanceCommand.toEntity(user);
+        Attendance attendance = attendanceCreateRequest.toEntity(register);
+        Attendance savedAttendance = attendanceRepository.save(attendance);
 
-        attendanceRepository.save(attendance);
-        return attendance;
+        return AttendanceIdResponse.from(savedAttendance.getId());
     }
 
-    /**
-     * 출결 요청 수정
-     * @param updateAttendanceCommand - 출결 요청 수정 데이터
-     * @return attendance - 수정된 출결 요청
-     */
-    public Attendance updateAttendance(UpdateAttendanceCommand updateAttendanceCommand) {
-        var attendance = attendanceRepository.findById(updateAttendanceCommand.id())
+    private void validateAlreadyRegistToday(User register) {
+        attendanceRepository.findByUserIdAndStartAt(register.getId(), dateTimeHolder.getDate())
+                .ifPresent(attendance -> {
+                    throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
+                });
+    }
+
+    public AttendanceIdResponse updateAttendance(
+            String currentUsername,
+            AttendanceUpdateRequest attendanceUpdateRequest
+    ) {
+        Attendance attendance = attendanceRepository.findById(attendanceUpdateRequest.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
-        attendance.update(updateAttendanceCommand);
-        return attendance;
+        User currentUser = getCurrentUser(currentUsername);
+        attendance.validateRegister(currentUser.getId());
+
+        attendance.update(attendanceUpdateRequest);
+
+        return AttendanceIdResponse.from(attendance.getId());
     }
 
-    /**
-     * 출결 요청 삭제
-     * @param attendanceId - 출결 요청 식별자
-     */
-    public void deleteAttendance(Long attendanceId) {
-        try {
-            attendanceRepository.deleteById(attendanceId);
-        } catch (EntityNotFoundException e) {
-            throw new NoSuchElementException("출결 요청을 찾을 수 없습니다.");
-        }
+    public void deleteAttendance(
+            String currentUsername,
+            Long attendanceId
+    ) {
+        User currentUser = getCurrentUser(currentUsername);
+
+        Attendance attendance = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
+
+        attendance.validateRegister(currentUser.getId());
+
+        attendanceRepository.delete(attendance);
     }
 
-    /**
-     * 출결 승인
-     * @param attendanceId - 출결 요청 식별자
-     * @return 승인 완료된 출결 내역
-     */
-    public Attendance approveAttendance(Long attendanceId) {
-        var attendance = attendanceRepository.findById(attendanceId)
+    public AttendanceIdResponse approveAttendance(Long attendanceId) {
+        Attendance attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
         attendance.approve();
 
-        attendanceRepository.save(attendance);
-        return attendance;
+        return AttendanceIdResponse.from(attendance.getId());
     }
 
-    /**
-     * 출결 반려
-     * @param attendanceId - 출결 요청 식별자
-     */
     public void rejectAttendance(Long attendanceId) {
-        try {
-            attendanceRepository.deleteById(attendanceId);
-        } catch (EntityNotFoundException e) {
-            throw new NoSuchElementException("출결 요청을 찾을 수 없습니다.");
-        }
+        attendanceRepository.deleteById(attendanceId);
+    }
+
+    // 타 도메인 메서드
+    private User getCurrentUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 }

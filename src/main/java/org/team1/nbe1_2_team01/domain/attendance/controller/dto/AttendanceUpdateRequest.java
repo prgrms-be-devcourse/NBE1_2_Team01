@@ -1,9 +1,10 @@
 package org.team1.nbe1_2_team01.domain.attendance.controller.dto;
 
 import java.time.LocalDateTime;
+import lombok.Builder;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
 
+@Builder
 public record AttendanceUpdateRequest(
         Long id,
         AttendanceIssueType attendanceIssueType,
@@ -12,14 +13,4 @@ public record AttendanceUpdateRequest(
         String description
 ) {
 
-    public UpdateAttendanceCommand toCommand(String username) {
-        return UpdateAttendanceCommand.builder()
-                .id(id)
-                .username(username)
-                .attendanceIssueType(attendanceIssueType)
-                .startAt(startAt)
-                .endAt(endAt)
-                .description(description)
-                .build();
-    }
 }
