@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamCreateRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamMemberAddRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamNameUpdateRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamResponse;
+import org.team1.nbe1_2_team01.domain.group.controller.request.TeamCreateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.request.TeamMemberAddRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.request.TeamNameUpdateRequest;
+import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.service.BelongingService;
 import org.team1.nbe1_2_team01.domain.group.service.TeamService;
@@ -26,13 +26,12 @@ public class TeamController {
 
     @PostMapping
     public ResponseEntity<?> createTeam(@RequestBody TeamCreateRequest teamCreateRequest) {
+        // TODO: 프로젝트 팀인지 스터디 팀인지 분기하는 로직을 서비스로 옮기기
         try {
             if (teamCreateRequest.getTeamType().equals("PROJECT")) {
-                Team team = teamService.projectTeamCreate(teamCreateRequest);
-                return ResponseEntity.ok().body(TeamResponse.of(team));
+                return ResponseEntity.status(HttpStatus.CREATED).body(teamService.projectTeamCreate(teamCreateRequest));
             } else if (teamCreateRequest.getTeamType().equals("STUDY")) {
-                Team team = teamService.studyTeamCreate(teamCreateRequest);
-                return ResponseEntity.ok().body(TeamResponse.of(team));
+                return ResponseEntity.status(HttpStatus.CREATED).body(teamService.studyTeamCreate(teamCreateRequest));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("팀 타입이 필요합니다.");
             }
@@ -43,21 +42,13 @@ public class TeamController {
 
     @GetMapping("/waiting")
     public ResponseEntity<?> getCreationWaitingStudyTeams() {
-        List<Team> teams = teamService.creationWaitingStudyTeamList();
-
-        List<TeamResponse> response = new ArrayList<>();
-
-        for (Team t : teams) {
-            response.add(TeamResponse.of(t));
-        }
-
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(teamService.creationWaitingStudyTeamList());
     }
 
     @PatchMapping("/approval/{teamId}")
     public ResponseEntity<?> approveStudyTeam(@PathVariable Long teamId) {
         try {
-            return ResponseEntity.ok().body(teamService.studyTeamApprove(teamId));
+            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamApprove(teamId));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -66,7 +57,7 @@ public class TeamController {
     @PatchMapping("/project/{teamId}/name")
     public ResponseEntity<?> updateProjectTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
         try {
-            return ResponseEntity.ok().body(teamService.projectTeamNameUpdate(teamId, teamNameUpdateRequest));
+            return ResponseEntity.status(HttpStatus.OK).body(teamService.projectTeamNameUpdate(teamId, teamNameUpdateRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -75,7 +66,7 @@ public class TeamController {
     @PatchMapping("/study/{teamId}/name")
     public ResponseEntity<?> updateStudyTeamName(@PathVariable Long teamId, @RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
         try {
-            return ResponseEntity.ok().body(teamService.studyTeamNameUpdate(teamId, teamNameUpdateRequest));
+            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamNameUpdate(teamId, teamNameUpdateRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -84,7 +75,7 @@ public class TeamController {
     @PostMapping("/project/{teamId}/member")
     public ResponseEntity<?> addProjectTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
-            return ResponseEntity.ok().body(teamService.projectTeamAddMember(teamId, teamMemberAddRequest));
+            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.projectTeamAddMember(teamId, teamMemberAddRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -93,7 +84,7 @@ public class TeamController {
     @PostMapping("/study/{teamId}/member")
     public ResponseEntity<?> addStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
-            return ResponseEntity.ok().body(teamService.studyTeamAddMember(teamId, teamMemberAddRequest));
+            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.studyTeamAddMember(teamId, teamMemberAddRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -102,7 +93,8 @@ public class TeamController {
     @DeleteMapping("/project/{teamId}/member")
     public ResponseEntity<?> deleteProjectTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
-            return ResponseEntity.ok().body(teamService.projectTeamDeleteMember(teamId, teamMemberAddRequest));
+            teamService.projectTeamDeleteMember(teamId, teamMemberAddRequest);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -111,7 +103,8 @@ public class TeamController {
     @DeleteMapping("/study/{teamId}/member")
     public ResponseEntity<?> deleteStudyTeamMember(@PathVariable Long teamId, @RequestBody TeamMemberAddRequest teamMemberAddRequest) {
         try {
-            return ResponseEntity.ok().body(teamService.studyTeamDeleteMember(teamId, teamMemberAddRequest));
+            teamService.studyTeamDeleteMember(teamId, teamMemberAddRequest);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -119,10 +112,9 @@ public class TeamController {
 
     @DeleteMapping("/project/{teamId}")
     public ResponseEntity<?> deleteProjectTeam(@PathVariable Long teamId) {
-        // TODO: 예외처리
         try {
             teamService.projectTeamDelete(teamId);
-            return ResponseEntity.ok().body("삭제 완료");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -130,10 +122,9 @@ public class TeamController {
 
     @DeleteMapping("/study/{teamId}")
     public ResponseEntity<?> deleteStudyTeam(@PathVariable Long teamId) {
-        // TODO: 예외처리
         try {
             teamService.studyTeamDelete(teamId);
-            return ResponseEntity.ok().body("삭제 완료");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -141,7 +132,7 @@ public class TeamController {
 
     @GetMapping
     public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
-        return ResponseEntity.ok().body(belongingService.courseUserList(course));
+        return ResponseEntity.status(HttpStatus.OK).body(belongingService.courseUserList(course));
     }
 
 }

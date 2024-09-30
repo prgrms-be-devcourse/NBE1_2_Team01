@@ -5,14 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.BelongingResponse;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamCreateRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamMemberAddRequest;
-import org.team1.nbe1_2_team01.domain.group.controller.dto.TeamNameUpdateRequest;
+import org.team1.nbe1_2_team01.domain.group.controller.request.*;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.group.repository.TeamRepository;
+import org.team1.nbe1_2_team01.domain.group.service.response.BelongingIdResponse;
+import org.team1.nbe1_2_team01.domain.group.service.response.BelongingResponse;
+import org.team1.nbe1_2_team01.domain.group.service.response.TeamIdResponse;
+import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
@@ -30,7 +31,7 @@ public class TeamService {
     public final CalendarRepository calendarRepository;
 
     @Transactional
-    public Team projectTeamCreate(TeamCreateRequest teamCreateRequest) {
+    public TeamIdResponse projectTeamCreate(TeamCreateRequest teamCreateRequest) {
         // 가입되지 않은 유저가 있다면 예외
         List<User> users = checkUsers(teamCreateRequest.getUserIds());
 
@@ -72,13 +73,13 @@ public class TeamService {
             calendarRepository.save(courseCalendar);
         }
         calendarRepository.save(teamCalendar);
-        return newTeam;
+        return TeamIdResponse.of(newTeam);
 
         //TODO: 스터디 팀 생성 메서드랑 공통되는 부분 메서드로 빼기
     }
 
     @Transactional
-    public Team studyTeamCreate(TeamCreateRequest teamCreateRequest) {
+    public TeamIdResponse studyTeamCreate(TeamCreateRequest teamCreateRequest) {
         if (!belongingRepository.existsByCourse(teamCreateRequest.getCourse())) throw new RuntimeException("존재하지 않는 코스명입니다.");
         // 가입되지 않은 유저가 있다면 예외
         List<User> users = checkUsers(teamCreateRequest.getUserIds());
@@ -107,7 +108,7 @@ public class TeamService {
         belongingRepository.saveAll(belongings);
         System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         calendarRepository.save(teamCalendar);
-        return newTeam;
+        return TeamIdResponse.of(newTeam);
     }
 
     private List<User> checkUsers(List<Long> userIds) {
@@ -123,12 +124,12 @@ public class TeamService {
         return users;
     }
 
-    public List<Team> creationWaitingStudyTeamList() {
-        return teamRepository.findByCreationWaiting(true);
+    public List<TeamResponse> creationWaitingStudyTeamList() {
+        return teamRepository.findByCreationWaiting(true).stream().map(TeamResponse::of).toList();
     }
 
     @Transactional
-    public Team studyTeamApprove(Long teamId) {
+    public TeamIdResponse studyTeamApprove(Long teamId) {
         Optional<Team> team = teamRepository.findById(teamId);
 
         if (team.isEmpty()) {
@@ -141,27 +142,27 @@ public class TeamService {
 
         team.get().setCreationWaiting(false);
 
-        return teamRepository.save(team.get());
+        return TeamIdResponse.of(teamRepository.save(team.get()));
     }
 
     @Transactional
-    public String projectTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
+    public TeamIdResponse projectTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
         int res = teamRepository.updateProjectTeamNameById(teamId, teamNameUpdateRequest.getName());
         if (res == 0) throw new RuntimeException("수정 중 오류 발생");
 
-        return ("수정 완료. 수정된 튜플 개수는 " + res);
+        return new TeamIdResponse(teamId);
     }
 
     @Transactional
-    public String studyTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
+    public TeamIdResponse studyTeamNameUpdate(Long teamId, TeamNameUpdateRequest teamNameUpdateRequest) {
         int res = teamRepository.updateStudyTeamNameById(teamId, teamNameUpdateRequest.getName());
         if (res == 0) throw new RuntimeException("수정 중 오류 발생");
 
-        return ("수정 완료. 수정된 튜플 개수는 " + res);
+        return new TeamIdResponse(teamId);
     }
 
     @Transactional
-    public List<BelongingResponse> projectTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public List<BelongingIdResponse> projectTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
 
         List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamId);
@@ -183,11 +184,11 @@ public class TeamService {
             newBelongings.add(belonging);
         }
 
-        return belongingRepository.saveAll(newBelongings).stream().map(BelongingResponse::of).toList();
+        return belongingRepository.saveAll(newBelongings).stream().map(BelongingIdResponse::of).toList();
     }
 
     @Transactional
-    public List<BelongingResponse> studyTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public List<BelongingIdResponse> studyTeamAddMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
 
         List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamId);
@@ -210,11 +211,11 @@ public class TeamService {
             newBelongings.add(belonging);
         }
 
-        return belongingRepository.saveAll(newBelongings).stream().map(BelongingResponse::of).toList();
+        return belongingRepository.saveAll(newBelongings).stream().map(BelongingIdResponse::of).toList();
     }
 
     @Transactional
-    public String projectTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public void projectTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
         List<Long> userIds = users.stream().map(User::getId).toList();
 
@@ -235,12 +236,10 @@ public class TeamService {
         }
 
         int deleted = belongingRepository.deleteBelongings(teamId, userIds);
-
-        return "삭제된 개수는 " + deleted;
     }
 
     @Transactional
-    public String studyTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
+    public void studyTeamDeleteMember(Long teamId, TeamMemberAddRequest teamMemberAddRequest) {
         // TODO: Authorization 헤더 보고, 팀장이 요청한 게 아니면 예외
 
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
@@ -263,23 +262,23 @@ public class TeamService {
         }
 
         int deleted = belongingRepository.deleteBelongings(teamId, userIds);
-
-        return "삭제된 개수는 " + deleted;
     }
 
     @Transactional
     public void projectTeamDelete(Long teamId) {
+        // TODO: 예외처리
+
         Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamId, true);
         calendarRepository.deleteByBelonging(ownerBelonging);
-
         teamRepository.deleteById(teamId);
     }
 
     @Transactional
     public void studyTeamDelete(Long teamId) {
+        // TODO: 예외처리
+
         Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamId, true);
         calendarRepository.deleteByBelonging(ownerBelonging);
-
         teamRepository.deleteById(teamId);
     }
 
