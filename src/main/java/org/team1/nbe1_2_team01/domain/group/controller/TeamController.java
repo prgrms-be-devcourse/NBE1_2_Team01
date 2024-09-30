@@ -128,7 +128,7 @@ public class TeamController {
         }
     }
 
-    @GetMapping
+    @GetMapping // pk 써서 사용해보기
     public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
         return ResponseEntity.status(HttpStatus.OK).body(belongingService.courseUserList(course));
     }

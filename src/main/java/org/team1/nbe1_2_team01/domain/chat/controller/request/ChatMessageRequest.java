@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.chat.controller.dto;
+package org.team1.nbe1_2_team01.domain.chat.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatMessageDTO {
+public class ChatMessageRequest {
     private Long channelId;
     private Long userId;
     private String content;
@@ -27,3 +27,4 @@ public class ChatMessageDTO {
                 '}';
     }
 }
+

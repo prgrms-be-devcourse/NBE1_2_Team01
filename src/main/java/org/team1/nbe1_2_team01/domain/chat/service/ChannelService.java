@@ -11,6 +11,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +20,20 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final ParticipantRepository participantRepository;
     private final UserRepository userRepository;
+    private final UserChannelUtil userChannelUtil;
 
+
+    // 채널 목록 전체 조회
+    public List<String> showAllChannel() {
+        return channelRepository.findAllChannelName();
+    }
+
+
+    // 채널 생성
     @Transactional
-    public Channel createChannel(String channelName, Long creatorUserId) {
+    public Long createChannel(Long creatorUserId, String channelName) {
         User creator = userRepository.findById(creatorUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         Channel channel = Channel.builder()
                 .channelName(channelName)
@@ -42,8 +52,40 @@ public class ChannelService {
 
         participantRepository.save(participant);
 
-        return saveChannel;
+        return saveChannel.getId();
     }
 
+
+    // 채널 수정
+    public Long updateChannel(Long userId, Long channelId, String channelName) {
+        Participant participant = userChannelUtil.findUser(userId, channelId);
+
+        if (!participant.isCreator()) {
+            throw new RuntimeException("채널 생성자만 수정할 수 있습니다.");
+        }
+
+        Channel channel = participant.getChannel();
+
+        channel.setChannelName(channelName); // 수정이라 빌더 패턴 대신 set 사용
+
+        channelRepository.save(channel);
+
+        return channel.getId(); // pk값 반환
+    }
+
+    // 채널 삭제
+    public void deleteChannel(Long userId, Long channelId) {
+        Participant participant = userChannelUtil.findUser(userId, channelId);
+
+        if (!participant.isCreator()) {
+            throw new RuntimeException("채널 생성자만 삭제할 수 있습니다.");
+        }
+
+        List<Participant> participants = participantRepository.findByChannelId(channelId);
+        participantRepository.deleteAll(participants); // 모든 참여자 먼저 삭제
+
+        Channel channel = participant.getChannel();
+        channelRepository.delete(channel);
+    }
 
 }

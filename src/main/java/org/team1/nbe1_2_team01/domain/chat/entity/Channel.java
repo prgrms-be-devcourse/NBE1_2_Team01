@@ -2,10 +2,7 @@ package org.team1.nbe1_2_team01.domain.chat.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -15,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "channel")
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel {
 
