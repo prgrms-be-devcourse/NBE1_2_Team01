@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
+import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -14,12 +15,15 @@ import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository
 public class AttendanceQueryService {
 
     private final AttendanceRepository attendanceRepository;
+    private final UserRepository userRepository;
 
     public List<Attendance> getAll() {
         return attendanceRepository.findAll();
     }
 
-    public List<Attendance> getMyAttendances(Long currentUserId) {
+    public List<Attendance> getMyAttendances(String currentUsername) {
+        Long currentUserId = getCurrentUserId(currentUsername);
+
         return attendanceRepository.findAttendancesByUserId(currentUserId);
     }
 
@@ -28,8 +32,16 @@ public class AttendanceQueryService {
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
     }
 
-    public Attendance getByIdAndUserId(Long attendanceId, Long currentUserId) {
+    public Attendance getByIdAndUserId(Long attendanceId, String currentUsername) {
+        Long currentUserId = getCurrentUserId(currentUsername);
+
         return attendanceRepository.findAttendanceIdByUserId(attendanceId, currentUserId)
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
+    }
+
+    private Long getCurrentUserId(String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+        return user.getId();
     }
 }

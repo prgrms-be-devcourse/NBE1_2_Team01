@@ -3,7 +3,6 @@ package org.team1.nbe1_2_team01.domain.attendance.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +18,6 @@ import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdate
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
-import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 @RestController
@@ -29,7 +27,6 @@ public class AttendanceController {
 
     private final AttendanceService attendanceService;
     private final AttendanceQueryService attendanceQueryService;
-    private final UserRepository userRepository;
 
     /**
      * 자신의 출결 요청 보기
@@ -37,9 +34,9 @@ public class AttendanceController {
      */
     @GetMapping
     public ResponseEntity<List<Attendance>> getMyAttendances() {
-        var currentUserId = getCurrentUserId();
+        var currentUsername = SecurityUtil.getCurrentUsername();
 
-        List<Attendance> myAttendances = attendanceQueryService.getMyAttendances(currentUserId);
+        List<Attendance> myAttendances = attendanceQueryService.getMyAttendances(currentUsername);
         return ResponseEntity.ok(myAttendances);
     }
 
@@ -51,9 +48,9 @@ public class AttendanceController {
     public ResponseEntity<Attendance> getMyAttendance(
             @PathVariable("id") Long attendanceId
     ) {
-        var currentUserId = getCurrentUserId();
+        var currentUsername = SecurityUtil.getCurrentUsername();
 
-        var myAttendance = attendanceQueryService.getByIdAndUserId(attendanceId, currentUserId);
+        var myAttendance = attendanceQueryService.getByIdAndUserId(attendanceId, currentUsername);
         return ResponseEntity.ok(myAttendance);
     }
 
@@ -66,10 +63,10 @@ public class AttendanceController {
     public ResponseEntity<Attendance> registAttendance(
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {
-        var registerId = getCurrentUserId();
+        var registerUsername = SecurityUtil.getCurrentUsername();
         var addAttendanceCommand = attendanceCreateRequest.toCommand();
 
-        var attendanceId = attendanceService.registAttendance(registerId, addAttendanceCommand);
+        var attendanceId = attendanceService.registAttendance(registerUsername, addAttendanceCommand);
         return ResponseEntity
                 .created(URI.create("/attendance/" + attendanceId))
                 .build();
@@ -84,10 +81,10 @@ public class AttendanceController {
             @PathVariable("id") Long attendanceId,
             @RequestBody @Valid AttendanceUpdateRequest attendanceUpdateRequest
     ) {
-        var currentUserId = getCurrentUserId();
+        var currentUsername = SecurityUtil.getCurrentUsername();
         var updateAttendanceCommand = attendanceUpdateRequest.toCommand(attendanceId);
 
-        attendanceService.updateAttendance(currentUserId, updateAttendanceCommand);
+        attendanceService.updateAttendance(currentUsername, updateAttendanceCommand);
         return ResponseEntity
                 .ok().build();
     }
@@ -100,21 +97,10 @@ public class AttendanceController {
     public ResponseEntity<String> deleteAttendance(
             @PathVariable("id") Long attendanceId
     ) {
-        var currentUserId = getCurrentUserId();
+        var currentUsername = SecurityUtil.getCurrentUsername();
 
-        attendanceService.deleteAttendance(currentUserId, attendanceId);
+        attendanceService.deleteAttendance(currentUsername, attendanceId);
         return ResponseEntity
                 .noContent().build();
-    }
-
-    /**
-     * userId를 바로 반환받을 수 있다면 해당 메서드는 지워질 예정
-     * @return 현재 api에 접근한 user id
-     */
-    private Long getCurrentUserId() {
-        var username = SecurityUtil.getCurrentUsername();
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
-        return user.getId();
     }
 }
