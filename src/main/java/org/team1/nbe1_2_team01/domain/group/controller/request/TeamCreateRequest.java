@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.group.controller.dto;
+package org.team1.nbe1_2_team01.domain.group.controller.request;
 
 import lombok.Data;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;

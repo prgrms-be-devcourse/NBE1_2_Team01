@@ -5,7 +5,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, CustomUserRepository {
 
     Optional<User> findByUsername(String username);
 

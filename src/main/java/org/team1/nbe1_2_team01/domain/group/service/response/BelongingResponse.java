@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.group.controller.dto;
+package org.team1.nbe1_2_team01.domain.group.service.response;
 
 import lombok.Builder;
 import lombok.Data;
@@ -21,8 +21,8 @@ public class BelongingResponse {
     public static BelongingResponse of(Belonging belonging) {
         return BelongingResponse.builder()
                 .id(belonging.getId())
-                .userId(belonging.getUser().getId())
-                .teamId(belonging.getTeam().getId())
+                .userId(belonging.getUser() != null ? belonging.getUser().getId() : null)
+                .teamId(belonging.getTeam() != null ? belonging.getTeam().getId() : null)
                 .build();
     }
 }
