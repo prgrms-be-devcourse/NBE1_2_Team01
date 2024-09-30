@@ -10,7 +10,7 @@ import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResp
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
-import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 

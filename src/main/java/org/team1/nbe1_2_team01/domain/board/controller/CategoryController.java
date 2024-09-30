@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryRequest;
 import org.team1.nbe1_2_team01.domain.board.service.CategoryService;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
-import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.board.service.response;
+package org.team1.nbe1_2_team01.global.util;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

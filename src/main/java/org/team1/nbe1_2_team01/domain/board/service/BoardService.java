@@ -3,7 +3,7 @@ package org.team1.nbe1_2_team01.domain.board.service;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
-import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Message;
 
 import java.util.List;
 

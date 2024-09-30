@@ -13,7 +13,7 @@ import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
-import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
