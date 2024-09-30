@@ -1,15 +1,20 @@
 package org.team1.nbe1_2_team01.domain.chat.service.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-public class ChannelResponse {
+@Builder
+public class ChatMessageResponse {
     private Long channelId;
-    private String name;
-
+    private Long userId;
+    private String content;
+    private LocalDateTime createdAt;
 
 }

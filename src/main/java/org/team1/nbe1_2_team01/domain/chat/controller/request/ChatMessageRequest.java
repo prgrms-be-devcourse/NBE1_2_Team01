@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatMessageDTO {
+public class ChatMessageRequest {
     private Long channelId;
     private Long userId;
     private String content;
@@ -27,3 +27,4 @@ public class ChatMessageDTO {
                 '}';
     }
 }
+

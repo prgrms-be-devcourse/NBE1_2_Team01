@@ -20,6 +20,8 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final ParticipantRepository participantRepository;
     private final UserRepository userRepository;
+    private final UserChannelUtil userChannelUtil;
+
 
     // 채널 목록 전체 조회
     public List<String> showAllChannel() {
@@ -56,7 +58,7 @@ public class ChannelService {
 
     // 채널 수정
     public Long updateChannel(Long userId, Long channelId, String channelName) {
-        Participant participant = findUser(userId, channelId);
+        Participant participant = userChannelUtil.findUser(userId, channelId);
 
         if (!participant.isCreator()) {
             throw new RuntimeException("채널 생성자만 수정할 수 있습니다.");
@@ -73,7 +75,7 @@ public class ChannelService {
 
     // 채널 삭제
     public void deleteChannel(Long userId, Long channelId) {
-        Participant participant = findUser(userId, channelId);
+        Participant participant = userChannelUtil.findUser(userId, channelId);
 
         if (!participant.isCreator()) {
             throw new RuntimeException("채널 생성자만 삭제할 수 있습니다.");
@@ -86,14 +88,4 @@ public class ChannelService {
         channelRepository.delete(channel);
     }
 
-
-    private Participant findUser(Long userId, Long channelId) {
-        channelRepository.findById(channelId)
-                .orElseThrow(() -> new RuntimeException("채널을 찾을 수 없습니다."));
-
-        Participant participant = participantRepository.findByUserIdAndChannelId(userId, channelId)
-                .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
-
-        return participant;
-    }
 }
