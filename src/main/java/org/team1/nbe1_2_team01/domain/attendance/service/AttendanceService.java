@@ -28,23 +28,26 @@ public class AttendanceService {
     ) {
         User register = getCurrentUser(registerName);
 
-        // 오늘 등록된 요청이 있는지 확인
+        validateAlreadyRegistToday(register);
+
+        Attendance attendance = attendanceCreateRequest.toEntity(register);
+        Attendance savedAttendance = attendanceRepository.save(attendance);
+
+        return AttendanceIdResponse.from(savedAttendance.getId());
+    }
+
+    private void validateAlreadyRegistToday(User register) {
         attendanceRepository.findByUserIdAndStartAt(register.getId(), LocalDate.now())
                 .ifPresent(attendance -> {
                     throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
                 });
-
-        var attendance = attendanceCreateRequest.toEntity(register);
-        var savedAttendance = attendanceRepository.save(attendance);
-
-        return AttendanceIdResponse.from(savedAttendance.getId());
     }
 
     public AttendanceIdResponse updateAttendance(
             String currentUsername,
             AttendanceUpdateRequest attendanceUpdateRequest
     ) {
-        var attendance = attendanceRepository.findById(attendanceUpdateRequest.id())
+        Attendance attendance = attendanceRepository.findById(attendanceUpdateRequest.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
         User currentUser = getCurrentUser(currentUsername);
@@ -61,7 +64,7 @@ public class AttendanceService {
     ) {
         User currentUser = getCurrentUser(currentUsername);
 
-        var attendance = attendanceRepository.findById(attendanceId)
+        Attendance attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
         attendance.validateRegister(currentUser.getId());
@@ -82,6 +85,7 @@ public class AttendanceService {
         attendanceRepository.deleteById(attendanceId);
     }
 
+    // 타 도메인 메서드
     private User getCurrentUser(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
