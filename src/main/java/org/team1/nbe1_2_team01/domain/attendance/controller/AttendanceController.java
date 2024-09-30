@@ -64,9 +64,8 @@ public class AttendanceController {
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {
         var registerUsername = SecurityUtil.getCurrentUsername();
-        var addAttendanceCommand = attendanceCreateRequest.toCommand();
 
-        var attendanceId = attendanceService.registAttendance(registerUsername, addAttendanceCommand);
+        var attendanceId = attendanceService.registAttendance(registerUsername, attendanceCreateRequest);
         return ResponseEntity
                 .created(URI.create("/attendance/" + attendanceId))
                 .build();
@@ -76,15 +75,13 @@ public class AttendanceController {
      * 출결 요청 수정
      * @param attendanceUpdateRequest 출결 요청 수정에 필요한 데이터
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/update")
     public ResponseEntity<Attendance> updateAttendance(
-            @PathVariable("id") Long attendanceId,
             @RequestBody @Valid AttendanceUpdateRequest attendanceUpdateRequest
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
-        var updateAttendanceCommand = attendanceUpdateRequest.toCommand(attendanceId);
 
-        attendanceService.updateAttendance(currentUsername, updateAttendanceCommand);
+        attendanceService.updateAttendance(currentUsername, attendanceUpdateRequest);
         return ResponseEntity
                 .ok().build();
     }

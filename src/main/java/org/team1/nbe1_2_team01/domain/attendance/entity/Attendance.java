@@ -16,8 +16,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.exception.AccessDeniedException;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
+import org.team1.nbe1_2_team01.domain.attendance.service.validation.AttendanceValidator;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 @Entity
@@ -70,11 +71,13 @@ public class Attendance {
         }
     }
 
-    public void update(UpdateAttendanceCommand updateAttendanceCommand) {
-        this.attendanceIssueType = updateAttendanceCommand.attendanceIssueType();
-        this.startAt = updateAttendanceCommand.startAt();
-        this.endAt = updateAttendanceCommand.endAt();
-        this.description = updateAttendanceCommand.description();
+    public void update(AttendanceUpdateRequest attendanceUpdateRequest) {
+        AttendanceValidator.validateAttendTime(startAt, endAt);
+
+        this.attendanceIssueType = attendanceUpdateRequest.attendanceIssueType();
+        this.startAt = attendanceUpdateRequest.startAt();
+        this.endAt = attendanceUpdateRequest.endAt();
+        this.description = attendanceUpdateRequest.description();
     }
 
     public void approve() {

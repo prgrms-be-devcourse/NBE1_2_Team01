@@ -1,9 +1,9 @@
 package org.team1.nbe1_2_team01.domain.attendance.fixture;
 
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.AddAttendanceCommand;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.common.stub.FixedDateTimeHolder;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
@@ -40,9 +40,9 @@ public class AttendanceFixture {
                 .build();
     }
 
-    // AddAttendanceCommand Fixture
-    public static AddAttendanceCommand createAddAttendanceCommand(int startHour, int startMinute, int endHour, int endMinute) {
-        return AddAttendanceCommand.builder()
+    // AttendanceCreateRequest Fixture
+    public static AttendanceCreateRequest createAttendanceCreateRequest(int startHour, int startMinute, int endHour, int endMinute) {
+        return AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.LATE)
                 .startAt(new FixedDateTimeHolder(startHour, startMinute).getDate())
                 .endAt(new FixedDateTimeHolder(endHour, endMinute).getDate())
@@ -50,8 +50,8 @@ public class AttendanceFixture {
                 .build();
     }
 
-    public static AddAttendanceCommand createAddAttendanceCommand_ABSENT() {
-        return AddAttendanceCommand.builder()
+    public static AttendanceCreateRequest createAttendanceCreateRequest_ABSENT() {
+        return AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(new FixedDateTimeHolder(14, 0).getDate())
                 .endAt(new FixedDateTimeHolder(16, 0).getDate())
@@ -59,9 +59,9 @@ public class AttendanceFixture {
                 .build();
     }
 
-    // UpdateAttendanceCommand Fixture
-    public static UpdateAttendanceCommand createUpdateAttendanceCommand_ABSENT() {
-        return UpdateAttendanceCommand.builder()
+    // AttendanceUpdateRequest Fixture
+    public static AttendanceUpdateRequest createAttendanceUpdateRequest_ABSENT() {
+        return AttendanceUpdateRequest.builder()
                 .id(1L)
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(new FixedDateTimeHolder(13, 0).getDate())

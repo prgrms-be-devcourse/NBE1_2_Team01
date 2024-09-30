@@ -7,9 +7,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAddAttendanceCommand_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceCreateRequest_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createUpdateAttendanceCommand_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceUpdateRequest_ABSENT;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import java.time.LocalDate;
@@ -52,14 +52,14 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_등록() {
         // given
-        var createCommand = createAddAttendanceCommand_ABSENT();
+        var createRequest = createAttendanceCreateRequest_ABSENT();
         when(attendanceRepository.findByUserIdAndStartAt(user.getId(), LocalDate.now())).thenReturn(Optional.empty());
         var attendance = Mockito.spy(createAttendance_ABSENT(user));
         when(attendanceRepository.save(any(Attendance.class))).thenReturn(attendance);
         when(attendance.getId()).thenReturn(1L);
 
         // when
-        var createdAttendanceId = attendanceService.registAttendance(user.getUsername(), createCommand);
+        var createdAttendanceId = attendanceService.registAttendance(user.getUsername(), createRequest);
 
         // then
         assertThat(createdAttendanceId).isNotNull();
@@ -68,25 +68,25 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_수정() {
         // given
-        var updateCommand = createUpdateAttendanceCommand_ABSENT();
+        var updateRequest = createAttendanceUpdateRequest_ABSENT();
         var attendance = createAttendance_ABSENT(user);
-        when(attendanceRepository.findById(updateCommand.id())).thenReturn(Optional.of(attendance));
+        when(attendanceRepository.findById(updateRequest.id())).thenReturn(Optional.of(attendance));
 
         // when
-        attendanceService.updateAttendance(user.getUsername(), updateCommand);
+        attendanceService.updateAttendance(user.getUsername(), updateRequest);
 
         // then
-        assertThat(attendance.getStartAt()).isEqualTo(updateCommand.startAt());
+        assertThat(attendance.getStartAt()).isEqualTo(updateRequest.startAt());
     }
 
     @Test
     void 출결_요청_수정_시_출결_요청_데이터가_없다면_예외를_발생시킨다() {
         // given
-        var updateCommand = createUpdateAttendanceCommand_ABSENT();
-        when(attendanceRepository.findById(updateCommand.id())).thenReturn(Optional.empty());
+        var updateRequest = createAttendanceUpdateRequest_ABSENT();
+        when(attendanceRepository.findById(updateRequest.id())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.updateAttendance(user.getUsername(), updateCommand))
+        assertThatThrownBy(() -> attendanceService.updateAttendance(user.getUsername(), updateRequest))
                 .isInstanceOf(NoSuchElementException.class);
     }
 

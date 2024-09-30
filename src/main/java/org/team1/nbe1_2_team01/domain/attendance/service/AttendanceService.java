@@ -5,10 +5,10 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.AddAttendanceCommand;
-import org.team1.nbe1_2_team01.domain.attendance.service.command.UpdateAttendanceCommand;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
@@ -22,7 +22,7 @@ public class AttendanceService {
 
     public Long registAttendance(
             String registerName,
-            AddAttendanceCommand addAttendanceCommand
+            AttendanceCreateRequest attendanceCreateRequest
     ) {
         User register = getCurrentUser(registerName);
 
@@ -32,7 +32,7 @@ public class AttendanceService {
                     throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
                 });
 
-        var attendance = addAttendanceCommand.toEntity(register);
+        var attendance = attendanceCreateRequest.toEntity(register);
         var savedAttendance = attendanceRepository.save(attendance);
 
         return savedAttendance.getId();
@@ -40,16 +40,16 @@ public class AttendanceService {
 
     public void updateAttendance(
             String currentUsername,
-            UpdateAttendanceCommand updateAttendanceCommand
+            AttendanceUpdateRequest attendanceUpdateRequest
     ) {
         User currentUser = getCurrentUser(currentUsername);
 
-        var attendance = attendanceRepository.findById(updateAttendanceCommand.id())
+        var attendance = attendanceRepository.findById(attendanceUpdateRequest.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
         attendance.validateRegister(currentUser.getId());
 
-        attendance.update(updateAttendanceCommand);
+        attendance.update(attendanceUpdateRequest);
     }
 
     public void deleteAttendance(

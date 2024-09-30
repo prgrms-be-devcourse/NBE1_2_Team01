@@ -3,15 +3,24 @@ package org.team1.nbe1_2_team01.domain.attendance.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAddAttendanceCommand;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceCreateRequest;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createAdmin;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 @SuppressWarnings("NonAsciiCharacters")
 public class AttendanceTest {
+
+    User user;
+
+    @BeforeEach
+    void setUp() {
+        user = createUser();
+    }
 
     @Test
     void 출결_정보_생성() {
@@ -24,15 +33,23 @@ public class AttendanceTest {
 
     @Test
     void 출결_정보를_생성할_때_출결_시작_시간이_끝_시간보다_나중이면_예외를_발생시킨다() {
-        assertThatThrownBy(() -> createAddAttendanceCommand(9, 30, 9, 10))
+        var createRequest = createAttendanceCreateRequest(9, 30, 9, 10);
+
+        assertThatThrownBy(() -> createRequest.toEntity(user))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 출결_정보를_생성할_때_출결_시간_모두_9시부터_18시_사이가_아니라면_예외를_발생시킨다() {
         assertSoftly(softly -> {
-            assertThatThrownBy(() -> createAddAttendanceCommand(8, 59, 9, 30)).isInstanceOf(IllegalArgumentException.class);
-            assertThatThrownBy(() -> createAddAttendanceCommand(9, 10, 18, 30)).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> {
+                var createRequest = createAttendanceCreateRequest(8, 59, 9, 30);
+                createRequest.toEntity(user);
+            }).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> {
+                var createRequest = createAttendanceCreateRequest(9, 10, 18, 30);
+                createRequest.toEntity(user);
+            }).isInstanceOf(IllegalArgumentException.class);
         });
     }
 
