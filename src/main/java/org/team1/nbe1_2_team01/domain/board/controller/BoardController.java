@@ -9,17 +9,18 @@ import org.team1.nbe1_2_team01.domain.board.service.BoardService;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/board")
+@RequestMapping("/api/board")
 @RequiredArgsConstructor
-public class CommonBoardController {
+public class BoardController {
 
     private final BoardService boardService;
-    private static final String BASE_URL = "/api/v1/board";
+    private static final String BASE_URL = "/api/board";
 
     /**
      * 공통 게시글 목록 조회 api
@@ -29,11 +30,12 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<BoardResponse>> getCommonBoardList(
+    public ResponseEntity<Response<List<BoardResponse>>> getCommonBoardList(
             @ModelAttribute BoardListRequest boardListRequest
     ) {
+        List<BoardResponse> commonBoardList = boardService.getCommonBoardList(boardListRequest);
         return ResponseEntity.ok()
-                .body(boardService.getCommonBoardList(boardListRequest));
+                .body(Response.success(commonBoardList));
     }
 
     /**
@@ -43,11 +45,12 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping("/team")
-    public ResponseEntity<List<BoardResponse>> getTeamBoardList(
+    public ResponseEntity<Response<List<BoardResponse>>> getTeamBoardList(
             @ModelAttribute TeamBoardListRequest request
     ) {
+        List<BoardResponse> boardList = boardService.getTeamBoardListByType(request);
         return ResponseEntity.ok()
-                .body(boardService.getTeamBoardListByType(request));
+                .body(Response.success(boardList));
     }
 
     /**
@@ -57,11 +60,12 @@ public class CommonBoardController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Message> addCommonBoard(
+    public ResponseEntity<Response<Message>> addCommonBoard(
             @RequestBody @Valid BoardRequest boardRequest
     ) {
+        Message message = boardService.addBoard(boardRequest);
         return ResponseEntity.ok()
-                .body(boardService.addBoard(boardRequest));
+                .body(Response.success(message));
     }
 
     /**
@@ -70,28 +74,31 @@ public class CommonBoardController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<BoardDetailResponse> getBoardDetailById(
+    public ResponseEntity<Response<BoardDetailResponse>> getBoardDetailById(
             @PathVariable Long id
     ) {
+        BoardDetailResponse data = boardService.getBoardDetailById(id);
         return ResponseEntity.ok()
-                .body(boardService.getBoardDetailById(id));
+                .body(Response.success(data));
     }
 
     @PatchMapping
-    public ResponseEntity<Message> updateBoard(
+    public ResponseEntity<Response<Message>> updateBoard(
             @RequestBody @Valid BoardUpdateRequest updateRequest
     ) {
         URI uri = URI.create(BASE_URL + "/" + updateRequest.boardId());
+        Message message = boardService.updateBoard(updateRequest);
 
         return ResponseEntity.created(uri)
-                .body(boardService.updateBoard(updateRequest));
+                .body(Response.success(message));
     }
 
     @DeleteMapping
-    public ResponseEntity<Message> deleteBoard(
-            @RequestBody BoardDeleteRequest deleteRequest
+    public ResponseEntity<Response<Message>> deleteBoard(
+            @RequestBody @Valid BoardDeleteRequest deleteRequest
     ) {
+        Message message = boardService.deleteBoardById(deleteRequest);
         return ResponseEntity.ok()
-                .body(boardService.deleteBoardById(deleteRequest));
+                .body(Response.success(message));
     }
 }
