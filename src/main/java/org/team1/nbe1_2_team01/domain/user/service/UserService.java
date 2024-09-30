@@ -9,7 +9,9 @@ import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
+import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.EMAIL_ALREADY_EXISTS;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXISTS;
@@ -19,6 +21,7 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXI
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -39,5 +42,11 @@ public class UserService {
         user.passwordEncode(passwordEncoder);
         Long id = userRepository.save(user).getId();
         return new UserIdResponse(id);
+    }
+
+    @Transactional
+    public void logout() {
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        refreshTokenRepository.deleteById(currentUsername);
     }
 }

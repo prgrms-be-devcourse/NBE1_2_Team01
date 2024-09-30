@@ -24,4 +24,10 @@ public class UserController {
         return ResponseEntity.ok().body(Response.success(userIdResponse));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(){
+        userService.logout();
+        return ResponseEntity.noContent().build();
+    }
+    
 }
