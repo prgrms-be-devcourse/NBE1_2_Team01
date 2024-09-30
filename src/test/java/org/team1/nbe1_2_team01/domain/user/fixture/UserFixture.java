@@ -24,8 +24,4 @@ public class UserFixture {
                 .role(Role.USER)
                 .build();
     }
-
-    public static User createUser_onlyId_1L() {
-        return new User(1L);
-    }
 }

@@ -74,10 +74,6 @@ public class User {
         this.role = role;
     }
 
-    public User(Long id) {
-        this.id = id;
-    }
-
     public void addBoard(Board board) {
         this.boards.add(board);
     }

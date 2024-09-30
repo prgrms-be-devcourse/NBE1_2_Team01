@@ -4,12 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAddAttendanceCommand_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createUpdateAttendanceCommand_ABSENT;
-import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser_onlyId_1L;
+import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
@@ -19,10 +20,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -31,6 +34,9 @@ public class AttendanceServiceTest {
     @Mock
     private AttendanceRepository attendanceRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private AttendanceService attendanceService;
 
@@ -38,7 +44,9 @@ public class AttendanceServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = createUser_onlyId_1L();
+        user = Mockito.spy(createUser());
+        lenient().when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        lenient().when(user.getId()).thenReturn(1L);
     }
 
     @Test
@@ -46,11 +54,12 @@ public class AttendanceServiceTest {
         // given
         var createCommand = createAddAttendanceCommand_ABSENT();
         when(attendanceRepository.findByUserIdAndStartAt(user.getId(), LocalDate.now())).thenReturn(Optional.empty());
-        var attendance = createAttendance_ABSENT(user);
+        var attendance = Mockito.spy(createAttendance_ABSENT(user));
         when(attendanceRepository.save(any(Attendance.class))).thenReturn(attendance);
+        when(attendance.getId()).thenReturn(1L);
 
         // when
-        var createdAttendanceId = attendanceService.registAttendance(user.getId(), createCommand);
+        var createdAttendanceId = attendanceService.registAttendance(user.getUsername(), createCommand);
 
         // then
         assertThat(createdAttendanceId).isNotNull();
@@ -64,7 +73,7 @@ public class AttendanceServiceTest {
         when(attendanceRepository.findById(updateCommand.id())).thenReturn(Optional.of(attendance));
 
         // when
-        attendanceService.updateAttendance(user.getId(), updateCommand);
+        attendanceService.updateAttendance(user.getUsername(), updateCommand);
 
         // then
         assertThat(attendance.getStartAt()).isEqualTo(updateCommand.startAt());
@@ -77,7 +86,7 @@ public class AttendanceServiceTest {
         when(attendanceRepository.findById(updateCommand.id())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.updateAttendance(user.getId(), updateCommand))
+        assertThatThrownBy(() -> attendanceService.updateAttendance(user.getUsername(), updateCommand))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -89,7 +98,7 @@ public class AttendanceServiceTest {
         doNothing().when(attendanceRepository).delete(attendance);
 
         // when
-        attendanceService.deleteAttendance(user.getId(), attendance.getId());
+        attendanceService.deleteAttendance(user.getUsername(), attendance.getId());
 
         // then
         verify(attendanceRepository).delete(attendance);
@@ -102,7 +111,7 @@ public class AttendanceServiceTest {
         when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.deleteAttendance(user.getId(), attendance.getId()))
+        assertThatThrownBy(() -> attendanceService.deleteAttendance(user.getUsername(), attendance.getId()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 

@@ -24,15 +24,14 @@ public class AttendanceService {
             String registerName,
             AddAttendanceCommand addAttendanceCommand
     ) {
-        Long registerId = getCurrentUserId(registerName);
+        User register = getCurrentUser(registerName);
 
         // 오늘 등록된 요청이 있는지 확인
-        attendanceRepository.findByUserIdAndStartAt(registerId, LocalDate.now())
+        attendanceRepository.findByUserIdAndStartAt(register.getId(), LocalDate.now())
                 .ifPresent(attendance -> {
                     throw new AlreadyExistException("이미 오늘 등록된 요청이 있습니다");
                 });
 
-        var register = new User(registerId);
         var attendance = addAttendanceCommand.toEntity(register);
         var savedAttendance = attendanceRepository.save(attendance);
 
@@ -43,12 +42,12 @@ public class AttendanceService {
             String currentUsername,
             UpdateAttendanceCommand updateAttendanceCommand
     ) {
-        Long currentUserId = getCurrentUserId(currentUsername);
+        User currentUser = getCurrentUser(currentUsername);
 
         var attendance = attendanceRepository.findById(updateAttendanceCommand.id())
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
-        attendance.validateRegister(currentUserId);
+        attendance.validateRegister(currentUser.getId());
 
         attendance.update(updateAttendanceCommand);
     }
@@ -57,12 +56,12 @@ public class AttendanceService {
             String currentUsername,
             Long attendanceId
     ) {
-        Long currentUserId = getCurrentUserId(currentUsername);
+        User currentUser = getCurrentUser(currentUsername);
 
         var attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
 
-        attendance.validateRegister(currentUserId);
+        attendance.validateRegister(currentUser.getId());
 
         attendanceRepository.delete(attendance);
     }
@@ -76,9 +75,8 @@ public class AttendanceService {
         attendanceRepository.deleteById(attendanceId);
     }
 
-    private Long getCurrentUserId(String username) {
-        var user = userRepository.findByUsername(username)
+    private User getCurrentUser(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
-        return user.getId();
     }
 }
