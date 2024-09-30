@@ -47,11 +47,13 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/sign-up").permitAll()
-                                .anyRequest().authenticated()
+                               // .requestMatchers("/sign-up").permitAll()
+                               // .anyRequest().authenticated()
+                                .anyRequest().permitAll()
+
                 );
-        http.addFilterAfter(customUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
-        http.addFilterBefore(jwtAuthenticationProcessingFilter(), CustomUsernamePasswordAuthenticationFilter.class);
+        // http.addFilterAfter(customUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
+        // http.addFilterBefore(jwtAuthenticationProcessingFilter(), CustomUsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

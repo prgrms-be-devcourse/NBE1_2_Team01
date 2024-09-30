@@ -9,12 +9,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChannelDTO;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChatDTO;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChatMessageDTO;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.ChatDTO;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.ChatMessageDTO;
 import org.team1.nbe1_2_team01.domain.chat.entity.Chat;
 import org.team1.nbe1_2_team01.domain.chat.service.ChatService;
-import org.team1.nbe1_2_team01.domain.chat.service.ParticipantService;
 
 import java.time.LocalDateTime;
 import java.util.List;

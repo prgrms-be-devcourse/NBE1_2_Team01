@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChannelDTO;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.ChannelJoinDTO;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.InviteDTO;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.ChannelDTO;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.ChannelRequest;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.InviteDTO;
 import org.team1.nbe1_2_team01.domain.chat.entity.Channel;
 import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.service.ParticipantService;
@@ -23,11 +23,9 @@ public class ParticipantController {
     private final ParticipantService participantService;
 
     @PostMapping("/joinChannel")
-    public ResponseEntity<Participant> joinChannel(@RequestBody ChannelJoinDTO channelJoinDTO) {
-
-        Participant participant = participantService.joinChannel(channelJoinDTO.getChannelId(), channelJoinDTO.getUserId());
+    public ResponseEntity<Participant> joinChannel(@RequestBody ChannelRequest channelRequest) {
+        Participant participant = participantService.joinChannel(channelRequest.getChannelId(), channelRequest.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(participant);
-
     }
 
     @PostMapping("/invite")

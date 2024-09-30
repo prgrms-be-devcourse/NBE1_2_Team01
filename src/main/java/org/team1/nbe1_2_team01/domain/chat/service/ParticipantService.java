@@ -4,9 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.team1.nbe1_2_team01.domain.chat.controller.dto.InviteDTO;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.InviteDTO;
 import org.team1.nbe1_2_team01.domain.chat.entity.Channel;
-import org.team1.nbe1_2_team01.domain.chat.entity.Chat;
 import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.entity.ParticipantPK;
 import org.team1.nbe1_2_team01.domain.chat.repository.ChannelRepository;
@@ -50,7 +49,6 @@ public class ParticipantService {
 
 
     // 사용자 초대
-
     @Transactional
     public void inviteUser(InviteDTO inviteDTO) {
         ParticipantPK participantPK = new ParticipantPK(inviteDTO.getInviteUserId(), inviteDTO.getChannelId());

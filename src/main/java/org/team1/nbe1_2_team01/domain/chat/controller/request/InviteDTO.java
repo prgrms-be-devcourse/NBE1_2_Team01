@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.chat.controller.dto;
+package org.team1.nbe1_2_team01.domain.chat.controller.request;
 
 import lombok.Getter;
 

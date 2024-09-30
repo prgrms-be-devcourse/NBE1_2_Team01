@@ -64,7 +64,7 @@ public class TeamController {
         return ResponseEntity.ok().body(team);
     }
 
-    @GetMapping
+    @GetMapping // pk 써서 사용해보기
     public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
         return ResponseEntity.ok().body(belongingService.courseUserList(course));
     }

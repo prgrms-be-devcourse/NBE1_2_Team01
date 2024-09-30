@@ -6,9 +6,14 @@ import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.entity.ParticipantPK;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ParticipantRepository extends JpaRepository<Participant, ParticipantPK> {
 
     List<Participant> findByUserId(Long userId);
+
+    List<Participant> findByChannelId(Long channelId);
+
+    Optional<Participant> findByUserIdAndChannelId(Long userId, Long channelId);
 }
