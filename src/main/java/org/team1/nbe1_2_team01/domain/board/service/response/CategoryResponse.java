@@ -3,7 +3,6 @@ package org.team1.nbe1_2_team01.domain.board.service.response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.team1.nbe1_2_team01.domain.board.entity.Category;
 
 @Getter @ToString
 public class CategoryResponse {
