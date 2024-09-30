@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<Error> handleException(final Exception e) {
         log.error(e.getMessage(), e);
 
-        return buildErrorTemplate(
+        return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 e.getMessage()
         );
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
             final AppException e
     ) {
         e.printStackTrace();    //개발 완료 후 삭제해야할 코드
-        return buildErrorTemplate(
+        return buildErrorResponse(
                 e.getErrorCode().getStatus(),
                 e.getErrorCode().getMessage()
         );
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
             final MissingServletRequestParameterException e
     ) {
         e.printStackTrace();
-        return buildErrorTemplate(
+        return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "요청 파라미터가 누락되었습니다."
         );
@@ -80,13 +80,13 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         }
 
-        return buildErrorTemplate(
+        return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 errors);
     }
 
     // BadRequest 응답 생성
-    private ResponseEntity<Error> buildErrorTemplate(HttpStatus status, Object message) {
+    private ResponseEntity<Error> buildErrorResponse(HttpStatus status, Object message) {
         return ResponseEntity.status(status)
                 .body(Error.of(status.value(), message));
     }
