@@ -5,9 +5,10 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.BoardUpdateRequest;
-import org.team1.nbe1_2_team01.domain.board.exception.BoardNotUpdatedException;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -81,7 +82,7 @@ public class Board {
         String newContent = updateRequest.content();
 
         if(this.title.equals(newTitle) && this.content.equals(newContent)) {
-            throw new BoardNotUpdatedException("게시글이 수정되지 않았습니다.");
+            throw new AppException(ErrorCode.BOARD_NOT_UPDATED);
         }
 
         this.title = newTitle;

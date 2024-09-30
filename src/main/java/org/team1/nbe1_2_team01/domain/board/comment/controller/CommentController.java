@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.comment.controller.dto.CommentRequest;
 import org.team1.nbe1_2_team01.domain.board.comment.service.CommentService;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.Message;
+import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/comments")
+@RequestMapping("/api/comments")
 public class CommentController {
 
     private final CommentService commentService;
@@ -24,12 +26,13 @@ public class CommentController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> getComments(
-            @RequestParam(name = "p") int page,
+    public ResponseEntity<Response<List<CommentResponse>>> getComments(
+            @RequestParam int page,
             @RequestParam("boardId") Long boardId
     ) {
+        List<CommentResponse> reviews = commentService.getReviewsByPage(boardId, page);
         return ResponseEntity.ok()
-                .body(commentService.getReviewsByPage(boardId, page));
+                .body(Response.success(reviews));
     }
 
     /**
@@ -38,9 +41,12 @@ public class CommentController {
      * @return
      */
     @DeleteMapping
-    public ResponseEntity<String> deleteComment(@RequestBody Long commentId) {
+    public ResponseEntity<Response<Message>> deleteComment(
+            @RequestBody Long commentId
+    ) {
+        Message message = commentService.deleteById(commentId);
         return ResponseEntity.ok()
-                .body(commentService.deleteById(commentId));
+                .body(Response.success(message));
     }
 
     /**
@@ -49,8 +55,11 @@ public class CommentController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<String> addComment(@RequestBody CommentRequest commentRequest) {
+    public ResponseEntity<Response<Message>> addComment(
+            @RequestBody CommentRequest commentRequest
+    ) {
+        Message message = commentService.addComment(commentRequest);
         return ResponseEntity.ok()
-                .body(commentService.addComment(commentRequest));
+                .body(Response.success(message));
     }
 }

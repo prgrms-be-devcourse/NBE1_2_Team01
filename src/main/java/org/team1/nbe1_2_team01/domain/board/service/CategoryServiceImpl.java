@@ -11,6 +11,8 @@ import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.Message;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public Message addCategory(CategoryRequest categoryRequest) {
         Belonging belonging = belongingRepository.findById(categoryRequest.teamId())
-                .orElseThrow(() -> new IllegalArgumentException("팀이 존재하지 않습니다."));
+                .orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
 
         Category newCategory = categoryRequest.toEntity(belonging);
         categoryRepository.save(newCategory);
