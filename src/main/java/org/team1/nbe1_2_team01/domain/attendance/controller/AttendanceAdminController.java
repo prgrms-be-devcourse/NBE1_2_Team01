@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
@@ -13,7 +14,7 @@ import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 
 @RestController
-@RequestMapping("/attendance/admin")
+@RequestMapping("/admin/attendance")
 @RequiredArgsConstructor
 public class AttendanceAdminController {
 
@@ -22,7 +23,6 @@ public class AttendanceAdminController {
 
     /**
      * 관리자 - 모든 출결 요청 보기
-     * @return 모든 사용자의 출결 요청 정보
      */
     @GetMapping
     public ResponseEntity<List<Attendance>> findAll() {
@@ -32,8 +32,6 @@ public class AttendanceAdminController {
 
     /**
      * 관리자 - 출결 요청 상세 내역 보기
-     * @param attendanceId 조회할 출결 요청 id
-     * @return 요청한 출결 상세 정보
      */
     @GetMapping("{id}")
     public ResponseEntity<Attendance> getAttendanceById(
@@ -45,12 +43,10 @@ public class AttendanceAdminController {
 
     /**
      * 관리자 - 출결 요청 승인
-     * @param attendanceId 승인할 출결 요청 id
-     * @return
      */
-    @PostMapping("/admin/{id}/approve")
+    @PostMapping("/approve")
     public ResponseEntity<Attendance> approveAttendance(
-            @PathVariable("id") Long attendanceId
+            @RequestBody Long attendanceId
     ) {
         attendanceService.approveAttendance(attendanceId);
         return ResponseEntity
@@ -59,12 +55,10 @@ public class AttendanceAdminController {
 
     /**
      * 관리자 - 출결 요청 반려
-     * @param attendanceId 반려할 출결 요청 id
-     * @return
      */
-    @PostMapping("/admin/{id}/reject")
+    @PostMapping("/reject")
     public ResponseEntity<String> rejectAttendance(
-            @PathVariable("id") Long attendanceId
+            @RequestBody Long attendanceId
     ) {
         attendanceService.rejectAttendance(attendanceId);
         return ResponseEntity

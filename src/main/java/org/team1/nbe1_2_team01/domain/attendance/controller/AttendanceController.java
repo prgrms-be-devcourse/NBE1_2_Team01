@@ -30,7 +30,6 @@ public class AttendanceController {
 
     /**
      * 자신의 출결 요청 보기
-     * @return 자신의 출결 요청 리스트
      */
     @GetMapping
     public ResponseEntity<List<Attendance>> getMyAttendances() {
@@ -42,7 +41,6 @@ public class AttendanceController {
 
     /**
      * 자신의 출결 요청 상세 보기
-     *
      */
     @GetMapping("{id}")
     public ResponseEntity<Attendance> getMyAttendance(
@@ -56,10 +54,8 @@ public class AttendanceController {
 
     /**
      * 출결 요청 등록
-     * @param attendanceCreateRequest 출결 요청 생성에 필요한 데이터
-     * @return 등록된 attendance id url 반환
      */
-    @PostMapping("/register")
+    @PostMapping("/regist")
     public ResponseEntity<Attendance> registAttendance(
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {
@@ -73,9 +69,8 @@ public class AttendanceController {
 
     /**
      * 출결 요청 수정
-     * @param attendanceUpdateRequest 출결 요청 수정에 필요한 데이터
      */
-    @PatchMapping("/update")
+    @PatchMapping
     public ResponseEntity<Attendance> updateAttendance(
             @RequestBody @Valid AttendanceUpdateRequest attendanceUpdateRequest
     ) {
@@ -88,11 +83,10 @@ public class AttendanceController {
 
     /**
      * 출결 요청 삭제
-     * @param attendanceId 삭제할 출결 요청 id
      */
-    @DeleteMapping("/{id}}")
+    @DeleteMapping
     public ResponseEntity<String> deleteAttendance(
-            @PathVariable("id") Long attendanceId
+            @RequestBody Long attendanceId
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
