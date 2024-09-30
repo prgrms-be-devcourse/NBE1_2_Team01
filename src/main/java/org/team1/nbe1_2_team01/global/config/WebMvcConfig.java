@@ -10,7 +10,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8080") // 임시로 테스트 할라고 변경
+                .allowedOrigins("http://localhost:3000")
                 .allowedMethods("*")
                 .allowCredentials(true);
 

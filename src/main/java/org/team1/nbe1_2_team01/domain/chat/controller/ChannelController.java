@@ -30,7 +30,7 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pk);
     }
 
-    @PutMapping("/updateChannel")
+    @PatchMapping("/updateChannel")
     public ResponseEntity<Long> updateChannel(@RequestBody ChannelUpdateRequest channelUpdateRequest) {
         Long pk = channelService.updateChannel(channelUpdateRequest.getUserId(), channelUpdateRequest.getChannelId(), channelUpdateRequest.getChannelName());
         return ResponseEntity.status(HttpStatus.OK).body(pk);
