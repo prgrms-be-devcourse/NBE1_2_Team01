@@ -18,7 +18,8 @@ import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.EMAIL_ALREADY_EXISTS;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -56,27 +57,32 @@ public class UserService {
 
     @Transactional
     public UserIdResponse update(UserUpdateRequest userUpdateRequest) {
-        User user = userRepository.findById(userUpdateRequest.id())
-                .orElseThrow(() -> new AppException(USER_NOT_FOUND));
-        if (userUpdateRequest.name() != null && !userUpdateRequest.name().isEmpty()) {
+        User user = getcurrentuser();
+        if (userUpdateRequest.name() != null) {
             user.updateName(userUpdateRequest.name());
         }
-        if (userUpdateRequest.password() != null && !userUpdateRequest.password().isEmpty()) {
+        if (userUpdateRequest.password() != null) {
             user.updatePassword(userUpdateRequest.password());
             user.passwordEncode(passwordEncoder);
         }
         return new UserIdResponse(user.getId());
     }
 
+
     public UserDetailsResponse getCurrentUserDetails() {
-        String username = SecurityUtil.getCurrentUsername();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다."));
+        User user = getcurrentuser();
 
         return new UserDetailsResponse(user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getName());
+    }
+
+    private User getcurrentuser() {
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다."));
+        return user;
     }
 
     public List<UserDetailsResponse> getAllUsers() {
