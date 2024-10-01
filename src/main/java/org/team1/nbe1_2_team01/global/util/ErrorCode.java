@@ -12,6 +12,7 @@ public enum ErrorCode {
     REQUEST_ALREADY_APPROVED(HttpStatus.CONFLICT, "이미 승인되었습니다."),
     REQUEST_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 오늘 등록된 요청이 있습니다"),
     ATTENDANCE_TIME_INVALID(HttpStatus.BAD_REQUEST, "출결 이슈는 9시에서 17시 59분 사이여야 합니다."),
+    ATTENDANCE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "출결 이슈에 접근할 수 없습니다."),
 
     //board
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."),
