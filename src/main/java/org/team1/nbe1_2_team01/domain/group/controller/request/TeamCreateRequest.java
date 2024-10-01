@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 public class TeamCreateRequest {
+    //TODO: 리퀘스트들 Validation 넣기
 
     private String course;
 

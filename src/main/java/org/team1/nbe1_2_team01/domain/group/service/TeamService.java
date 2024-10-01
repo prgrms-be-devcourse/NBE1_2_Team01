@@ -11,17 +11,16 @@ import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.group.repository.TeamRepository;
 import org.team1.nbe1_2_team01.domain.group.service.response.BelongingIdResponse;
-import org.team1.nbe1_2_team01.domain.group.service.response.BelongingResponse;
 import org.team1.nbe1_2_team01.domain.group.service.response.TeamIdResponse;
 import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
+import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,15 +39,16 @@ public class TeamService {
         List<User> users = checkUsers(teamCreateRequest.getUserIds());
         List<Belonging> belongings = new ArrayList<>();
 
+        boolean existsByCourse = belongingRepository.existsByCourse(teamCreateRequest.getCourse());
         Calendar courseCalendar = null;
         if (teamCreateRequest.getTeamType().equals("PROJECT")) {
             // 처음으로 생성되는 코스라면 코스 Belonging 생성, 코스 Calendar 생성
-            if (!belongingRepository.existsByCourse(teamCreateRequest.getCourse())) {
+            if (!existsByCourse) {
                 Belonging courseBelonging = Belonging.createBelongingOf(false, teamCreateRequest.getCourse(), null);
                 belongings.add(courseBelonging);
                 courseCalendar = Calendar.createCalendarOf(courseBelonging);
             }
-        }
+        } else if (!existsByCourse) throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         // 저장될 팀 객체
         Team newTeam = teamCreateRequest.toProjectTeamEntity();
 
@@ -61,19 +61,13 @@ public class TeamService {
             newTeam.assignBelonging(belonging);
             belongings.add(belonging);
 
-            if (isOwner) {
-                teamCalendar = Calendar.createCalendarOf(belonging);
-            }
+            if (isOwner) teamCalendar = Calendar.createCalendarOf(belonging);
         }
         assert teamCalendar != null;
 
         teamRepository.save(newTeam);
         belongingRepository.saveAll(belongings);
-
-        if (courseCalendar != null) {
-            calendarRepository.save(courseCalendar);
-        }
-
+        if (courseCalendar != null) calendarRepository.save(courseCalendar);
         calendarRepository.save(teamCalendar);
         return TeamIdResponse.of(newTeam);
     }
@@ -83,11 +77,7 @@ public class TeamService {
         List<User> users = userRepository.findAllUsersByIdList(userIds);
 
         List<Long> foundUserIds = users.stream().map(User::getId).toList();
-        for (Long userId : userIds) {
-            if (!foundUserIds.contains(userId)) {
-                throw new RuntimeException("아이디가 " + userId + "인 유저는 없습니다.");
-            }
-        }
+        for (Long userId : userIds) if (!foundUserIds.contains(userId)) throw new AppException(ErrorCode.USER_NOT_FOUND);
 
         return users;
     }
@@ -98,32 +88,25 @@ public class TeamService {
     }
 
     public TeamIdResponse studyTeamApprove(TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
-        Optional<Team> team = teamRepository.findById(teamApprovalUpdateRequest.getTeamId());
+        Team team = teamRepository.findById(teamApprovalUpdateRequest.getTeamId()).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+        if (!team.isCreationWaiting()) throw new AppException(ErrorCode.TEAM_NOT_WAITING);
 
-        if (team.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 팀입니다.");
-        }
+        team.setCreationWaiting(false);
 
-        if (!team.get().isCreationWaiting()) {
-            throw new RuntimeException("승인 대기중인 팀이 아닙니다.");
-        }
-
-        team.get().setCreationWaiting(false);
-
-        return TeamIdResponse.of(teamRepository.save(team.get()));
+        return TeamIdResponse.of(teamRepository.save(team));
     }
 
-    public TeamIdResponse projectTeamNameUpdate(TeamNameUpdateRequest teamNameUpdateRequest) {
-        int res = teamRepository.updateProjectTeamNameById(teamNameUpdateRequest.getTeamId(), teamNameUpdateRequest.getName());
-        if (res == 0) throw new RuntimeException("수정 중 오류 발생");
+    public TeamIdResponse teamNameUpdate(TeamNameUpdateRequest teamNameUpdateRequest) {
+        Team team = teamRepository.findByIdWithLeaderBelonging(teamNameUpdateRequest.getTeamId()).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findByUsername(SecurityUtil.getCurrentUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return new TeamIdResponse(teamNameUpdateRequest.getTeamId());
-    }
+        if (team.getTeamType().name().equals("PROJECT") && !user.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        if (team.getTeamType().name().equals("STUDY")) {
+            Long leaderId = team.getBelongings().get(0).getUser().getId();
+            if (!user.getId().equals(leaderId)) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
+        }
 
-    public TeamIdResponse studyTeamNameUpdate(TeamNameUpdateRequest teamNameUpdateRequest) {
-        int res = teamRepository.updateStudyTeamNameById(teamNameUpdateRequest.getTeamId(), teamNameUpdateRequest.getName());
-        if (res == 0) throw new RuntimeException("수정 중 오류 발생");
-
+        team.setName(teamNameUpdateRequest.getName());
         return new TeamIdResponse(teamNameUpdateRequest.getTeamId());
     }
 

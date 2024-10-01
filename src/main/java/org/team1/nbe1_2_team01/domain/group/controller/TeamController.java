@@ -19,55 +19,32 @@ import java.util.List;
 @RequestMapping("/api/teams")
 @RequiredArgsConstructor
 public class TeamController {
-    // TODO: /teams/project 이하 엔드포인트들은 ADMIN 토큰 필요하도록 하기
 
     private final TeamService teamService;
     private final BelongingService belongingService;
 
     @PostMapping
     public ResponseEntity<?> createTeam(@RequestBody TeamCreateRequest teamCreateRequest) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Response.success(teamService.teamCreate(teamCreateRequest)));
-        } catch (AppException e) {
-            return ResponseEntity.status(e.getErrorCode().getStatus())
-                    .body(Response.error(e.getErrorCode().getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Response.error("서버 내부 오류 발생"));
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Response.success(teamService.teamCreate(teamCreateRequest)));
     }
 
     @GetMapping("/waiting")
     public ResponseEntity<?> getCreationWaitingStudyTeams() {
-        return ResponseEntity.ok().body(teamService.creationWaitingStudyTeamList());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success(teamService.creationWaitingStudyTeamList()));
     }
 
     @PatchMapping("/approval")
     public ResponseEntity<?> approveStudyTeam(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamApprove(teamApprovalUpdateRequest));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success(teamService.studyTeamApprove(teamApprovalUpdateRequest)));
     }
 
-    @PatchMapping("/project/name")
-    public ResponseEntity<?> updateProjectTeamName(@RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(teamService.projectTeamNameUpdate(teamNameUpdateRequest));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @PatchMapping("/study/name")
-    public ResponseEntity<?> updateStudyTeamName(@RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(teamService.studyTeamNameUpdate(teamNameUpdateRequest));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @PatchMapping("/name")
+    public ResponseEntity<?> updateTeamName(@RequestBody TeamNameUpdateRequest teamNameUpdateRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success(teamService.teamNameUpdate(teamNameUpdateRequest)));
     }
 
     @PostMapping("/project/member")

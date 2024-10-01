@@ -7,19 +7,17 @@ import org.springframework.data.repository.query.Param;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TeamRepository extends JpaRepository<Team, Long> {
 
     List<Team> findByCreationWaiting(boolean waiting);
 
-    @Modifying
-    @Query("UPDATE Team t SET t.name = :name WHERE t.id = :id AND t.teamType = 'PROJECT'")
-    int updateProjectTeamNameById(@Param("id") Long id, @Param("name") String name);
-
-    @Modifying
-    @Query("UPDATE Team t SET t.name = :name WHERE t.id = :id AND t.teamType = 'STUDY'")
-    int updateStudyTeamNameById(@Param("id") Long id, @Param("name") String name);
-
     void deleteById(Long id);
 
+    @Query("select t " +
+            "from Team t " +
+            "join fetch t.belongings b " +
+            "where b.isOwner = true and t.id = :teamId")
+    Optional<Team> findByIdWithLeaderBelonging(@Param("teamId") Long teamId);
 }
