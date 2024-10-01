@@ -11,7 +11,8 @@ public enum ErrorCode {
     ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "출결 요청을 찾을 수 없습니다."),
     REQUEST_ALREADY_APPROVED(HttpStatus.CONFLICT, "이미 승인되었습니다."),
     REQUEST_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 오늘 등록된 요청이 있습니다"),
-    ATTENDANCE_TIME_INVALID(HttpStatus.BAD_REQUEST, "출결 이슈는 9시에서 17시 59분 사이여야 합니다."),
+    ATTENDANCE_TIME_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "출결 이슈는 9시에서 17시 59분 사이여야 합니다."),
+    ATTENDANCE_TIME_END_BEFORE_START(HttpStatus.BAD_REQUEST, "출결 시작 시간이 끝 시간보다 나중일 수 없습니다."),
     ATTENDANCE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "출결 이슈에 접근할 수 없습니다."),
 
     //board
