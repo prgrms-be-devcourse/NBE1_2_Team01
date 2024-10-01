@@ -9,12 +9,14 @@ import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.service.BelongingService;
 import org.team1.nbe1_2_team01.domain.group.service.TeamService;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/teams")
+@RequestMapping("/api/teams")
 @RequiredArgsConstructor
 public class TeamController {
     // TODO: /teams/project 이하 엔드포인트들은 ADMIN 토큰 필요하도록 하기
@@ -24,17 +26,15 @@ public class TeamController {
 
     @PostMapping
     public ResponseEntity<?> createTeam(@RequestBody TeamCreateRequest teamCreateRequest) {
-        // TODO: 프로젝트 팀인지 스터디 팀인지 분기하는 로직을 서비스로 옮기기
         try {
-            if (teamCreateRequest.getTeamType().equals("PROJECT")) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(teamService.projectTeamCreate(teamCreateRequest));
-            } else if (teamCreateRequest.getTeamType().equals("STUDY")) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(teamService.studyTeamCreate(teamCreateRequest));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("팀 타입이 필요합니다.");
-            }
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Response.success(teamService.teamCreate(teamCreateRequest)));
+        } catch (AppException e) {
+            return ResponseEntity.status(e.getErrorCode().getStatus())
+                    .body(Response.error(e.getErrorCode().getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Response.error("서버 내부 오류 발생"));
         }
     }
 
