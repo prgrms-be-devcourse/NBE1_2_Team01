@@ -130,8 +130,10 @@ public class BoardServiceImpl implements BoardService {
 
     private Board getBoardWithValidateUser(Long boardId, boolean isNotice) {
         Board findBoard = getBoardById(boardId);
-        BoardValidator.validateWriter(findBoard);
-        BoardValidator.validateAdminForNotice(getUser(), isNotice);
+        User user = getUser();
+
+        BoardValidator.validateWriter(findBoard, user);
+        BoardValidator.validateAdminForNotice(user, isNotice);
         return findBoard;
     }
 }
