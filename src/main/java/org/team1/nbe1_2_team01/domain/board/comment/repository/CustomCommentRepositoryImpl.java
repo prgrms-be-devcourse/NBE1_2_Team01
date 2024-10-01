@@ -5,8 +5,12 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
+import org.team1.nbe1_2_team01.domain.user.entity.Role;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.team1.nbe1_2_team01.domain.board.entity.QComment.comment;
@@ -24,7 +28,8 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                         comment.id,
                         user.username,
                         comment.content,
-                        comment.createdAt
+                        comment.createdAt,
+                        user.id
                 )
                 .from(comment)
                 .innerJoin(user).on(comment.user.eq(user))
@@ -37,17 +42,21 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                 .orderBy(comment.createdAt.desc(), comment.id.desc())
                 .fetch();
 
-        List<CommentResponse> comments = convertToResponses(tuples);
+        User currentUser = findCurrentUser();
+        List<CommentResponse> comments = convertToResponses(tuples, currentUser);
+
 
         return Optional.of(comments);
     }
 
-    private static List<CommentResponse> convertToResponses(List<Tuple> tuples) {
+    private static List<CommentResponse> convertToResponses(List<Tuple> tuples, User currentUSer) {
         return tuples.stream().map(tuple -> CommentResponse.of(
                 tuple.get(comment.id),
                 tuple.get(user.username),
                 tuple.get(comment.content),
-                tuple.get(comment.createdAt)
+                tuple.get(comment.createdAt),
+                Objects.equals(currentUSer.getRole(), Role.ADMIN),
+                Objects.equals(tuple.get(user.id), currentUSer.getId())
         )).toList();
     }
 
@@ -55,5 +64,10 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         if(commentId != null) {
             query.where(comment.id.lt(commentId));
         }
+    }
+
+    private User findCurrentUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        return queryFactory.selectFrom(user).where(user.username.eq(currentUsername)).fetchOne();
     }
 }

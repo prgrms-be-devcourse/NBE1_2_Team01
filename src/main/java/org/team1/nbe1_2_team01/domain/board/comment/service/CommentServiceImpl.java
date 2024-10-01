@@ -9,9 +9,12 @@ import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResp
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
+import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -45,12 +49,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Message addComment(CommentRequest commentRequest) {
-        //유저 정보(미완), board정보 가져오기(완)
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
         Board findBoard = boardRepository.findById(commentRequest.boardId())
                 .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
 
-        Comment comment = commentRequest.toEntity(null, findBoard);
+        Comment comment = commentRequest.toEntity(currentUser, findBoard);
         commentRepository.save(comment);
+
         String addCommentMessage = ADD_BOARD_COMPLETED.getMessage();
         return new Message(addCommentMessage);
     }

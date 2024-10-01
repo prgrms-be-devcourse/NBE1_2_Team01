@@ -114,23 +114,9 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
         }
 
         User currentUser = findCurrentUser();
-
-        BoardDetailResponse boardDetailResponse = BoardDetailResponse.of(
-                tuple.get(board.id),
-                tuple.get(board.title),
-                tuple.get(board.content),
-                tuple.get(user.name),
-                tuple.get(board.createdAt),
-                Objects.equals(currentUser.getRole(), Role.ADMIN),
-                Objects.equals(tuple.get(board.user.id), currentUser.getId())
-        );
+        BoardDetailResponse boardDetailResponse = getBoardDetailResponse(tuple, currentUser);
 
         return Optional.ofNullable(boardDetailResponse);
-    }
-
-    private User findCurrentUser() {
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        return queryFactory.selectFrom(user).where(user.username.eq(currentUsername)).fetchOne();
     }
 
     private void setPagingStart(JPAQuery<Tuple> commonQuery, long belongingId, Long boardId) {
@@ -140,11 +126,15 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
             commonQuery.where(board.id.lt(boardId));
         }
     }
-
     private void setConditionByCategoryId(JPAQuery<Tuple> teamBoardQuery, Long categoryId) {
         if(categoryId != null) {
             teamBoardQuery.where(board.category.id.eq(categoryId));
         }
+    }
+
+    private User findCurrentUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        return queryFactory.selectFrom(user).where(user.username.eq(currentUsername)).fetchOne();
     }
 
     private List<BoardResponse> getBoardResponses(List<Tuple> query) {
@@ -158,5 +148,16 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
                         tuple.get(comment.count())
                 ))
                 .toList();
+    }
+    private BoardDetailResponse getBoardDetailResponse(Tuple tuple, User currentUser) {
+        return BoardDetailResponse.of(
+                tuple.get(board.id),
+                tuple.get(board.title),
+                tuple.get(board.content),
+                tuple.get(user.name),
+                tuple.get(board.createdAt),
+                Objects.equals(currentUser.getRole(), Role.ADMIN),
+                Objects.equals(tuple.get(board.user.id), currentUser.getId())
+        );
     }
 }
