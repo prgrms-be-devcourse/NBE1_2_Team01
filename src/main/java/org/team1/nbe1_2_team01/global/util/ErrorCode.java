@@ -30,6 +30,9 @@ public enum ErrorCode {
 
 
     //calender
+    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다."),
+    SCHEDULE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "일정 정보에 접근할 수 없습니다."),
+    USER_NOT_OWNER(HttpStatus.FORBIDDEN, "팀원은 수행할 수 없습니다."),
 
     //group
     MISSING_TEAM_TYPE(HttpStatus.BAD_REQUEST, "팀 타입이 필요합니다."),
