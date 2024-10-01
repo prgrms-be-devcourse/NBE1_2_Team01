@@ -16,6 +16,8 @@ import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenReposito
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
+import java.util.List;
+
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 
 @Service
@@ -75,6 +77,15 @@ public class UserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getName());
+    }
+
+    public List<UserDetailsResponse> getAllUsers() {
+        return userRepository.findByRole(Role.USER)
+                .stream()
+                .map(user -> {
+                    return new UserDetailsResponse(user.getId(), user.getUsername(), user.getEmail(), user.getName());
+                })
+                .toList();
     }
 
 }

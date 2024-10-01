@@ -11,6 +11,8 @@ import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -51,5 +53,15 @@ public class UserController {
     public ResponseEntity<Response<UserIdResponse>> update(@RequestBody UserUpdateRequest userUpdateRequest){
         UserIdResponse userIdResponse = userService.update(userUpdateRequest);
         return ResponseEntity.ok().body(Response.success(userIdResponse));
+    }
+
+    /**
+     *  전체 회원(USER) 조회
+     *  관리자가 프로젝트 팀을 만들때 필요
+     */
+    @GetMapping("/admin/all")
+    public ResponseEntity<Response<List<UserDetailsResponse>>> getAllUsers(){
+        List<UserDetailsResponse> userDetailsResponses = userService.getAllUsers();
+        return ResponseEntity.ok().body(Response.success(userDetailsResponses));
     }
 }
