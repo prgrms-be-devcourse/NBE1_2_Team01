@@ -63,21 +63,22 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
 
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        refreshTokenRepository.findByRefreshToken(refreshToken)
+        refreshTokenRepository.findByToken(refreshToken)
                 .ifPresent(token->{
                     String username = token.getUsername();
                     User user = userRepository.findByUsername(username)
                             .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
                     String reIssuedRefreshToken = reIssueRefreshToken(user);
                     jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(username), reIssuedRefreshToken);
-                    RefreshToken redis = new RefreshToken(reIssuedRefreshToken, username);
-                    refreshTokenRepository.save(redis);
                 });
     }
 
     private String reIssueRefreshToken(User user) {
         String reIssuedRefreshToken = jwtService.createRefreshToken();
-        RefreshToken redis = new RefreshToken(reIssuedRefreshToken, user.getUsername());
+        RefreshToken redis = RefreshToken.builder()
+                .username(user.getUsername())
+                .token(reIssuedRefreshToken)
+                .build();
         refreshTokenRepository.save(redis);
         return reIssuedRefreshToken;
     }
