@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 
 import java.util.Date;
 import java.util.Optional;
@@ -39,8 +38,9 @@ public class JwtService {
     private static final String USERNAME_CLAIM = "username";
     private static final String BEARER = "Bearer ";
 
-    private final UserRepository userRepository;
-
+    /**
+     * AccessToken 생성 메서드
+     */
     public String createAccessToken(String username) {
         Date now = new Date();
         Claims claims = Jwts.claims();
@@ -53,6 +53,9 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * RefreshToken 생성 메서드
+     */
 
     public String createRefreshToken() {
         Date now = new Date();
@@ -65,7 +68,9 @@ public class JwtService {
                 .compact();
     }
 
-
+    /**
+     * RefreshToken과 AccessToken을 응답 헤더에 넣어주는 메서드
+     */
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -74,19 +79,28 @@ public class JwtService {
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 
+    /**
+     * Bearer 를 제거하여 refreshToken만 추출해 내는 메서드
+     */
+
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(refreshHeader))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
-
+    /**
+     * Bearer 를 제거하여 accessToken만 추출해 내는 메서드
+     */
     public Optional<String> extractAccessToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(accessHeader))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
+    /**
+     * accessToken에서 username을 추출해 내는 메서드
+     */
     public Optional<String> extractUsername(String accessToken) {
         try {
             Claims claims = Jwts.parser()
@@ -101,16 +115,23 @@ public class JwtService {
         }
     }
 
-
+    /**
+     * AccessToken을 응답 헤더에 넣어주는 메서드
+     */
     public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
         response.setHeader(accessHeader, accessToken);
     }
 
+    /**
+     * RefreshToken을 응답 헤더에 넣어주는 메서드
+     */
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
         response.setHeader(refreshHeader, refreshToken);
     }
 
-
+    /**
+     * 해당 토큰이 유효한지 검증하는 메서드
+     */
 
     public boolean isTokenValid(String token) {
         try {

@@ -24,6 +24,7 @@ import java.io.IOException;
 /**
  * Jwt 인증 필터
  * "/login 이외의 URI 요청을 처리하는 필터
+ *  RTR 방식으로 동작
  * 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공
  * 2. RefreshToken이 없고, AccessToken이 없거나 유효X 인 경우 -> 인증 실패
  * 3. RefreshToken이 있는 경우 -> RefreshToken과 비교하여 일치하면 AccessToken 재발급 RefreshToken 재발급
