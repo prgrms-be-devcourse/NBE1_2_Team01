@@ -56,9 +56,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (refreshToken == null) {
-            checkAccessTokenAndAuthentication(request, response, filterChain);
-        }
+        checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
 
@@ -68,19 +66,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                     String username = token.getUsername();
                     User user = userRepository.findByUsername(username)
                             .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
+                    String reIssuedRefreshToken = jwtService.createRefreshToken(username);
                     jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(username), reIssuedRefreshToken);
                 });
-    }
-
-    private String reIssueRefreshToken(User user) {
-        String reIssuedRefreshToken = jwtService.createRefreshToken();
-        RefreshToken redis = RefreshToken.builder()
-                .username(user.getUsername())
-                .token(reIssuedRefreshToken)
-                .build();
-        refreshTokenRepository.save(redis);
-        return reIssuedRefreshToken;
     }
 
 
@@ -88,9 +76,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                                                   FilterChain filterChain) throws ServletException, IOException {
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
-                .ifPresent(accessToken -> jwtService.extractUsername(accessToken)
-                        .ifPresent(username -> userRepository.findByUsername(username)
-                                .ifPresent(this::saveAuthentication)));
+                .flatMap(jwtService::extractUsername)
+                .flatMap(userRepository::findByUsername)
+                .ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
     }
