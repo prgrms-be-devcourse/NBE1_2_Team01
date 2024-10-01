@@ -1,6 +1,5 @@
 package org.team1.nbe1_2_team01.domain.calendar.service;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.SCHEDULE_ACCESS_DENIED;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.SCHEDULE_NOT_FOUND;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.USER_NOT_OWNER;
 
@@ -13,8 +12,8 @@ import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;
-import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
-import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
+import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
+import org.team1.nbe1_2_team01.domain.group.service.response.GroupAuthResponse;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Service
@@ -24,16 +23,18 @@ public class ScheduleService {
 
     private final CalendarRepository calendarRepository;
     private final ScheduleRepository scheduleRepository;
-    private final BelongingRepository belongingRepository;
+    private final GroupAuthService groupAuthService;
 
     public Long registSchedule(
-            Long currentUserId,
+            String register,
             Long belongingId,
             ScheduleCreateRequest scheduleCreateRequest
     ) {
-        validatePermission(currentUserId, belongingId);
+        GroupAuthResponse groupAuthResponse = groupAuthService.validateTeam(register, belongingId);
 
-        Calendar calendar = calendarRepository.findByBelongingId(belongingId).orElseThrow();
+        validateOwner(groupAuthResponse.isOwner());
+
+        Calendar calendar = calendarRepository.findByBelongingId(groupAuthResponse.belongingId()).orElseThrow();
 
         Schedule Schedule = scheduleCreateRequest.toEntity(calendar);
         Schedule savedSchedule = scheduleRepository.save(Schedule);
@@ -41,11 +42,13 @@ public class ScheduleService {
     }
 
     public void updateSchedule(
-            Long currentUserId,
+            String currentUsername,
             Long belongingId,
             ScheduleUpdateRequest scheduleUpdateRequest
     ) {
-        validatePermission(currentUserId, belongingId);
+        GroupAuthResponse groupAuthResponse = groupAuthService.validateTeam(currentUsername, belongingId);
+
+        validateOwner(groupAuthResponse.isOwner());
 
         Schedule schedule = scheduleRepository.findById(scheduleUpdateRequest.id())
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
@@ -54,11 +57,13 @@ public class ScheduleService {
     }
 
     public void deleteSchedule(
-            Long currentUserId,
+            String currentUsername,
             Long belongingId,
             Long scheduleId
     ) {
-        validatePermission(currentUserId, belongingId);
+        GroupAuthResponse groupAuthResponse = groupAuthService.validateTeam(currentUsername, belongingId);
+
+        validateOwner(groupAuthResponse.isOwner());
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
@@ -66,22 +71,8 @@ public class ScheduleService {
         scheduleRepository.delete(schedule);
     }
 
-    // 타 도메인 검증 메서드 - 소속이 아니면 접근 불가
-    private void validatePermission(Long currentUserId, Long belongingId) {
-        Belonging belonging = belongingRepository.findById(belongingId).orElseThrow();
-
-        validateBelonging(currentUserId, belonging);
-        validateOwner(belonging);
-    }
-
-    private void validateBelonging(Long currentUserId, Belonging belonging) {
-        if (!belonging.getUser().getId().equals(currentUserId)) {
-            throw new AppException(SCHEDULE_ACCESS_DENIED);
-        }
-    }
-
-    private void validateOwner(Belonging belonging) {
-        if (!belonging.isOwner()) {
+    private void validateOwner(boolean isOwner) {
+        if (!isOwner) {
             throw new AppException(USER_NOT_OWNER);
         }
     }

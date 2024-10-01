@@ -31,20 +31,21 @@ public enum ErrorCode {
 
     //calender
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다."),
-    SCHEDULE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "일정 정보에 접근할 수 없습니다."),
-    USER_NOT_OWNER(HttpStatus.FORBIDDEN, "팀원은 수행할 수 없습니다."),
 
     //group
     MISSING_TEAM_TYPE(HttpStatus.BAD_REQUEST, "팀 타입이 필요합니다."),
     COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "코스가 존재하지 않습니다."),
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀이 존재하지 않습니다."),
     BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "소속이 존재하지 않습니다"),
+    COURSE_AUTH_DENIED(HttpStatus.FORBIDDEN, "코스에 소속된 유저만 접근할 수 있습니다."),
+    TEAM_AUTH_DENIED(HttpStatus.FORBIDDEN, "팀에 소속된 유저만 접근할 수 있습니다."),
 
     //user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
     NOT_ADMIN_USER(HttpStatus.UNAUTHORIZED, "관리자만 이용가능합니다."),
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "%s는 이미 존재하는 아이디입니다."),
-    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "%s는 이미 존재하는 이메일 입니다.")
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "%s는 이미 존재하는 이메일 입니다."),
+    USER_NOT_OWNER(HttpStatus.FORBIDDEN, "팀원은 수행할 수 없습니다.")
     ;
 
     @Getter

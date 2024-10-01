@@ -1,10 +1,8 @@
 package org.team1.nbe1_2_team01.domain.calendar.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 import static org.team1.nbe1_2_team01.domain.calendar.fixture.ScheduleFixture.createCalendar;
 import static org.team1.nbe1_2_team01.domain.calendar.fixture.ScheduleFixture.createSchedule_MEETING;
 import static org.team1.nbe1_2_team01.domain.calendar.fixture.ScheduleFixture.createSchedule_RBF;
@@ -13,7 +11,6 @@ import static org.team1.nbe1_2_team01.domain.group.fixture.TeamFixture.createTea
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,10 +19,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;
-import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
+import org.team1.nbe1_2_team01.domain.group.service.response.GroupAuthResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
-import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
-import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -35,52 +32,53 @@ public class ScheduleServiceTest {
     private ScheduleRepository scheduleRepository;
 
     @Mock
-    private BelongingRepository belongingRepository;
-
-    @Mock
-    private UserRepository userRepository;
+    private GroupAuthService groupAuthService;
 
     @InjectMocks
     private ScheduleQueryService scheduleQueryService;
 
     User user;
 
+    Belonging belonging;
+
     @BeforeEach
     void setUp() {
         user = Mockito.spy(createUser());
-        lenient().when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
-        lenient().when(user.getId()).thenReturn(1L);
+        belonging = Mockito.spy(createBelonging_DEVCOURCE_1_MEMBER(user, createTeam_PRODUCT_TEAM_1()));
+        lenient().when(belonging.getId()).thenReturn(1L);
     }
 
     @Test
     void 공지_일정_조회() {
         // given
-        var belonging = Mockito.spy(createBelonging_DEVCOURCE_1_MEMBER(user, createTeam_PRODUCT_TEAM_1()));
-        when(belonging.getId()).thenReturn(1L);
-        var userIdsAsDEVCOURCE_1 = List.of(1L, 2L, 3L);
-        given(belongingRepository.findDistinctUserIdsByCourse(belonging.getCourse())).willReturn(userIdsAsDEVCOURCE_1);
+        given(groupAuthService.validateCourse(user.getUsername(), belonging.getCourse())).willReturn(1L);
         var calendar = createCalendar(belonging);
         var schedule_1 = createSchedule_MEETING(calendar);
         var schedule_2 = createSchedule_RBF(calendar);
-        given(scheduleRepository.findByBelongingId(belonging.getId())).willReturn(List.of(schedule_1, schedule_2));
+        given(scheduleRepository.findByBelongingId(1L)).willReturn(List.of(schedule_1, schedule_2));
 
         // when
-        var noticeScheduleResponses = scheduleQueryService.getNoticeSchedules(user.getUsername(),
-                belonging.getCourse());
+        var noticeScheduleResponses = scheduleQueryService.getNoticeSchedules(user.getUsername(), belonging.getCourse());
 
         // then
         assertThat(noticeScheduleResponses).hasSize(2);
     }
 
     @Test
-    void 공지_일정_조회_시_유저가_코스에_소속되어_있지_않다면_예외를_발생시킨다() {
+    void 팀_일정_조회() {
         // given
-        var course = "devcourse_1th";
-        var userIdsAsDEVCOURCE_1 = List.of(2L, 3L);
-        given(belongingRepository.findDistinctUserIdsByCourse(course)).willReturn(userIdsAsDEVCOURCE_1);
+        var groupAuthResponse = GroupAuthResponse.from(belonging);
+        given(groupAuthService.validateTeam(user.getUsername(), belonging.getId()))
+                .willReturn(groupAuthResponse);
+        var calendar = createCalendar(belonging);
+        var schedule_1 = createSchedule_MEETING(calendar);
+        var schedule_2 = createSchedule_RBF(calendar);
+        given(scheduleRepository.findByBelongingId(1L)).willReturn(List.of(schedule_1, schedule_2));
 
-        // when & then
-        assertThatThrownBy(() -> scheduleQueryService.getNoticeSchedules(user.getUsername(), course))
-                .isInstanceOf(AppException.class);
+        // when
+        var teamScheduleResponses = scheduleQueryService.getTeamSchedules(user.getUsername(), belonging.getId());
+
+        // then
+        assertThat(teamScheduleResponses).hasSize(2);
     }
 }
