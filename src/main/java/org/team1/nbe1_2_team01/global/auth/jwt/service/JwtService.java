@@ -50,7 +50,7 @@ public class JwtService {
         Date now = new Date();
         Claims claims = Jwts.claims();
         claims.put(USERNAME_CLAIM, username);
-        claims.setExpiration(new Date(now.getTime() + 1000L));
+        claims.setExpiration(new Date(now.getTime() + accessTokenExpirationPeriod));
         return Jwts.builder()
                 .setSubject(ACCESS_TOKEN_SUBJECT)
                 .setClaims(claims)

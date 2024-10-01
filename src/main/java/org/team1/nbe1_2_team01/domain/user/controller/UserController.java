@@ -50,7 +50,7 @@ public class UserController {
      * 회원 정보 수정
      */
     @PatchMapping
-    public ResponseEntity<Response<UserIdResponse>> update(@RequestBody UserUpdateRequest userUpdateRequest){
+    public ResponseEntity<Response<UserIdResponse>> update(@Valid @RequestBody UserUpdateRequest userUpdateRequest){
         UserIdResponse userIdResponse = userService.update(userUpdateRequest);
         return ResponseEntity.ok().body(Response.success(userIdResponse));
     }
