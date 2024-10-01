@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public interface CustomBoardRepository {
 
-    Optional<List<BoardResponse>> findAllCommonBoard(CommonBoardType type, long belongId, Long boardId);
+    List<BoardResponse> findAllCommonBoard(CommonBoardType type, long belongId, Long boardId);
 
-    Optional<List<BoardResponse>> findAllTeamBoardDByType(Long belongingId, Long categoryId, Long boardId);
+    List<BoardResponse> findAllTeamBoardDByType(Long belongingId, Long categoryId, Long boardId);
 
     Optional<BoardDetailResponse> findBoardDetailExcludeComments(Long id);
 }

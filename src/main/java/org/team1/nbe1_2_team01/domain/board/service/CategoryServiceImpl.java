@@ -14,7 +14,6 @@ import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,8 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategoryByBelongings(Long teamId) {
-        return categoryRepository.getAllCategoryByTeamId(teamId)
-                .orElseGet(ArrayList::new);
+        return categoryRepository.getAllCategoryByTeamId(teamId);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
 
     private final JPAQueryFactory queryFactory;
     @Override
-    public Optional<List<CategoryResponse>> getAllCategoryByTeamId(Long teamId) {
+    public List<CategoryResponse> getAllCategoryByTeamId(Long teamId) {
         List<Tuple> fetchedList = queryFactory.select(
                         category.id,
                         category.name,
@@ -29,12 +29,14 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
                 .orderBy(category.id.asc())
                 .fetch();
 
-        List<CategoryResponse> responseList = fetchedList.stream().map(tuple -> CategoryResponse.of(
+        return convertToResponse(fetchedList);
+    }
+
+    private List<CategoryResponse> convertToResponse(List<Tuple> fetchedList) {
+        return fetchedList.stream().map(tuple -> CategoryResponse.of(
                 tuple.get(category.id),
                 tuple.get(category.name),
                 Optional.ofNullable(tuple.get(board.count())).orElse(0L)
         )).toList();
-
-        return Optional.of(responseList);
     }
 }

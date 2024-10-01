@@ -23,7 +23,6 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -46,11 +45,10 @@ public class BoardServiceImpl implements BoardService {
         CommonBoardType boardType = CommonBoardType.getType(boardListRequest.type());
 
         return boardRepository.findAllCommonBoard(
-                        boardType,
-                        boardListRequest.courseId(),
-                        boardListRequest.boardId()
-                )
-                .orElseGet(ArrayList::new);
+                boardType,
+                boardListRequest.courseId(),
+                boardListRequest.boardId()
+        );
     }
 
     @Override
@@ -116,9 +114,9 @@ public class BoardServiceImpl implements BoardService {
         Long boardId = request.boardId();
 
         return boardRepository.findAllTeamBoardDByType(
-                        belongingId,
-                        categoryId,
-                        boardId)
-                .orElseGet(ArrayList::new);
+                belongingId,
+                categoryId,
+                boardId
+        );
     }
 }
