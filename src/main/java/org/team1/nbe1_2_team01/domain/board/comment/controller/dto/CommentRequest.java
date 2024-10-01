@@ -13,7 +13,6 @@ public record CommentRequest(
 
         @NotBlank(message = "내용을 입력해주세요.")
         String content
-
 ) {
     public Comment toEntity(User user, Board board) {
         return Comment.builder()
