@@ -154,23 +154,16 @@ public class TeamService {
         belongingRepository.deleteBelongings(teamMemberDeleteRequest.getTeamId(), userIds);
     }
 
-    public void projectTeamDelete(TeamDeleteRequest teamDeleteRequest) {
-        // TODO: 예외처리
-
-        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamDeleteRequest.getTeamId(), true);
-        calendarRepository.deleteByBelonging(ownerBelonging);
-        teamRepository.deleteById(teamDeleteRequest.getTeamId());
-    }
-
-    public void studyTeamDelete(TeamDeleteRequest teamDeleteRequest) {
-        // TODO: 예외처리
-
-        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamDeleteRequest.getTeamId(), true);
-        calendarRepository.deleteByBelonging(ownerBelonging);
-        teamRepository.deleteById(teamDeleteRequest.getTeamId());
-    }
-
     public void teamDelete(TeamDeleteRequest teamDeleteRequest) {
+        User curUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamDeleteRequest.getTeamId(), true);
+
+        String teamType = ownerBelonging.getTeam().getTeamType().name();
+        if (teamType.equals("PROJECT") && !curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        if (teamType.equals("STUDY") && !ownerBelonging.getUser().getId().equals(curUser.getId())) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
+
+        calendarRepository.deleteByBelonging(ownerBelonging);
+        teamRepository.deleteById(teamDeleteRequest.getTeamId());
     }
 }

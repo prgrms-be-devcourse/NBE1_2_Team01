@@ -62,26 +62,10 @@ public class TeamController {
     @DeleteMapping
     public ResponseEntity<?> deleteTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
         teamService.teamDelete(teamDeleteRequest);
-
-        try {
-            teamService.projectTeamDelete(teamDeleteRequest);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/study")
-    public ResponseEntity<?> deleteStudyTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
-        try {
-            teamService.studyTeamDelete(teamDeleteRequest);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @GetMapping // pk 써서 사용해보기
+    @GetMapping
     public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
         return ResponseEntity.status(HttpStatus.OK).body(belongingService.courseUserList(course));
     }
