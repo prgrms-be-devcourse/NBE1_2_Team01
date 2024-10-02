@@ -15,7 +15,6 @@ public class ScheduleQueryService {
 
     private final ScheduleRepository scheduleRepository;
 
-    // 공지 일정 조회
     public List<ScheduleResponse> getNoticeSchedules(
             Long validatedBelongingCourseId
     ) {
@@ -26,11 +25,18 @@ public class ScheduleQueryService {
                 .toList();
     }
 
-    // 팀 일정 조회
     public List<ScheduleResponse> getTeamSchedules(
             Long belongingTeamId
     ) {
         List<Schedule> schedules = scheduleRepository.findByBelongingId(belongingTeamId);
+
+        return schedules.stream()
+                .map(schedule -> ScheduleResponse.from(schedule.getCalendar(), schedule))
+                .toList();
+    }
+
+    public List<ScheduleResponse> getAllSchedules() {
+        List<Schedule> schedules = scheduleRepository.findAll();
 
         return schedules.stream()
                 .map(schedule -> ScheduleResponse.from(schedule.getCalendar(), schedule))

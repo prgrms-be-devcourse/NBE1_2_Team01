@@ -18,58 +18,31 @@ import org.team1.nbe1_2_team01.domain.calendar.service.ScheduleQueryService;
 import org.team1.nbe1_2_team01.domain.calendar.service.ScheduleService;
 import org.team1.nbe1_2_team01.domain.calendar.service.response.ScheduleIdResponse;
 import org.team1.nbe1_2_team01.domain.calendar.service.response.ScheduleResponse;
-import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
 import org.team1.nbe1_2_team01.global.util.Response;
-import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/api/schedules/admin")
 @RequiredArgsConstructor
-public class ScheduleController {
+public class ScheduleAdminController {
 
-    private final ScheduleService scheduleService;
     private final ScheduleQueryService scheduleQueryService;
-    private final GroupAuthService groupAuthService;
+    private final ScheduleService scheduleService;
 
     /**
-     * 팀 내 일정 조회
+     * 모든 일정 조회
      */
-    @GetMapping("/team")
-    public Response<List<ScheduleResponse>> getTeamSchedule(
-            @RequestBody Long belongingTeamId
-    ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, belongingTeamId);
-
-        return Response.success(scheduleQueryService.getTeamSchedules(belongingTeamId));
+    @GetMapping
+    public Response<List<ScheduleResponse>> getAllSchedules() {
+        return Response.success(scheduleQueryService.getAllSchedules());
     }
 
     /**
-     * 공지 일정 조회
-     */
-    @GetMapping("/common")
-    public Response<List<ScheduleResponse>> getNoticeSchedules(
-            @RequestBody String course
-    ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        Long validatedBelongingCourseId = groupAuthService.validateCourse(currentUsername, course);
-
-        return Response.success(scheduleQueryService.getNoticeSchedules(validatedBelongingCourseId));
-    }
-
-    /**
-     * 일정 등록
+     * 공통(공지) 일정 등록
      */
     @PostMapping("/regist")
     public ResponseEntity<Response<ScheduleIdResponse>> registSchedule(
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
-        var register = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(register, scheduleCreateRequest.belongingId());
-
         var scheduleIdResponse = scheduleService.registSchedule(scheduleCreateRequest.belongingId(),
                 scheduleCreateRequest);
         return ResponseEntity
@@ -78,30 +51,22 @@ public class ScheduleController {
     }
 
     /**
-     * 일정 수정
+     * 공통(공지) 일정 수정
      */
     @PatchMapping
     public Response<ScheduleIdResponse> updateSchedule(
             @RequestBody ScheduleUpdateRequest scheduleUpdateRequest
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, scheduleUpdateRequest.belongingId());
-
         return Response.success(scheduleService.updateSchedule(scheduleUpdateRequest));
     }
 
     /**
-     * 일정 삭제
+     * 공통(공지) 일정 삭제
      */
     @DeleteMapping
     public ResponseEntity<Void> deleteSchedule(
             @RequestBody ScheduleDeleteRequest scheduleDeleteRequest
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, scheduleDeleteRequest.belongingId());
-
         scheduleService.deleteSchedule(scheduleDeleteRequest.id());
         return ResponseEntity.noContent()
                 .build();
