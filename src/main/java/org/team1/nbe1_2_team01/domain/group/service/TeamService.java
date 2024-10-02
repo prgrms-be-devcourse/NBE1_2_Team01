@@ -40,15 +40,7 @@ public class TeamService {
         List<Belonging> belongings = new ArrayList<>();
 
         boolean existsByCourse = belongingRepository.existsByCourse(teamCreateRequest.getCourse());
-        Calendar courseCalendar = null;
-        if (teamCreateRequest.getTeamType().equals("PROJECT")) {
-            // 처음으로 생성되는 코스라면 코스 Belonging 생성, 코스 Calendar 생성
-            if (!existsByCourse) {
-                Belonging courseBelonging = Belonging.createBelongingOf(false, teamCreateRequest.getCourse(), null);
-                belongings.add(courseBelonging);
-                courseCalendar = Calendar.createCalendarOf(courseBelonging);
-            }
-        } else if (!existsByCourse) throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+        if (!existsByCourse) throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         // 저장될 팀 객체
         Team newTeam = teamCreateRequest.toProjectTeamEntity();
 
@@ -67,7 +59,6 @@ public class TeamService {
 
         teamRepository.save(newTeam);
         belongingRepository.saveAll(belongings);
-        if (courseCalendar != null) calendarRepository.save(courseCalendar);
         calendarRepository.save(teamCalendar);
         return TeamIdResponse.of(newTeam);
     }
