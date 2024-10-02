@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceIdRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
@@ -23,7 +24,7 @@ import org.team1.nbe1_2_team01.global.util.Response;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 @RestController
-@RequestMapping("/attendance")
+@RequestMapping("/api/attendances")
 @RequiredArgsConstructor
 public class AttendanceController {
 
@@ -84,11 +85,11 @@ public class AttendanceController {
      */
     @DeleteMapping
     public ResponseEntity<Void> deleteAttendance(
-            @RequestBody Long attendanceId
+            @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        attendanceService.deleteAttendance(currentUsername, attendanceId);
+        attendanceService.deleteAttendance(currentUsername, attendanceIdRequest.id());
         return ResponseEntity.noContent()
                 .build();
     }
