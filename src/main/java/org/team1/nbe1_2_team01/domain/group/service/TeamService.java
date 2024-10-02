@@ -101,50 +101,29 @@ public class TeamService {
         return new TeamIdResponse(teamNameUpdateRequest.getTeamId());
     }
 
-    public List<BelongingIdResponse> projectTeamAddMember(TeamMemberAddRequest teamMemberAddRequest) {
+    public List<BelongingIdResponse> teamAddMember(TeamMemberAddRequest teamMemberAddRequest) {
+        User curUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
 
-        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamMemberAddRequest.getTeamId());
-        if (allBelongingsWithTeam.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 팀입니다.");
-        }
-        Team team = allBelongingsWithTeam.get(0).getTeam();
-        if (!team.getTeamType().name().equals("PROJECT")) throw new RuntimeException("프로젝트 팀에 대한 요청이 아닙니다.");
-        List<Long> existingUserIds = allBelongingsWithTeam.stream().map(Belonging::getUser).map(User::getId).toList();
+        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamMemberAddRequest.getTeamId());
+        if (allBelongings.isEmpty()) throw new AppException(ErrorCode.TEAM_NOT_FOUND);
 
+        Long leaderId = allBelongings.stream()
+                .filter(Belonging::isOwner)
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.LEADER_BELONGING_NOT_FOUND))
+                .getUser().getId();
+
+        Team team = allBelongings.get(0).getTeam();
+        if (team.getTeamType().name().equals("PROJECT") && !curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        if (team.getTeamType().name().equals("STUDY") && !curUser.getId().equals(leaderId)) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
+
+        List<Long> existingUserIds = allBelongings.stream().map(Belonging::getUser).map(User::getId).toList();
         List<Belonging> newBelongings = new ArrayList<>();
         for (User u : users) {
-            if (existingUserIds.contains(u.getId())) {
-                throw new RuntimeException("이미 해당 팀에 존재하던 회원이 포함되어 있습니다.");
-            }
+            if (existingUserIds.contains(u.getId())) throw new AppException(ErrorCode.TEAM_EXISTING_MEMBER);
 
-            Belonging belonging = Belonging.createBelongingOf(false, allBelongingsWithTeam.get(0).getCourse(), u);
-            belonging.assignTeam(team);
-            newBelongings.add(belonging);
-        }
-
-        return belongingRepository.saveAll(newBelongings).stream().map(BelongingIdResponse::of).toList();
-    }
-
-    public List<BelongingIdResponse> studyTeamAddMember(TeamMemberAddRequest teamMemberAddRequest) {
-        List<User> users = checkUsers(teamMemberAddRequest.getUserIds());
-
-        List<Belonging> allBelongingsWithTeam = belongingRepository.findAllByTeamIdWithTeam(teamMemberAddRequest.getTeamId());
-        if (allBelongingsWithTeam.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 팀입니다.");
-        }
-        Team team = allBelongingsWithTeam.get(0).getTeam();
-        if (!team.getTeamType().name().equals("STUDY")) throw new RuntimeException("스터디 팀에 대한 요청이 아닙니다.");
-        // TODO: Authorization 헤더 보고, 팀장이 요청한 게 아니면 예외
-        List<Long> existingUserIds = allBelongingsWithTeam.stream().map(Belonging::getUser).map(User::getId).toList();
-
-        List<Belonging> newBelongings = new ArrayList<>();
-        for (User u : users) {
-            if (existingUserIds.contains(u.getId())) {
-                throw new RuntimeException("이미 해당 팀에 존재하던 회원이 포함되어 있습니다.");
-            }
-
-            Belonging belonging = Belonging.createBelongingOf(false, allBelongingsWithTeam.get(0).getCourse(), u);
+            Belonging belonging = Belonging.createBelongingOf(false, allBelongings.get(0).getCourse(), u);
             belonging.assignTeam(team);
             newBelongings.add(belonging);
         }

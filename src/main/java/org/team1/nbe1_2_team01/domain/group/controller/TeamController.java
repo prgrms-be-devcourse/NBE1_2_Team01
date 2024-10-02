@@ -47,22 +47,10 @@ public class TeamController {
                 .body(Response.success(teamService.teamNameUpdate(teamNameUpdateRequest)));
     }
 
-    @PostMapping("/project/member")
-    public ResponseEntity<?> addProjectTeamMember(@RequestBody TeamMemberAddRequest teamMemberAddRequest) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.projectTeamAddMember(teamMemberAddRequest));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/study/member")
-    public ResponseEntity<?> addStudyTeamMember(@RequestBody TeamMemberAddRequest teamMemberAddRequest) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(teamService.studyTeamAddMember(teamMemberAddRequest));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @PostMapping("/member")
+    public ResponseEntity<?> addTeamMember(@RequestBody TeamMemberAddRequest teamMemberAddRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success(teamService.teamAddMember(teamMemberAddRequest)));
     }
 
     @DeleteMapping("/project/member")

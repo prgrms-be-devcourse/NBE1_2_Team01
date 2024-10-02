@@ -37,6 +37,8 @@ public enum ErrorCode {
     BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "소속이 존재하지 않습니다"),
     NOT_TEAM_LEADER(HttpStatus.UNAUTHORIZED, "팀장만 이용 가능합니다."),
     TEAM_NOT_UPDATED(HttpStatus.NOT_MODIFIED, "팀이 수정되지 않았습니다"),
+    TEAM_EXISTING_MEMBER(HttpStatus.CONFLICT, "이미 해당 팀에 존재하는 회원입니다."),
+    LEADER_BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "팀장 소속 정보를 찾아오는 중 오류가 발생했습니다."),
 
     //user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
