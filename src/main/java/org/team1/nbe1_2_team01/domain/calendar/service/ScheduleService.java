@@ -12,6 +12,7 @@ import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;
+import org.team1.nbe1_2_team01.domain.calendar.service.response.ScheduleIdResponse;
 import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
 import org.team1.nbe1_2_team01.domain.group.service.response.GroupAuthResponse;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -25,7 +26,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final GroupAuthService groupAuthService;
 
-    public Long registSchedule(
+    public ScheduleIdResponse registSchedule(
             String register,
             Long belongingId,
             ScheduleCreateRequest scheduleCreateRequest
@@ -38,10 +39,10 @@ public class ScheduleService {
 
         Schedule Schedule = scheduleCreateRequest.toEntity(calendar);
         Schedule savedSchedule = scheduleRepository.save(Schedule);
-        return savedSchedule.getId();
+        return ScheduleIdResponse.from(savedSchedule.getId());
     }
 
-    public void updateSchedule(
+    public ScheduleIdResponse updateSchedule(
             String currentUsername,
             Long belongingId,
             ScheduleUpdateRequest scheduleUpdateRequest
@@ -54,6 +55,8 @@ public class ScheduleService {
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
 
         schedule.update(scheduleUpdateRequest);
+
+        return ScheduleIdResponse.from(schedule.getId());
     }
 
     public void deleteSchedule(

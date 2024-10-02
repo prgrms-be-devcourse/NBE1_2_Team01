@@ -6,6 +6,7 @@ import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
 
 public record ScheduleCreateRequest(
+        Long belongingId,
         String name,
         ScheduleType scheduleType,
         LocalDateTime startAt,
