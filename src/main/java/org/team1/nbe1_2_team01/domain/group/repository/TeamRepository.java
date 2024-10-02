@@ -20,4 +20,5 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
             "join fetch t.belongings b " +
             "where b.isOwner = true and t.id = :teamId")
     Optional<Team> findByIdWithLeaderBelonging(@Param("teamId") Long teamId);
+
 }

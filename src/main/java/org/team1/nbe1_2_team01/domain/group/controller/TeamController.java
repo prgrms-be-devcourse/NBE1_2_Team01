@@ -5,15 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.group.controller.request.*;
-import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
-import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.service.BelongingService;
 import org.team1.nbe1_2_team01.domain.group.service.TeamService;
-import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.Response;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/teams")
@@ -35,10 +29,10 @@ public class TeamController {
                 .body(Response.success(teamService.creationWaitingStudyTeamList()));
     }
 
-    @PatchMapping("/approval")
-    public ResponseEntity<?> approveStudyTeam(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
+    @PostMapping("/approval")
+    public ResponseEntity<?> approveStudyTeamCreation(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Response.success(teamService.studyTeamApprove(teamApprovalUpdateRequest)));
+                .body(Response.success(teamService.studyTeamCreationApprove(teamApprovalUpdateRequest)));
     }
 
     @PatchMapping("/name")
@@ -63,6 +57,13 @@ public class TeamController {
     public ResponseEntity<?> deleteTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
         teamService.teamDelete(teamDeleteRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/approval")
+    public ResponseEntity<?> approveStudyTeamDeletion(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
+        teamService.studyTeamDeletionApprove(teamApprovalUpdateRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     @GetMapping

@@ -78,7 +78,7 @@ public class TeamService {
         return teamRepository.findByCreationWaiting(true).stream().map(TeamResponse::of).toList();
     }
 
-    public TeamIdResponse studyTeamApprove(TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
+    public TeamIdResponse studyTeamCreationApprove(TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
         Team team = teamRepository.findById(teamApprovalUpdateRequest.getTeamId()).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
         if (!team.isCreationWaiting()) throw new AppException(ErrorCode.TEAM_NOT_WAITING);
 
@@ -159,11 +159,23 @@ public class TeamService {
 
         Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(teamDeleteRequest.getTeamId(), true);
 
-        String teamType = ownerBelonging.getTeam().getTeamType().name();
-        if (teamType.equals("PROJECT") && !curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
-        if (teamType.equals("STUDY") && !ownerBelonging.getUser().getId().equals(curUser.getId())) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
-
-        calendarRepository.deleteByBelonging(ownerBelonging);
-        teamRepository.deleteById(teamDeleteRequest.getTeamId());
+        Team team = ownerBelonging.getTeam();
+        String teamType = team.getTeamType().name();
+        if (teamType.equals("PROJECT")) {
+            if (!curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+            calendarRepository.deleteByBelonging(ownerBelonging);
+            teamRepository.delete(team);
+        }
+        if (teamType.equals("STUDY")) {
+            if (!ownerBelonging.getUser().getId().equals(curUser.getId())) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
+            team.setDeletionWaiting(true);
+        }
     }
+
+    public void studyTeamDeletionApprove(TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
+        teamRepository.delete(
+                teamRepository.findById(teamApprovalUpdateRequest.getTeamId()).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND))
+        );
+    }
+
 }
