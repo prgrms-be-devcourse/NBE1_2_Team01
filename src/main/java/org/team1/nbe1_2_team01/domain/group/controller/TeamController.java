@@ -53,28 +53,16 @@ public class TeamController {
                 .body(Response.success(teamService.teamAddMember(teamMemberAddRequest)));
     }
 
-    @DeleteMapping("/project/member")
-    public ResponseEntity<?> deleteProjectTeamMember(@RequestBody TeamMemberDeleteRequest teamMemberDeleteRequest) {
-        try {
-            teamService.projectTeamDeleteMember(teamMemberDeleteRequest);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    @DeleteMapping("/member")
+    public ResponseEntity<?> deleteTeamMember(@RequestBody TeamMemberDeleteRequest teamMemberDeleteRequest) {
+        teamService.teamDeleteMember(teamMemberDeleteRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/study/member")
-    public ResponseEntity<?> deleteStudyTeamMember(@RequestBody TeamMemberDeleteRequest teamMemberDeleteRequest) {
-        try {
-            teamService.studyTeamDeleteMember(teamMemberDeleteRequest);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+    @DeleteMapping
+    public ResponseEntity<?> deleteTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
+        teamService.teamDelete(teamDeleteRequest);
 
-    @DeleteMapping("/project")
-    public ResponseEntity<?> deleteProjectTeam(@RequestBody TeamDeleteRequest teamDeleteRequest) {
         try {
             teamService.projectTeamDelete(teamDeleteRequest);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

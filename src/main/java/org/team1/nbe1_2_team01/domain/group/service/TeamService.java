@@ -131,52 +131,27 @@ public class TeamService {
         return belongingRepository.saveAll(newBelongings).stream().map(BelongingIdResponse::of).toList();
     }
 
-    public void projectTeamDeleteMember(TeamMemberDeleteRequest teamMemberDeleteRequest) {
+    public void teamDeleteMember(TeamMemberDeleteRequest teamMemberDeleteRequest) {
+        User curUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         List<User> users = checkUsers(teamMemberDeleteRequest.getUserIds());
         List<Long> userIds = users.stream().map(User::getId).toList();
 
         List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamMemberDeleteRequest.getTeamId());
-        if (allBelongings.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 팀입니다.");
-        }
-        if (!allBelongings.get(0).getTeam().getTeamType().name().equals("PROJECT")) throw new RuntimeException("프로젝트 팀에 대한 요청이 아닙니다.");
+        if (allBelongings.isEmpty()) throw new AppException(ErrorCode.TEAM_NOT_FOUND);
 
-        Long leaderId = null;
-        for (Belonging b : allBelongings) {
-            if (b.isOwner()) {
-                leaderId = b.getUser().getId();
-            }
-        }
-        if (userIds.contains(leaderId)) {
-            throw new RuntimeException("팀장은 삭제할 수 없습니다.");
-        }
+        Long leaderId = allBelongings.stream()
+                .filter(Belonging::isOwner)
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.LEADER_BELONGING_NOT_FOUND))
+                .getUser().getId();
 
-        int deleted = belongingRepository.deleteBelongings(teamMemberDeleteRequest.getTeamId(), userIds);
-    }
+        String teamType = allBelongings.get(0).getTeam().getTeamType().name();
+        if (!teamType.equals("PROJECT") && !curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        if (!teamType.equals("STUDY") && !curUser.getId().equals(leaderId)) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
 
-    public void studyTeamDeleteMember(TeamMemberDeleteRequest teamMemberDeleteRequest) {
-        // TODO: Authorization 헤더 보고, 팀장이 요청한 게 아니면 예외
+        if (userIds.contains(leaderId)) throw new AppException(ErrorCode.CANNOT_DELETE_LEADER);
 
-        List<User> users = checkUsers(teamMemberDeleteRequest.getUserIds());
-        List<Long> userIds = users.stream().map(User::getId).toList();
-
-        List<Belonging> allBelongings = belongingRepository.findAllByTeamIdWithTeam(teamMemberDeleteRequest.getTeamId());
-        if (allBelongings.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 팀입니다.");
-        }
-        if (!allBelongings.get(0).getTeam().getTeamType().name().equals("STUDY")) throw new RuntimeException("스터디 팀에 대한 요청이 아닙니다.");
-
-        Long leaderId = null;
-        for (Belonging b : allBelongings) {
-            if (b.isOwner()) {
-                leaderId = b.getUser().getId();
-            }
-        }
-        if (userIds.contains(leaderId)) {
-            throw new RuntimeException("팀장은 삭제할 수 없습니다.");
-        }
-
-        int deleted = belongingRepository.deleteBelongings(teamMemberDeleteRequest.getTeamId(), userIds);
+        belongingRepository.deleteBelongings(teamMemberDeleteRequest.getTeamId(), userIds);
     }
 
     public void projectTeamDelete(TeamDeleteRequest teamDeleteRequest) {
@@ -195,4 +170,7 @@ public class TeamService {
         teamRepository.deleteById(teamDeleteRequest.getTeamId());
     }
 
+    public void teamDelete(TeamDeleteRequest teamDeleteRequest) {
+
+    }
 }
