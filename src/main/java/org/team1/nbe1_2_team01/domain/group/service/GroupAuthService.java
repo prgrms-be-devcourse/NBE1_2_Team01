@@ -1,6 +1,5 @@
 package org.team1.nbe1_2_team01.domain.group.service;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.BELONGING_NOT_FOUND;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.COURSE_AUTH_DENIED;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.TEAM_AUTH_DENIED;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.USER_NOT_FOUND;
@@ -34,37 +33,37 @@ public class GroupAuthService {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(USER_NOT_FOUND));
 
-        List<Long> belongingIdsAsCourse = belongingRepository.findDistinctUserIdsByCourse(course);
-
-        return belongingIdsAsCourse.stream()
-                .filter(id -> isBelongToCourse(currentUser.getId(), id))
+        // course에 등록되어 있는지 확인
+        List<Belonging> belongingsAsCourse = belongingRepository.findByCourseAndUserIsNotNull(course);
+        belongingsAsCourse.stream()
+                .filter(belonging -> isBelong(currentUser, belonging.getUser()))
                 .findFirst()
                 .orElseThrow(() -> new AppException(COURSE_AUTH_DENIED));
-    }
 
-    private boolean isBelongToCourse(Long currentUserId, Long belongingId) {
-        return belongingId.equals(currentUserId);
+        // course를 나타내는 Belonging 레코드 Id 반환
+        Belonging belongingAsCourse = belongingRepository.findByCourseAndUserIsNullAndTeamIsNull(course);
+        return belongingAsCourse.getId();
     }
 
     /**
      * 팀에 소속되어 있는지 검증
      * @param username 현재 접속 중인 유저 이름
-     * @param belongingId 현재 접속중인 소속 이름
+     * @param belongingTeamId 현재 접속중인 소속 이름
      * @return 팀 체크 후 관계 테이블(소속)의 id 반환
      */
-    public GroupAuthResponse validateTeam(String username, Long belongingId) {
+    public GroupAuthResponse validateTeam(String username, Long belongingTeamId) {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(USER_NOT_FOUND));
-        Belonging belonging = belongingRepository.findById(belongingId)
-                .orElseThrow(() -> new AppException(BELONGING_NOT_FOUND));
 
-        isBelongToTeam(currentUser.getId(), belonging);
-        return GroupAuthResponse.from(belonging);
+        Belonging belongingByTeam = belongingRepository.findById(belongingTeamId)
+                .filter(belonging -> isBelong(currentUser, belonging.getUser())) // 현재 접속 유저가 Team에 속해있는지 확인
+                .filter(Belonging::isOwner) // belongingTeamId가 팀장의 Id인지 확인
+                .orElseThrow(() -> new AppException(TEAM_AUTH_DENIED));
+
+        return GroupAuthResponse.from(belongingByTeam);
     }
 
-    private void isBelongToTeam(Long currentUserId, Belonging belonging) {
-        if (!belonging.getUser().getId().equals(currentUserId)) {
-            throw new AppException(TEAM_AUTH_DENIED);
-        }
+    private boolean isBelong(User currentUser, User belongingUser) {
+        return belongingUser.getId().equals(currentUser.getId());
     }
 }

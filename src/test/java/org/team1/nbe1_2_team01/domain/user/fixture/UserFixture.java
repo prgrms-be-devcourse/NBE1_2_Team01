@@ -24,4 +24,14 @@ public class UserFixture {
                 .role(Role.USER)
                 .build();
     }
+
+    public static User createUser2() {
+        return User.builder()
+                .username("user2")
+                .password("1234")
+                .email("user2@gmail.com")
+                .name("박상순")
+                .role(Role.USER)
+                .build();
+    }
 }

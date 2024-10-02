@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;
 import org.team1.nbe1_2_team01.domain.calendar.service.response.ScheduleResponse;
-import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
-import org.team1.nbe1_2_team01.domain.group.service.response.GroupAuthResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -16,17 +14,12 @@ import org.team1.nbe1_2_team01.domain.group.service.response.GroupAuthResponse;
 public class ScheduleQueryService {
 
     private final ScheduleRepository scheduleRepository;
-    private final GroupAuthService groupAuthService;
 
     // 공지 일정 조회
     public List<ScheduleResponse> getNoticeSchedules(
-            String currentUsername,
-            String course
+            Long validatedBelongingCourseId
     ) {
-        Long validatedCourseBelongingId =
-                groupAuthService.validateCourse(currentUsername, course);
-
-        List<Schedule> schedules = scheduleRepository.findByBelongingId(validatedCourseBelongingId);
+        List<Schedule> schedules = scheduleRepository.findByBelongingId(validatedBelongingCourseId);
 
         return schedules.stream()
                 .map(schedule -> ScheduleResponse.from(schedule.getCalendar(), schedule))
@@ -35,12 +28,9 @@ public class ScheduleQueryService {
 
     // 팀 일정 조회
     public List<ScheduleResponse> getTeamSchedules(
-            String currentUsername,
-            Long belongingId
+            Long belongingTeamId
     ) {
-        GroupAuthResponse groupAuthResponse = groupAuthService.validateTeam(currentUsername, belongingId);
-
-        List<Schedule> schedules = scheduleRepository.findByBelongingId(groupAuthResponse.belongingId());
+        List<Schedule> schedules = scheduleRepository.findByBelongingId(belongingTeamId);
 
         return schedules.stream()
                 .map(schedule -> ScheduleResponse.from(schedule.getCalendar(), schedule))

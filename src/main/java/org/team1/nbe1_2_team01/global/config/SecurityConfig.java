@@ -51,7 +51,7 @@ public class SecurityConfig {
                         authorize -> authorize
                                 .requestMatchers("/sign-up").permitAll()
                                 .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+                                //.anyRequest().permitAll()
 
                 );
          http.addFilterAfter(customUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
