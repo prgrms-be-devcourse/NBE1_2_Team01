@@ -1,9 +1,10 @@
 package org.team1.nbe1_2_team01.domain.calendar.service;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.USER_NOT_OWNER;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.BELONGING_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
@@ -11,6 +12,7 @@ import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CalendarService {
 
@@ -23,23 +25,14 @@ public class CalendarService {
      * @return 만들어진 캘린더 id
      */
     public Long createCalendar(
-            Long currentUserId,
-            Long belongingId) {
-        Belonging belonging = belongingRepository.findById(belongingId).orElseThrow();
-        validateOwner(belonging);
+            Long belongingId
+    ) {
+        Belonging belonging = belongingRepository.findById(belongingId)
+                .orElseThrow(() -> new AppException(BELONGING_NOT_FOUND));
 
-        Calendar calendar = Calendar.builder()
-                .belonging(belonging)
-                .build();
+        Calendar calendar = Calendar.createCalendarOf(belonging);
 
         Calendar savedCalendar = calendarRepository.save(calendar);
         return savedCalendar.getId();
-    }
-
-    // 타 도메인 검증 메서드 - 소속이 아니면 접근 불가
-    private void validateOwner(Belonging belonging) {
-        if (!belonging.isOwner()) {
-            throw new AppException(USER_NOT_OWNER);
-        }
     }
 }
