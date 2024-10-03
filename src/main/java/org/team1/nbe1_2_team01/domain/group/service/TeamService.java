@@ -178,4 +178,7 @@ public class TeamService {
         );
     }
 
+    public List<TeamResponse> courseTeamList(String course) {
+        return teamRepository.findByCourse(course).stream().map(TeamResponse::of).toList();
+    }
 }

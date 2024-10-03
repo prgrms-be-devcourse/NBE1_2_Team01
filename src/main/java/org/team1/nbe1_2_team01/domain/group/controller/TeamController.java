@@ -71,8 +71,6 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(belongingService.courseUserList(course));
     }
 
-    // 특정코스에 어떤팀들있는지 목록
-
     // 특정팀에 누구누구있는지 목록
 
 }
