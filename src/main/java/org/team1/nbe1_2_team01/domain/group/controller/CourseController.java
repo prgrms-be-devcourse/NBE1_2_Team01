@@ -24,7 +24,6 @@ public class CourseController {
                 .body(Response.success(belongingService.courseBelongingCreate(courseCreateRequest)));
     }
 
-    // 특정코스에 어떤팀들있는지 목록
     @GetMapping("/teams")
     public ResponseEntity<?> courseTeamList(@RequestParam String course) {
         return ResponseEntity.status(HttpStatus.OK)

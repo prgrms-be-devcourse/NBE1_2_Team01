@@ -66,11 +66,10 @@ public class TeamController {
                 .build();
     }
 
-    @GetMapping
-    public ResponseEntity<?> getCourseUsers(@RequestParam String course) {
-        return ResponseEntity.status(HttpStatus.OK).body(belongingService.courseUserList(course));
+    @GetMapping("/members/{teamId}")
+    public ResponseEntity<?> getTeamMembers(@PathVariable Long teamId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success(belongingService.teamMemberList(teamId)));
     }
-
-    // 특정팀에 누구누구있는지 목록
 
 }

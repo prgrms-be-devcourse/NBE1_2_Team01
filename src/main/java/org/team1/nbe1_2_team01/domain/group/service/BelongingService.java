@@ -8,6 +8,8 @@ import org.team1.nbe1_2_team01.domain.group.controller.request.CourseCreateReque
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.group.service.response.BelongingIdResponse;
+import org.team1.nbe1_2_team01.domain.group.service.response.UserResponse;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +21,9 @@ public class BelongingService {
     private final BelongingRepository belongingRepository;
     private final CalendarRepository calendarRepository;
 
-    public List<Long> courseUserList(String course) {
-        return belongingRepository.findDistinctUserIdsByCourse(course);
+    public List<UserResponse> teamMemberList(Long teamId) {
+        List<User> users = belongingRepository.findUsersByTeamId(teamId);
+        return users.stream().map(UserResponse::of).toList();
     }
 
     public BelongingIdResponse courseBelongingCreate(CourseCreateRequest courseCreateRequest) {

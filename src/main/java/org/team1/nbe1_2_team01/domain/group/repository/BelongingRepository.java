@@ -5,15 +5,17 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.util.List;
 
 public interface BelongingRepository extends JpaRepository<Belonging, Long> {
 
-    @Query("select distinct b.user.id " +
+    @Query("select u " +
             "from Belonging b " +
-            "where b.course = :course and b.user is not null")
-    List<Long> findDistinctUserIdsByCourse(@Param("course") String course);
+            "join fetch b.user u " +
+            "where b.team.id = :teamId and b.user is not null")
+    List<User> findUsersByTeamId(@Param("teamId") Long teamId);
 
     boolean existsByCourse(String course);
 
