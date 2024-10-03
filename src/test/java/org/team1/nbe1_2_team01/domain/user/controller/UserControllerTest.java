@@ -1,16 +1,22 @@
 package org.team1.nbe1_2_team01.domain.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
+import com.jayway.jsonpath.JsonPath;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
+import org.team1.nbe1_2_team01.IntegrationTestSupport;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
@@ -20,14 +26,15 @@ import org.team1.nbe1_2_team01.domain.user.service.UserService;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+
 @AutoConfigureMockMvc
-class UserControllerTest {
+@Transactional
+class UserControllerTest extends IntegrationTestSupport {
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,6 +51,7 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+
     @Test
     void 회원가입_성공() throws Exception {
         // 요청과 응답 데이터 설정
@@ -53,12 +61,18 @@ class UserControllerTest {
                 "user@gmail.com",
                 "김철수");
         // 응답 검증
-        mockMvc.perform(post("/api/user/sign-up")
+        MvcResult result = mockMvc.perform(post("/api/user/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value("Success"))
-                .andExpect(jsonPath("$.result.id").value(1L));
+                .andReturn();
+        String jsonResponse = result.getResponse().getContentAsString();
+        Long resultId = JsonPath.parse(jsonResponse).read("$.result.id", Long.class);
+
+        User savedUser = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 없음"));
+        assertThat(savedUser.getId()).isEqualTo(resultId);
     }
 
     @Test
@@ -199,7 +213,7 @@ class UserControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value("Success"))
-                .andExpect(jsonPath("$.result.id").value(1L));
+                .andExpect(jsonPath("$.result.id").value(user.getId()));
 
         User updateuser = userRepository.findByUsername("userA")
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자 없음"));
@@ -211,7 +225,7 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "userA")
     void 회원정보조회_성공() throws Exception {
-        
+
         User user = User.builder()
                 .username("userA")
                 .password("1234abcd")
@@ -220,15 +234,15 @@ class UserControllerTest {
                 .role(Role.USER)
                 .build();
 
-        userRepository.save(user);
+        User saveduser = userRepository.save(user);
 
         mockMvc.perform(get("/api/user"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value("Success"))
-                .andExpect(jsonPath("$.result.id").value(1L))
-                .andExpect(jsonPath("$.result.username").value("userA"))
-                .andExpect(jsonPath("$.result.email").value("user@gmail.com"))
-                .andExpect(jsonPath("$.result.name").value("김철수"));
+                .andExpect(jsonPath("$.result.id").value(saveduser.getId()))
+                .andExpect(jsonPath("$.result.username").value(saveduser.getUsername()))
+                .andExpect(jsonPath("$.result.email").value(saveduser.getEmail()))
+                .andExpect(jsonPath("$.result.name").value(saveduser.getName()));
     }
 
     @Test
