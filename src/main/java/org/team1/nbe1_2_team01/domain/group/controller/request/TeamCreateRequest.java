@@ -20,7 +20,7 @@ public class TeamCreateRequest {
 
     private Long leaderId;
 
-    public Team toProjectTeamEntity() {
+    public Team toTeamEntity() {
         return Team.builder()
                 .teamType(TeamType.valueOf(this.getTeamType()))
                 .name(this.getName())
@@ -29,12 +29,4 @@ public class TeamCreateRequest {
                 .build();
     }
 
-    public Team toStudyTeamEntity() {
-        return Team.builder()
-                .teamType(TeamType.valueOf(this.getTeamType()))
-                .name(this.getName())
-                .creationWaiting(true)
-                .deletionWaiting(false)
-                .build();
-    }
 }

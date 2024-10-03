@@ -42,7 +42,7 @@ public class TeamService {
         boolean existsByCourse = belongingRepository.existsByCourse(teamCreateRequest.getCourse());
         if (!existsByCourse) throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         // 저장될 팀 객체
-        Team newTeam = teamCreateRequest.toProjectTeamEntity();
+        Team newTeam = teamCreateRequest.toTeamEntity();
 
         Calendar teamCalendar = null;
         for (User u : users) {
