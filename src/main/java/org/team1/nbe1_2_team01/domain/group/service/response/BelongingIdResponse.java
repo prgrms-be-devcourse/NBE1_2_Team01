@@ -6,12 +6,11 @@ import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 
 @Data
 public class BelongingIdResponse {
-    //TODO: dto들 빌더 패턴 생성자 private으로
 
     private Long id;
 
     @Builder
-    public BelongingIdResponse(Long id) {
+    private BelongingIdResponse(Long id) {
         this.id = id;
     }
 

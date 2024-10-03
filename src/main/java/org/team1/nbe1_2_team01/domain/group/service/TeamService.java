@@ -98,7 +98,7 @@ public class TeamService {
         }
 
         team.setName(teamNameUpdateRequest.getName());
-        return new TeamIdResponse(teamNameUpdateRequest.getTeamId());
+        return TeamIdResponse.of(team);
     }
 
     public List<BelongingIdResponse> teamAddMember(TeamMemberAddRequest teamMemberAddRequest) {
