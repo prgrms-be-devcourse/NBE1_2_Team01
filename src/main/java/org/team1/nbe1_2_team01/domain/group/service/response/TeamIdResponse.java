@@ -10,7 +10,7 @@ public class TeamIdResponse {
     private Long id;
 
     @Builder
-    public TeamIdResponse(Long id) {
+    private TeamIdResponse(Long id) {
         this.id = id;
     }
 
@@ -19,4 +19,5 @@ public class TeamIdResponse {
                 .id(team.getId())
                 .build();
     }
+
 }

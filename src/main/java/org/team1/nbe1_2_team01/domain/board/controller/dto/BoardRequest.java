@@ -2,7 +2,6 @@ package org.team1.nbe1_2_team01.domain.board.controller.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.team1.nbe1_2_team01.domain.board.entity.Board;
 import org.team1.nbe1_2_team01.domain.board.entity.Category;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
@@ -12,12 +11,10 @@ public record BoardRequest(
         Long belongingId,
         Long categoryId,
 
-        @NotNull(message = "제목은 필수 입력값입니다.")
-        @NotBlank(message = "내용을 입력해주세요.")
+        @NotBlank(message = "제목은 필수 입력값입니다.")
         String title,
 
-        @NotNull(message = "내용은 필수 입력값입니다.")
-        @NotBlank(message = "내용을 입력해주세요.")
+        @NotBlank(message = "내용은 필수 입력값입니다.")
         String content,
         boolean isNotice
 ) {

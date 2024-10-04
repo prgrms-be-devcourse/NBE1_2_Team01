@@ -27,7 +27,7 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
     private static final int PAGE_SIZE = 10;
 
     @Override
-    public Optional<List<BoardResponse>> findAllCommonBoard(
+    public List<BoardResponse> findAllCommonBoard(
             CommonBoardType type,
             long belongingId,
             Long boardId
@@ -38,11 +38,10 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
         List<Tuple> results = commonQuery
                 .limit(PAGE_SIZE)
                 .groupBy(board.id, board.title, user.username, board.createdAt)
-                .orderBy(board.createdAt.desc())
+                .orderBy(board.createdAt.desc(), board.id.desc())
                 .fetch();
 
-        List<BoardResponse> boards = getBoardResponses(results);
-        return Optional.of(boards);
+        return getBoardResponses(results);
     }
 
     private JPAQuery<Tuple> buildBoardQueryByType(CommonBoardType type) {
@@ -65,7 +64,7 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
     }
 
     @Override
-    public Optional<List<BoardResponse>> findAllTeamBoardDByType(
+    public List<BoardResponse> findAllTeamBoardDByType(
             Long belongingId,
             Long categoryId,
             Long boardId
@@ -89,12 +88,10 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
         List<Tuple> results = teamBoardQuery
                 .limit(PAGE_SIZE)
                 .groupBy(board.id, board.title, user.name, category.name, board.createdAt)
-                .orderBy(board.createdAt.desc())
+                .orderBy(board.createdAt.desc(), board.id.desc())
                 .fetch();
 
-        List<BoardResponse> boards = getBoardResponses(results);
-
-        return Optional.of(boards);
+        return getBoardResponses(results);
     }
 
     @Override
@@ -116,19 +113,8 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
             return Optional.empty(); // 결과가 없을 경우 빈 Optional 반환
         }
 
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        User currentUser = queryFactory.selectFrom(user).where(user.username.eq(currentUsername)).fetchOne();
-
-
-        BoardDetailResponse boardDetailResponse = BoardDetailResponse.of(
-                tuple.get(board.id),
-                tuple.get(board.title),
-                tuple.get(board.content),
-                tuple.get(user.name),
-                tuple.get(board.createdAt),
-                Objects.equals(currentUser.getRole(), Role.ADMIN),
-                Objects.equals(tuple.get(board.user.id), currentUser.getId())
-        );
+        User currentUser = findCurrentUser();
+        BoardDetailResponse boardDetailResponse = getBoardDetailResponse(tuple, currentUser);
 
         return Optional.ofNullable(boardDetailResponse);
     }
@@ -140,11 +126,15 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
             commonQuery.where(board.id.lt(boardId));
         }
     }
-
     private void setConditionByCategoryId(JPAQuery<Tuple> teamBoardQuery, Long categoryId) {
         if(categoryId != null) {
             teamBoardQuery.where(board.category.id.eq(categoryId));
         }
+    }
+
+    private User findCurrentUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        return queryFactory.selectFrom(user).where(user.username.eq(currentUsername)).fetchOne();
     }
 
     private List<BoardResponse> getBoardResponses(List<Tuple> query) {
@@ -158,5 +148,16 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
                         tuple.get(comment.count())
                 ))
                 .toList();
+    }
+    private BoardDetailResponse getBoardDetailResponse(Tuple tuple, User currentUser) {
+        return BoardDetailResponse.of(
+                tuple.get(board.id),
+                tuple.get(board.title),
+                tuple.get(board.content),
+                tuple.get(user.name),
+                tuple.get(board.createdAt),
+                Objects.equals(currentUser.getRole(), Role.ADMIN),
+                Objects.equals(tuple.get(board.user.id), currentUser.getId())
+        );
     }
 }
