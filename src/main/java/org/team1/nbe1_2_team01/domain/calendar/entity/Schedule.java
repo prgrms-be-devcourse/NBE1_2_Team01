@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleUpdateRequest;
 
 @Entity
 @Getter
@@ -49,5 +50,13 @@ public class Schedule {
         this.endAt = endAt;
         this.description = description;
         calendar.addSchedule(this);
+    }
+
+    public void update(ScheduleUpdateRequest scheduleUpdateRequest) {
+        this.name = scheduleUpdateRequest.name();
+        this.scheduleType = scheduleUpdateRequest.scheduleType();
+        this.startAt = scheduleUpdateRequest.startAt();
+        this.endAt = scheduleUpdateRequest.endAt();
+        this.description = scheduleUpdateRequest.description();
     }
 }

@@ -1,5 +1,6 @@
 package org.team1.nbe1_2_team01.domain.group.repository;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,6 +36,10 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     int deleteBelongings(@Param("teamId") Long teamId, @Param("userIds") List<Long> userIds);
 
     Belonging findByTeamIdAndIsOwner(Long teamId, boolean isOwner);
+
+    List<Belonging> findByCourseAndUserIsNotNull(String course);
+
+    Belonging findByCourseAndUserIsNullAndTeamIsNull(String course);
 
     Optional<Belonging> findByTeam_IdAndUser_Username(Long teamId, String username);
 }
