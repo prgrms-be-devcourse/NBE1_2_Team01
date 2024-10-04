@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
 
 import java.util.Date;
 import java.util.Optional;
@@ -39,8 +41,11 @@ public class JwtService {
     private static final String USERNAME_CLAIM = "username";
     private static final String BEARER = "Bearer ";
 
-    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
+    /**
+     * AccessToken 생성 메서드
+     */
     public String createAccessToken(String username) {
         Date now = new Date();
         Claims claims = Jwts.claims();
@@ -53,26 +58,43 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * RefreshToken 생성 메서드
+     * 생성 후 refreshTokenRepository에 저장
+     */
 
-    public String createRefreshToken() {
+    public String createRefreshToken(String username) {
         Date now = new Date();
         Claims claims = Jwts.claims();
         claims.setExpiration(new Date(now.getTime() + refreshTokenExpirationPeriod));
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(REFRESH_TOKEN_SUBJECT)
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .username(username)
+                .token(token)
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+        return token;
     }
 
-
+    /**
+     * RefreshToken과 AccessToken을 응답 헤더에 넣어주는 메서드
+     */
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
-
         setAccessTokenHeader(response, accessToken);
         setRefreshTokenHeader(response, refreshToken);
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
+
+    /**
+     * Bearer 를 제거하여 refreshToken만 추출해 내는 메서드
+     */
 
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(refreshHeader))
@@ -80,13 +102,18 @@ public class JwtService {
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
-
+    /**
+     * Bearer 를 제거하여 accessToken만 추출해 내는 메서드
+     */
     public Optional<String> extractAccessToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(accessHeader))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
+    /**
+     * accessToken에서 username을 추출해 내는 메서드
+     */
     public Optional<String> extractUsername(String accessToken) {
         try {
             Claims claims = Jwts.parser()
@@ -101,16 +128,23 @@ public class JwtService {
         }
     }
 
-
-    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
+    /**
+     * AccessToken을 응답 헤더에 넣어주는 메서드
+     */
+    private void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
         response.setHeader(accessHeader, accessToken);
     }
 
-    public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
+    /**
+     * RefreshToken을 응답 헤더에 넣어주는 메서드
+     */
+    private void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
         response.setHeader(refreshHeader, refreshToken);
     }
 
-
+    /**
+     * 해당 토큰이 유효한지 검증하는 메서드
+     */
 
     public boolean isTokenValid(String token) {
         try {

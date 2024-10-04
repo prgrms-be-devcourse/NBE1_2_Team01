@@ -51,8 +51,15 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/sign-up").permitAll()
+//                                .requestMatchers("/api/user/sign-up/**").permitAll()
+                                .requestMatchers("/user/sign-up/**").permitAll()
+                                .requestMatchers("/static/**").permitAll()
+                                .requestMatchers("/templates/**").permitAll()
+                                .requestMatchers("/api/user/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/api/email/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
+                                .anyRequest().permitAll()
+
                 );
          http.addFilterAfter(customUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
          http.addFilterBefore(jwtAuthenticationProcessingFilter(), CustomUsernamePasswordAuthenticationFilter.class);

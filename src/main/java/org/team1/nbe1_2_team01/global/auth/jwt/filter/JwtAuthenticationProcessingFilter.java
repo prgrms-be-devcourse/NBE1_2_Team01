@@ -24,6 +24,7 @@ import java.io.IOException;
 /**
  * Jwt 인증 필터
  * "/login 이외의 URI 요청을 처리하는 필터
+ *  RTR 방식으로 동작
  * 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공
  * 2. RefreshToken이 없고, AccessToken이 없거나 유효X 인 경우 -> 인증 실패
  * 3. RefreshToken이 있는 경우 -> RefreshToken과 비교하여 일치하면 AccessToken 재발급 RefreshToken 재발급
@@ -55,30 +56,19 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (refreshToken == null) {
-            checkAccessTokenAndAuthentication(request, response, filterChain);
-        }
+        checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
 
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        refreshTokenRepository.findByRefreshToken(refreshToken)
+        refreshTokenRepository.findByToken(refreshToken)
                 .ifPresent(token->{
                     String username = token.getUsername();
                     User user = userRepository.findByUsername(username)
                             .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
+                    String reIssuedRefreshToken = jwtService.createRefreshToken(username);
                     jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(username), reIssuedRefreshToken);
-                    RefreshToken redis = new RefreshToken(reIssuedRefreshToken, username);
-                    refreshTokenRepository.save(redis);
                 });
-    }
-
-    private String reIssueRefreshToken(User user) {
-        String reIssuedRefreshToken = jwtService.createRefreshToken();
-        RefreshToken redis = new RefreshToken(reIssuedRefreshToken, user.getUsername());
-        refreshTokenRepository.save(redis);
-        return reIssuedRefreshToken;
     }
 
 
@@ -86,9 +76,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                                                   FilterChain filterChain) throws ServletException, IOException {
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
-                .ifPresent(accessToken -> jwtService.extractUsername(accessToken)
-                        .ifPresent(username -> userRepository.findByUsername(username)
-                                .ifPresent(this::saveAuthentication)));
+                .flatMap(jwtService::extractUsername)
+                .flatMap(userRepository::findByUsername)
+                .ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
     }

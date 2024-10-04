@@ -1,8 +1,8 @@
-package org.team1.nbe1_2_team01.domain.user.controller.dto;
+package org.team1.nbe1_2_team01.domain.user.controller.request;
 
 import jakarta.validation.constraints.*;
 
-public record UserSignUpDto(
+public record UserSignUpRequest(
 
         @NotBlank(message = "아이디는 필수 입력 값입니다.")
         @Size(min = 5, max = 20, message = "아이디는 5자 이상, 20자 이하여야 합니다.")
@@ -20,7 +20,10 @@ public record UserSignUpDto(
 
         @NotBlank(message = "이름은 필수 입력 값입니다.")
         @Size(min = 2, message = "이름은 2자 이상이어야 합니다.")
-        String name
+        String name,
+
+        // 인증 번호 삭제를 위해 추가
+        String code
 
 ) {
 
