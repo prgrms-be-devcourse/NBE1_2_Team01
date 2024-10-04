@@ -14,23 +14,41 @@ public class CommentResponse {
     private final String writer;
     private final String content;
     private final String createdAt;
-    private boolean isAdmin;
-    private boolean isMine;
+    private final boolean isAdmin;
+    private final boolean isMine;
 
     @Builder
-    private CommentResponse(Long id, String writer, String content, LocalDateTime createdAt) {
+    private CommentResponse(
+            Long id,
+            String writer,
+            String content,
+            LocalDateTime createdAt,
+            boolean isAdmin,
+            boolean isMine
+    ) {
         this.id = id;
         this.writer = writer;
         this.content = content;
         this.createdAt = DateTimeToStringConverter.convert(createdAt);
+        this.isAdmin = isAdmin;
+        this.isMine = isMine;
     }
 
-    public static CommentResponse of(Long id, String writer, String content, LocalDateTime createdAt) {
+    public static CommentResponse of(
+            Long id,
+            String writer,
+            String content,
+            LocalDateTime createdAt,
+            boolean isAdmin,
+            boolean isMine
+    ) {
         return CommentResponse.builder()
                 .id(id)
                 .writer(writer)
                 .content(content)
                 .createdAt(createdAt)
+                .isAdmin(isAdmin)
+                .isMine(isMine)
                 .build();
     }
 }

@@ -20,5 +20,4 @@ public interface BoardService {
     Message updateBoard(BoardUpdateRequest updateRequest);
 
     List<BoardResponse> getTeamBoardListByType(TeamBoardListRequest teamBoardListRequest);
-
 }

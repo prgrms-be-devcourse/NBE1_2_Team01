@@ -17,15 +17,22 @@ public enum ErrorCode {
 
     //board
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."),
+    CANNOT_MANIPULATE_OTHERS_BOARD(HttpStatus.FORBIDDEN, "자신이 작성한 게시글이 아닙니다."),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+    CATEGORY_NOT_DELETED(HttpStatus.NOT_FOUND, "카테고리가 삭제되지 않았습니다."),
     BOARD_NOT_UPDATED(HttpStatus.NOT_MODIFIED, "게시글이 수정되지 않았습니다."),
+
+    //comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."),
+    CANNOT_MANIPULATE_OTHERS_COMMENT(HttpStatus.FORBIDDEN, "자신이 작성한 댓글이 아닙니다."),
+
 
 
     //chat
     CHANEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다"),
     NO_PARTICIPANTS(HttpStatus.NOT_FOUND, "참여자가 없음"),
     INVITER_NOT_FOUND(HttpStatus.NOT_FOUND, "초대자를 찾을 수 없음."),
-    NOT_CHANEL_CREATOR(HttpStatus.UNAUTHORIZED, "채널 생성자만이 초대를 할 수 있습니다."),
+    NOT_CHANEL_CREATOR(HttpStatus.FORBIDDEN, "채널 생성자만이 초대를 할 수 있습니다."),
     PARTICIPANTS_NOT_FOUND(HttpStatus.NOT_FOUND, "참여자 userId: %d가 channelId: %d에 존재하지 않습니다."),
 
 
@@ -36,6 +43,7 @@ public enum ErrorCode {
     COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "코스가 존재하지 않습니다."),
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀이 존재하지 않습니다."),
     BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "소속이 존재하지 않습니다"),
+    NOT_TEAM_LEADER(HttpStatus.UNAUTHORIZED, "팀장만 이용가능합니다."),
 
     //user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),

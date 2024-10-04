@@ -21,16 +21,16 @@ public class CommentController {
 
     /**
      * 댓글 목록 조회
-     * @param page 페이지 번호
+     * @param commentId 마지막으로 조회된 댓긃 번호
      * @param boardId 게시글 번호
      * @return
      */
     @GetMapping
     public ResponseEntity<Response<List<CommentResponse>>> getComments(
-            @RequestParam int page,
-            @RequestParam("boardId") Long boardId
+            @RequestParam Long commentId,
+            @RequestParam Long boardId
     ) {
-        List<CommentResponse> reviews = commentService.getReviewsByPage(boardId, page);
+        List<CommentResponse> reviews = commentService.getReviewsByPage(boardId, commentId);
         return ResponseEntity.ok()
                 .body(Response.success(reviews));
     }

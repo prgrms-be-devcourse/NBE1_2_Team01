@@ -13,17 +13,16 @@ import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.valid.BoardValidator;
+import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
-import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
-import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,53 +33,44 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final BelongingRepository belongingRepository;
     private final UserRepository userRepository;
+    private final BelongingRepository belongingRepository;
     private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional(readOnly = true)
     public List<BoardResponse> getCommonBoardList(BoardListRequest boardListRequest) {
-
-        //쿼리로 데이터 가져오기.
         CommonBoardType boardType = CommonBoardType.getType(boardListRequest.type());
 
         return boardRepository.findAllCommonBoard(
-                        boardType,
-                        boardListRequest.courseId(),
-                        boardListRequest.boardId()
-                )
-                .orElseGet(ArrayList::new);
+                boardType,
+                boardListRequest.courseId(),
+                boardListRequest.boardId()
+        );
     }
 
     @Override
     public Message addBoard(BoardRequest boardRequest) {
         User user = getUser();
-        if(boardRequest.isNotice() && user.getRole().equals(Role.USER)) {
-            throw new AppException(ErrorCode.NOT_ADMIN_USER);
-        }
+        BoardValidator.validateAdminForNotice(user, boardRequest.isNotice());
 
         Long belongingId = boardRequest.belongingId();
         Belonging course = belongingRepository.findById(belongingId)
-                .orElseThrow(() -> new AppException(ErrorCode.BELONGING_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
 
-        //CategoryService에 있으면 좋을 코드일거 같은데 임시로 넣어놨습니다.
+        log.info("course = {}", course);
+
+        Long categoryId = boardRequest.categoryId();
         Category category = null;
-        if(boardRequest.categoryId() != null) {
-            category = categoryRepository.findById(boardRequest.categoryId())
-                    .orElse(null);
+        if(categoryId != null) {
+            category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         }
 
         Board newBoard = boardRequest.toEntity(user, category, course);
         boardRepository.save(newBoard);
 
         return new Message(MessageContent.getAddMessage(boardRequest.isNotice()));
-    }
-
-    private User getUser() {
-        String currentUsername = SecurityUtil.getCurrentUsername(); //id를 반환
-        return userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Override
@@ -92,19 +82,25 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Message deleteBoardById(BoardDeleteRequest request) {
-        //내가 작성한 게시글인지 확인?
+        Board findBoard = getBoardWithValidateUser(
+                request.boardId(),
+                request.isNotice()
+        );
+        boardRepository.delete(findBoard);
 
-        boardRepository.deleteById(request.boardId());
         String deleteMessage = MessageContent.getDeleteMessage(request.isNotice());
         return new Message(deleteMessage);
     }
 
+
     @Override
     public Message updateBoard(BoardUpdateRequest updateRequest) {
-        Board findBoard = boardRepository.findById(updateRequest.boardId())
-                .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
-
+        Board findBoard = getBoardWithValidateUser(
+                updateRequest.boardId(),
+                updateRequest.isNotice()
+        );
         findBoard.updateBoard(updateRequest);
+
         String updateMessage = MessageContent.getUpdateMessage(updateRequest.isNotice());
         return new Message(updateMessage);
     }
@@ -116,9 +112,28 @@ public class BoardServiceImpl implements BoardService {
         Long boardId = request.boardId();
 
         return boardRepository.findAllTeamBoardDByType(
-                        belongingId,
-                        categoryId,
-                        boardId)
-                .orElseGet(ArrayList::new);
+                belongingId,
+                categoryId,
+                boardId
+        );
+    }
+    private Board getBoardById(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
+    }
+
+    private User getUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername(); //id를 반환
+        return userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private Board getBoardWithValidateUser(Long boardId, boolean isNotice) {
+        Board findBoard = getBoardById(boardId);
+        User user = getUser();
+
+        BoardValidator.validateWriter(findBoard, user);
+        BoardValidator.validateAdminForNotice(user, isNotice);
+        return findBoard;
     }
 }
