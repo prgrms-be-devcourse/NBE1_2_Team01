@@ -1,7 +1,9 @@
 package org.team1.nbe1_2_team01.domain.attendance.service;
 
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_NOT_FOUND;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.USER_NOT_FOUND;
+
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,7 +42,7 @@ public class AttendanceQueryService {
 
     public AttendanceResponse getById(Long id) {
         Attendance attendance = attendanceRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
+                .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
 
         return AttendanceResponse.from(attendance.getUser(), attendance);
     }
@@ -48,7 +51,7 @@ public class AttendanceQueryService {
         User currentUser = getUserByUsername(currentUsername);
 
         Attendance attendance = attendanceRepository.findByIdAndUserId(attendanceId, currentUser.getId())
-                .orElseThrow(() -> new NoSuchElementException("출결 요청을 찾을 수 없습니다."));
+                .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
 
         return AttendanceResponse.from(attendance.getUser(), attendance);
     }
@@ -56,6 +59,6 @@ public class AttendanceQueryService {
     // 타 서비스 메서드
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new AppException(USER_NOT_FOUND));
     }
 }

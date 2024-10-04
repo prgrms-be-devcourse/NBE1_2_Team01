@@ -1,5 +1,8 @@
 package org.team1.nbe1_2_team01.domain.attendance.entity;
 
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_ACCESS_DENIED;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_APPROVED;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,9 +20,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
-import org.team1.nbe1_2_team01.domain.attendance.exception.AccessDeniedException;
 import org.team1.nbe1_2_team01.domain.attendance.service.validation.AttendanceValidator;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Entity
 @Getter
@@ -67,7 +70,7 @@ public class Attendance {
     public void validateRegister(Long currentUserId) {
         Long registerId = user.getId();
         if (!registerId.equals(currentUserId)) {
-            throw new AccessDeniedException("접근할 수 없습니다.");
+            throw new AppException(ATTENDANCE_ACCESS_DENIED);
         }
     }
 
@@ -82,7 +85,7 @@ public class Attendance {
 
     public void approve() {
         if (!creationWaiting) {
-            throw new IllegalArgumentException("이미 승인되었습니다.");
+            throw new AppException(REQUEST_ALREADY_APPROVED);
         }
         creationWaiting = false;
     }

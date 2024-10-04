@@ -11,19 +11,28 @@ public enum ErrorCode {
     ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "출결 요청을 찾을 수 없습니다."),
     REQUEST_ALREADY_APPROVED(HttpStatus.CONFLICT, "이미 승인되었습니다."),
     REQUEST_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 오늘 등록된 요청이 있습니다"),
-    ATTENDANCE_TIME_INVALID(HttpStatus.BAD_REQUEST, "출결 이슈는 9시에서 17시 59분 사이여야 합니다."),
+    ATTENDANCE_TIME_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "출결 이슈는 9시에서 17시 59분 사이여야 합니다."),
+    ATTENDANCE_TIME_END_BEFORE_START(HttpStatus.BAD_REQUEST, "출결 시작 시간이 끝 시간보다 나중일 수 없습니다."),
+    ATTENDANCE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "출결 이슈에 접근할 수 없습니다."),
 
     //board
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."),
+    CANNOT_MANIPULATE_OTHERS_BOARD(HttpStatus.FORBIDDEN, "자신이 작성한 게시글이 아닙니다."),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+    CATEGORY_NOT_DELETED(HttpStatus.NOT_FOUND, "카테고리가 삭제되지 않았습니다."),
     BOARD_NOT_UPDATED(HttpStatus.NOT_MODIFIED, "게시글이 수정되지 않았습니다."),
+
+    //comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."),
+    CANNOT_MANIPULATE_OTHERS_COMMENT(HttpStatus.FORBIDDEN, "자신이 작성한 댓글이 아닙니다."),
+
 
 
     //chat
     CHANEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다"),
     NO_PARTICIPANTS(HttpStatus.NOT_FOUND, "참여자가 없음"),
     INVITER_NOT_FOUND(HttpStatus.NOT_FOUND, "초대자를 찾을 수 없음."),
-    NOT_CHANEL_CREATOR(HttpStatus.UNAUTHORIZED, "채널 생성자만이 초대를 할 수 있습니다."),
+    NOT_CHANEL_CREATOR(HttpStatus.FORBIDDEN, "채널 생성자만이 초대를 할 수 있습니다."),
     PARTICIPANTS_NOT_FOUND(HttpStatus.NOT_FOUND, "참여자 userId: %d가 channelId: %d에 존재하지 않습니다."),
 
 

@@ -13,7 +13,6 @@ import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixtur
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +22,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.exception.AlreadyExistException;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 import org.team1.nbe1_2_team01.domain.common.stub.FixedDateTimeHolder;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -80,7 +79,7 @@ public class AttendanceServiceTest {
 
         // when & then
         assertThatThrownBy(() -> attendanceService.registAttendance(user.getUsername(), createRequest))
-                .isInstanceOf(AlreadyExistException.class);
+                .isInstanceOf(AppException.class);
     }
 
     @Test
@@ -105,7 +104,7 @@ public class AttendanceServiceTest {
 
         // when & then
         assertThatThrownBy(() -> attendanceService.updateAttendance(user.getUsername(), updateRequest))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(AppException.class);
     }
 
     @Test
@@ -130,7 +129,7 @@ public class AttendanceServiceTest {
 
         // when & then
         assertThatThrownBy(() -> attendanceService.deleteAttendance(user.getUsername(), attendance.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(AppException.class);
     }
 
     @Test

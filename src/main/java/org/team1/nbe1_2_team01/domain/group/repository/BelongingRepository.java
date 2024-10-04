@@ -8,6 +8,7 @@ import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BelongingRepository extends JpaRepository<Belonging, Long> {
 
@@ -35,4 +36,5 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
 
     Belonging findByTeamIdAndIsOwner(Long teamId, boolean isOwner);
 
+    Optional<Belonging> findByTeam_IdAndUser_Username(Long teamId, String username);
 }

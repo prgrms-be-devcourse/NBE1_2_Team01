@@ -11,6 +11,7 @@ import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @SuppressWarnings("NonAsciiCharacters")
 public class AttendanceTest {
@@ -36,7 +37,7 @@ public class AttendanceTest {
         var createRequest = createAttendanceCreateRequest(9, 30, 9, 10);
 
         assertThatThrownBy(() -> createRequest.toEntity(user))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(AppException.class);
     }
 
     @Test
@@ -45,11 +46,11 @@ public class AttendanceTest {
             assertThatThrownBy(() -> {
                 var createRequest = createAttendanceCreateRequest(8, 59, 9, 30);
                 createRequest.toEntity(user);
-            }).isInstanceOf(IllegalArgumentException.class);
+            }).isInstanceOf(AppException.class);
             assertThatThrownBy(() -> {
                 var createRequest = createAttendanceCreateRequest(9, 10, 18, 30);
                 createRequest.toEntity(user);
-            }).isInstanceOf(IllegalArgumentException.class);
+            }).isInstanceOf(AppException.class);
         });
     }
 
@@ -73,6 +74,6 @@ public class AttendanceTest {
 
         // when & then
         assertThatThrownBy(() -> attendance.approve())
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(AppException.class);
     }
 }
