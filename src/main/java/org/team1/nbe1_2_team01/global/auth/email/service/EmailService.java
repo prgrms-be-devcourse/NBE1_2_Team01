@@ -4,6 +4,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.core.ApplicationPushBuilder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,9 +30,7 @@ public class EmailService {
     private static final String CONTENT = "<p>회원가입을 하려면 <a href=\"%s\">여기</a>를 클릭하세요</p>";
     private static final String SIGNUP_URL = "http://localhost:8080/api/user/sign-up/";
 
-    @Async
-    public void sendSignUpLinkToEmails(EmailsRequest emailsRequest) throws MessagingException {
-       for(String email : emailsRequest.emails()){
+    public void sendSignUpLinkToEmails(String email) throws MessagingException {
            UUID code = UUID.randomUUID();
            EmailToken emailToken = EmailToken.builder()
                    .email(email)
@@ -45,7 +45,6 @@ public class EmailService {
            helper.setText(createSignupContent(code), true);
            this.javaMailSender.send(message);
            log.info("메일 전송 성공!");
-       }
     }
 
     private String createSignupContent(UUID uuid){
