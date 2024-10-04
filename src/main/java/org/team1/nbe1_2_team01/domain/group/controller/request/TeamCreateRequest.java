@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 public class TeamCreateRequest {
+    //TODO: 리퀘스트들 Validation 넣기
 
     private String course;
 
@@ -19,21 +20,13 @@ public class TeamCreateRequest {
 
     private Long leaderId;
 
-    public Team toProjectTeamEntity() {
+    public Team toTeamEntity(boolean study) {
         return Team.builder()
                 .teamType(TeamType.valueOf(this.getTeamType()))
                 .name(this.getName())
-                .creationWaiting(false)
+                .creationWaiting(study)
                 .deletionWaiting(false)
                 .build();
     }
 
-    public Team toStudyTeamEntity() {
-        return Team.builder()
-                .teamType(TeamType.valueOf(this.getTeamType()))
-                .name(this.getName())
-                .creationWaiting(true)
-                .deletionWaiting(false)
-                .build();
-    }
 }

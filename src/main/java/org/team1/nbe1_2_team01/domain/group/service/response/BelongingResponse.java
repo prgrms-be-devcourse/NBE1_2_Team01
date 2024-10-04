@@ -12,7 +12,7 @@ public class BelongingResponse {
     private Long teamId;
 
     @Builder
-    public BelongingResponse(Long id, Long userId, Long teamId) {
+    private BelongingResponse(Long id, Long userId, Long teamId) {
         this.id = id;
         this.userId = userId;
         this.teamId = teamId;
@@ -25,4 +25,5 @@ public class BelongingResponse {
                 .teamId(belonging.getTeam() != null ? belonging.getTeam().getId() : null)
                 .build();
     }
+
 }

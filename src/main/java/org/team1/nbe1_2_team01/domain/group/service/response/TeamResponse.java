@@ -19,7 +19,7 @@ public class TeamResponse {
     private List<BelongingResponse> belongings;
 
     @Builder
-    public TeamResponse(Long id, String teamType, String name, boolean creationWaiting, boolean deletionWaiting) {
+    private TeamResponse(Long id, String teamType, String name, boolean creationWaiting, boolean deletionWaiting) {
         this.id = id;
         this.teamType = teamType;
         this.name = name;
@@ -43,4 +43,5 @@ public class TeamResponse {
 
         return teamResponse;
     }
+
 }
