@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum ErrorCode {
+    //emailToken
+    CODE_NOT_FOUND(HttpStatus.NOT_FOUND,"인증 코드를 찾을 수 없습니다."),
+
     //attendance
     ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "출결 요청을 찾을 수 없습니다."),
     REQUEST_ALREADY_APPROVED(HttpStatus.CONFLICT, "이미 승인되었습니다."),
