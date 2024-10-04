@@ -49,7 +49,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/api/user/sign-up").permitAll()
+                                .requestMatchers("/api/user/sign-up/**").permitAll()
                                 .requestMatchers("/api/user/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/email/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
