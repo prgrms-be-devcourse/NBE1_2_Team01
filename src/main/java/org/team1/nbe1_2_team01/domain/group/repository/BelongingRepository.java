@@ -13,7 +13,7 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
 
     @Query("select u " +
             "from Belonging b " +
-            "join fetch b.user u " +
+            "join b.user u " +
             "where b.team.id = :teamId and b.user is not null")
     List<User> findUsersByTeamId(@Param("teamId") Long teamId);
 

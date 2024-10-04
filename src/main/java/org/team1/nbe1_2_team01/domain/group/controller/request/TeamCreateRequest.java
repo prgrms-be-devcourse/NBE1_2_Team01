@@ -20,11 +20,11 @@ public class TeamCreateRequest {
 
     private Long leaderId;
 
-    public Team toTeamEntity() {
+    public Team toTeamEntity(boolean study) {
         return Team.builder()
                 .teamType(TeamType.valueOf(this.getTeamType()))
                 .name(this.getName())
-                .creationWaiting(false)
+                .creationWaiting(study)
                 .deletionWaiting(false)
                 .build();
     }

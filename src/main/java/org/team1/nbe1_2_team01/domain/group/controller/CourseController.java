@@ -18,7 +18,7 @@ public class CourseController {
     private final BelongingService belongingService;
     private final TeamService teamService;
 
-    @PostMapping
+    @PostMapping("/admin")
     public ResponseEntity<?> createCourse(@RequestBody CourseCreateRequest courseCreateRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Response.success(belongingService.courseBelongingCreate(courseCreateRequest)));

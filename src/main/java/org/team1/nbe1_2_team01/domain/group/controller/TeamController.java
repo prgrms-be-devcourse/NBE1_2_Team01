@@ -23,13 +23,13 @@ public class TeamController {
                 .body(Response.success(teamService.teamCreate(teamCreateRequest)));
     }
 
-    @GetMapping("/waiting")
+    @GetMapping("/admin/waiting")
     public ResponseEntity<?> getCreationWaitingStudyTeams() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Response.success(teamService.creationWaitingStudyTeamList()));
     }
 
-    @PostMapping("/approval")
+    @PostMapping("/admin/approval")
     public ResponseEntity<?> approveStudyTeamCreation(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Response.success(teamService.studyTeamCreationApprove(teamApprovalUpdateRequest)));
@@ -59,7 +59,7 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/approval")
+    @DeleteMapping("/admin/approval")
     public ResponseEntity<?> approveStudyTeamDeletion(@RequestBody TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
         teamService.studyTeamDeletionApprove(teamApprovalUpdateRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)

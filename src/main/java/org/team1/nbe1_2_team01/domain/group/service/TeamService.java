@@ -42,7 +42,8 @@ public class TeamService {
         boolean existsByCourse = belongingRepository.existsByCourse(teamCreateRequest.getCourse());
         if (!existsByCourse) throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         // 저장될 팀 객체
-        Team newTeam = teamCreateRequest.toTeamEntity();
+        boolean study = teamCreateRequest.getTeamType().equals("STUDY");
+        Team newTeam = teamCreateRequest.toTeamEntity(study);
 
         Calendar teamCalendar = null;
         for (User u : users) {
@@ -146,8 +147,8 @@ public class TeamService {
                 .getUser().getId();
 
         String teamType = allBelongings.get(0).getTeam().getTeamType().name();
-        if (!teamType.equals("PROJECT") && !curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
-        if (!teamType.equals("STUDY") && !curUser.getId().equals(leaderId)) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
+        if (teamType.equals("PROJECT") && !curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        if (teamType.equals("STUDY") && !curUser.getId().equals(leaderId)) throw new AppException(ErrorCode.NOT_TEAM_LEADER);
 
         if (userIds.contains(leaderId)) throw new AppException(ErrorCode.CANNOT_DELETE_LEADER);
 
@@ -173,9 +174,12 @@ public class TeamService {
     }
 
     public void studyTeamDeletionApprove(TeamApprovalUpdateRequest teamApprovalUpdateRequest) {
-        teamRepository.delete(
-                teamRepository.findById(teamApprovalUpdateRequest.getTeamId()).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND))
-        );
+        Team team = teamRepository.findById(teamApprovalUpdateRequest.getTeamId()).orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+        if (!team.isDeletionWaiting()) throw new AppException(ErrorCode.TEAM_NOT_WAITING);
+        Belonging ownerBelonging = belongingRepository.findByTeamIdAndIsOwner(team.getId(), true);
+        calendarRepository.deleteByBelonging(ownerBelonging);
+
+        teamRepository.delete(team);
     }
 
     public List<TeamResponse> courseTeamList(String course) {
