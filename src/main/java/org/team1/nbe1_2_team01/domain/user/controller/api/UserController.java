@@ -1,7 +1,8 @@
-package org.team1.nbe1_2_team01.domain.user.controller;
+package org.team1.nbe1_2_team01.domain.user.controller.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
@@ -9,6 +10,7 @@ import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.service.UserService;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
+import org.team1.nbe1_2_team01.global.auth.email.service.EmailService;
 import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.util.List;
@@ -16,17 +18,31 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
+@Slf4j
 public class UserController {
     private final UserService userService;
+    private final EmailService emailService;
 
-    /**
-     * 회원가입
-     */
-    @PostMapping("/sign-up")
-    public ResponseEntity<Response<UserIdResponse>> signUp(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
-        UserIdResponse userIdResponse = userService.signUp(userSignUpRequest);
-        return ResponseEntity.ok().body(Response.success(userIdResponse));
-    }
+//    /**
+//     * 이메일 uuid 검증
+//     */
+//    @GetMapping("/sign-up/{code}")
+//    public ResponseEntity<Response<String>> verifyUUID(@PathVariable String code) {
+//        boolean validCode = emailService.isValidCode(code);
+//        if (validCode) {
+//            return ResponseEntity.ok().body(Response.success("검증 성공"));
+//        }
+//        return ResponseEntity.status(403).build();
+//    }
+//
+//    /**
+//     * 회원가입
+//     */
+//    @PostMapping("/sign-up")
+//    public ResponseEntity<Response<UserIdResponse>> signUp(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
+//        UserIdResponse userIdResponse = userService.signUp(userSignUpRequest);
+//        return ResponseEntity.ok().body(Response.success(userIdResponse));
+//    }
 
     /**
      * 로그 아웃
