@@ -43,6 +43,12 @@ public class TeamService {
         if (!existsByCourse) throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         // 저장될 팀 객체
         boolean study = teamCreateRequest.getTeamType().equals("STUDY");
+
+        if (!study) {
+            User curUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            if (!curUser.getRole().name().equals("ADMIN")) throw new AppException(ErrorCode.NOT_ADMIN_USER);
+        }
+
         Team newTeam = teamCreateRequest.toTeamEntity(study);
 
         Calendar teamCalendar = null;

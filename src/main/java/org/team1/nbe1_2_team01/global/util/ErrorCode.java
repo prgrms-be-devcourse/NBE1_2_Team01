@@ -32,6 +32,7 @@ public enum ErrorCode {
     //group
     MISSING_TEAM_TYPE(HttpStatus.BAD_REQUEST, "팀 타입이 필요합니다."),
     COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "코스가 존재하지 않습니다."),
+    COURSE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 코스명입니다."),
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀이 존재하지 않습니다."),
     TEAM_NOT_WAITING(HttpStatus.BAD_REQUEST, "승인 대기 중인 팀이 아닙니다."),
     BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "소속이 존재하지 않습니다"),
