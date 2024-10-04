@@ -5,16 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record BoardUpdateRequest(
-        @NotNull(message = "필수 파라미터가 누락되었습니다.")
+        @NotBlank(message = "필수 파라미터가 누락되었습니다.")
         @Positive(message = "요청 파라미터의 형식이 잘못되었습니다.")
         Long boardId,
 
-        @NotNull(message = "제목은 필수 입력값입니다.")
-        @NotBlank(message = "내용을 입력해주세요.")
+        @NotBlank(message = "제목은 필수 입력값입니다.")
         String title,
 
-        @NotNull(message = "내용은 필수 입력값입니다.")
-        @NotBlank(message = "내용을 입력해주세요.")
+        @NotBlank(message = "내용은 필수 입력값입니다.")
         String content,
 
         @NotNull(message = "게시글 수정 실패했습니다.")

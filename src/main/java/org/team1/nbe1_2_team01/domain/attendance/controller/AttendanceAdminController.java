@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceIdRequest;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResponse;
+import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
-@RequestMapping("/admin/attendance")
+@RequestMapping("/api/attendances/admin")
 @RequiredArgsConstructor
 public class AttendanceAdminController {
 
@@ -26,28 +28,28 @@ public class AttendanceAdminController {
      * 관리자 - 모든 출결 요청 보기
      */
     @GetMapping
-    public ResponseEntity<List<AttendanceResponse>> findAll() {
-        return ResponseEntity.ok(attendanceQueryService.getAll());
+    public Response<List<AttendanceResponse>> findAll() {
+        return Response.success(attendanceQueryService.getAll());
     }
 
     /**
      * 관리자 - 출결 요청 상세 내역 보기
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AttendanceResponse> getAttendanceById(
-            @PathVariable("id") long attendanceId
+    public Response<AttendanceResponse> getAttendanceById(
+            @PathVariable("id") Long attendanceId
     ) {
-        return ResponseEntity.ok(attendanceQueryService.getById(attendanceId));
+        return Response.success(attendanceQueryService.getById(attendanceId));
     }
 
     /**
      * 관리자 - 출결 요청 승인
      */
     @PostMapping("/approve")
-    public ResponseEntity<AttendanceIdResponse> approveAttendance(
-            @RequestBody Long attendanceId
+    public Response<AttendanceIdResponse> approveAttendance(
+            @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
-        return ResponseEntity.ok(attendanceService.approveAttendance(attendanceId));
+        return Response.success(attendanceService.approveAttendance(attendanceIdRequest.id()));
     }
 
     /**
@@ -55,9 +57,9 @@ public class AttendanceAdminController {
      */
     @PostMapping("/reject")
     public ResponseEntity<Void> rejectAttendance(
-            @RequestBody Long attendanceId
+            @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
-        attendanceService.rejectAttendance(attendanceId);
+        attendanceService.rejectAttendance(attendanceIdRequest.id());
         return ResponseEntity.noContent()
                 .build();
     }

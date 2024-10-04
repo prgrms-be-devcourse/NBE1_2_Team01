@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryDeleteRequest;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.CategoryRequest;
 import org.team1.nbe1_2_team01.domain.board.service.CategoryService;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
@@ -47,11 +48,11 @@ public class CategoryController {
                 .body(Response.success(message));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     public ResponseEntity<Response<Message>> deleteCategory(
-            @PathVariable Long id
-    ) {
-        Message message = categoryService.deleteCategory(id);
+            @RequestBody CategoryDeleteRequest request
+            ) {
+        Message message = categoryService.deleteCategory(request);
         return ResponseEntity.ok()
                 .body(Response.success(message));
     }

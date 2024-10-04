@@ -10,7 +10,7 @@ public class BelongingIdResponse {
     private Long id;
 
     @Builder
-    public BelongingIdResponse(Long id) {
+    private BelongingIdResponse(Long id) {
         this.id = id;
     }
 
@@ -19,4 +19,5 @@ public class BelongingIdResponse {
                 .id(belonging.getId())
                 .build();
     }
+
 }

@@ -14,15 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceIdRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResponse;
+import org.team1.nbe1_2_team01.global.util.Response;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 @RestController
-@RequestMapping("/attendance")
+@RequestMapping("/api/attendances")
 @RequiredArgsConstructor
 public class AttendanceController {
 
@@ -33,29 +35,29 @@ public class AttendanceController {
      * 자신의 출결 요청 보기
      */
     @GetMapping
-    public ResponseEntity<List<AttendanceResponse>> getMyAttendances() {
+    public Response<List<AttendanceResponse>> getMyAttendances() {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        return ResponseEntity.ok(attendanceQueryService.getMyAttendances(currentUsername));
+        return Response.success(attendanceQueryService.getMyAttendances(currentUsername));
     }
 
     /**
      * 자신의 출결 요청 상세 보기
      */
     @GetMapping("{id}")
-    public ResponseEntity<AttendanceResponse> getMyAttendance(
+    public Response<AttendanceResponse> getMyAttendance(
             @PathVariable("id") Long attendanceId
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        return ResponseEntity.ok(attendanceQueryService.getByIdAndUserId(attendanceId, currentUsername));
+        return Response.success(attendanceQueryService.getByIdAndUserId(attendanceId, currentUsername));
     }
 
     /**
      * 출결 요청 등록
      */
     @PostMapping("/regist")
-    public ResponseEntity<AttendanceIdResponse> registAttendance(
+    public ResponseEntity<Response<AttendanceIdResponse>> registAttendance(
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {
         var registerUsername = SecurityUtil.getCurrentUsername();
@@ -63,19 +65,19 @@ public class AttendanceController {
         var attendanceIdResponse = attendanceService.registAttendance(registerUsername, attendanceCreateRequest);
         return ResponseEntity
                 .created(URI.create("/attendance/" + attendanceIdResponse.attendanceId()))
-                .body(attendanceIdResponse);
+                .body(Response.success(attendanceIdResponse));
     }
 
     /**
      * 출결 요청 수정
      */
     @PatchMapping
-    public ResponseEntity<AttendanceIdResponse> updateAttendance(
+    public Response<AttendanceIdResponse> updateAttendance(
             @RequestBody @Valid AttendanceUpdateRequest attendanceUpdateRequest
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        return ResponseEntity.ok(attendanceService.updateAttendance(currentUsername, attendanceUpdateRequest));
+        return Response.success(attendanceService.updateAttendance(currentUsername, attendanceUpdateRequest));
     }
 
     /**
@@ -83,11 +85,11 @@ public class AttendanceController {
      */
     @DeleteMapping
     public ResponseEntity<Void> deleteAttendance(
-            @RequestBody Long attendanceId
+            @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        attendanceService.deleteAttendance(currentUsername, attendanceId);
+        attendanceService.deleteAttendance(currentUsername, attendanceIdRequest.id());
         return ResponseEntity.noContent()
                 .build();
     }
