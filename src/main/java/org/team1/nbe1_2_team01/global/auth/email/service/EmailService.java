@@ -29,7 +29,7 @@ public class EmailService {
     private static final String CONTENT = "<p>회원가입을 하려면 <a href=\"%s\">여기</a>를 클릭하세요</p>";
     private static final String SIGNUP_URL = "http://localhost:8080/user/sign-up/";
 
-    public void sendSignUpLinkToEmails(String email) throws MessagingException {
+    public void sendSignUpLinkToEmail(String email) throws MessagingException {
            UUID code = UUID.randomUUID();
            EmailToken emailToken = EmailToken.builder()
                    .email(email)
