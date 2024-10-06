@@ -35,14 +35,15 @@ public class UserController {
 //        return ResponseEntity.status(403).build();
 //    }
 //
-//    /**
-//     * 회원가입
-//     */
-//    @PostMapping("/sign-up")
-//    public ResponseEntity<Response<UserIdResponse>> signUp(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
-//        UserIdResponse userIdResponse = userService.signUp(userSignUpRequest);
-//        return ResponseEntity.ok().body(Response.success(userIdResponse));
-//    }
+    /**
+     * 회원가입
+     */
+    @PostMapping("/sign-up")
+    public ResponseEntity<Response<UserIdResponse>> signUp(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
+        UserIdResponse userIdResponse = userService.signUp(userSignUpRequest);
+        emailService.deleteByEmail(userSignUpRequest.email());
+        return ResponseEntity.ok().body(Response.success(userIdResponse));
+    }
 
     /**
      * 로그 아웃

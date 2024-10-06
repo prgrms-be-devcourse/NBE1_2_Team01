@@ -35,16 +35,14 @@ public class SignupController {
         return "error";
     }
 
-    /**
-     * 회원가입
-     */
-    @PostMapping("/sign-up")
-    public String signUp(@Valid UserSignUpRequest userSignUpRequest, Model model) {
-        userService.signUp(userSignUpRequest);
-        // 회원가입 이후 email 정보 redis 저장소에서 삭제
-        emailService.deleteByEmail(userSignUpRequest.email());
-        model.addAttribute("successMessage", "회원가입이 완료되었습니다");
-        return "signup";
-    }
-
+//    /**
+//     * 회원가입
+//     */
+//    @PostMapping("/sign-up")
+//    public ResponseEntity<Response<UserIdResponse>> signUp(@Valid UserSignUpRequest userSignUpRequest, Model model) {
+//        UserIdResponse userIdResponse = userService.signUp(userSignUpRequest);
+//        // 회원가입 이후 email 정보 redis 저장소에서 삭제
+//        emailService.deleteByEmail(userSignUpRequest.email());
+//        return ResponseEntity.ok().body(Response.success(userIdResponse));
+//    }
 }

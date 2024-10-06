@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>회원가입 - 데브코스 그룹웨어</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMUjzGQ1s/LXz0xgkPLBxV2ZlT0BkFuc8RxZ6d" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMUjzGQ1s/LXz0x0gkPLBxV2ZlT0BkFuc8RxZ6d" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,10 +50,6 @@
             border-radius: 4px;
         }
 
-        input[readonly] {
-            background-color: #e9ecef;
-        }
-
         button {
             background-color: #007bff;
             color: white;
@@ -92,12 +88,17 @@
     <h1>회원가입</h1>
 
     <!-- 회원가입 성공 메시지 -->
-    <div th:if="${successMessage}" class="success-message">
-        <p th:text="${successMessage}"></p>
+    <div id="successMessage" class="success-message" style="display: none;">
+        <p>회원가입이 완료되었습니다!</p>
+    </div>
+
+    <!-- 회원가입 실패 메시지 -->
+    <div id="errorMessage" class="error-message" style="display: none;">
+        <p id="errorText"></p>
     </div>
 
     <!-- 회원가입 폼 -->
-    <form th:action="@{/user/sign-up}" method="post">
+    <form id="signupForm" method="post">
         <div class="form-group">
             <label for="name">이름:</label>
             <input type="text" id="name" name="name" required>
@@ -108,7 +109,6 @@
         </div>
         <div class="form-group">
             <label for="email">이메일:</label>
-            <!-- 넘겨받은 이메일을 입력하고 수정 불가능하게 설정 -->
             <input type="email" id="email" name="email" th:value="${email}" readonly required>
         </div>
         <div class="form-group">
@@ -123,15 +123,84 @@
         <button type="submit">회원가입</button>
     </form>
 
-    <!-- 오류 메시지 -->
-    <div th:if="${error}" class="error-message">
-        <p th:text="${error}"></p>
-    </div>
-
     <div class="login-link">
-        <!-- 로그인 페이지 링크 설정 -->
         <p>이미 회원이신가요? <a href="https://rinklove.github.io/groupware-front/">로그인 페이지로 가기</a></p>
     </div>
 </div>
+
+<script>
+    document.getElementById("signupForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        // 비밀번호와 비밀번호 확인이 일치하는지 확인
+        if (password !== confirmPassword) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        const formData = {
+            name: document.getElementById("name").value,
+            username: document.getElementById("username").value,
+            email: document.getElementById("email").value,
+            password: password
+        };
+
+        try {
+            const response = await fetch("/api/user/sign-up", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // 성공 시 alert 메시지 표시 및 로그인 페이지로 리다이렉트
+                alert("회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.");
+                window.location.href = "https://rinklove.github.io/groupware-front/";
+            } else if (response.status === 400) {
+                // 검증 실패 시, 각 필드에 에러 메시지 표시
+                displayValidationErrors(data.message);
+            } else {
+                // 기타 에러 메시지
+                document.getElementById("errorText").innerText = "오류가 발생했습니다. 다시 시도해주세요.";
+                document.getElementById("errorMessage").style.display = "block";
+            }
+        } catch (error) {
+            alert("오류가 발생했습니다. 다시 시도해주세요.");
+        }
+    });
+
+    function displayValidationErrors(errors) {
+        // 에러 메시지 초기화
+        clearValidationErrors();
+
+        // 각 필드에 대한 에러 메시지를 표시
+        for (const field in errors) {
+            const errorMessage = errors[field];
+            const errorElement = document.createElement("p");
+            errorElement.classList.add("error-message");
+            errorElement.innerText = errorMessage;
+
+            const inputField = document.getElementById(field);
+            if (inputField) {
+                inputField.parentElement.appendChild(errorElement);
+            }
+        }
+    }
+
+    function clearValidationErrors() {
+        const errorMessages = document.querySelectorAll(".error-message");
+        errorMessages.forEach(function(message) {
+            message.remove();
+        });
+    }
+</script>
+
 </body>
 </html>
