@@ -21,7 +21,7 @@ import org.team1.nbe1_2_team01.domain.calendar.service.response.ScheduleResponse
 import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
-@RequestMapping("/api/schedules/admin")
+@RequestMapping("/api/admin/schedules")
 @RequiredArgsConstructor
 public class ScheduleAdminController {
 
@@ -39,14 +39,14 @@ public class ScheduleAdminController {
     /**
      * 공통(공지) 일정 등록
      */
-    @PostMapping("/regist")
+    @PostMapping
     public ResponseEntity<Response<ScheduleIdResponse>> registSchedule(
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
         var scheduleIdResponse = scheduleService.registSchedule(scheduleCreateRequest.belongingId(),
                 scheduleCreateRequest);
         return ResponseEntity
-                .created(URI.create("/api/schedules/" + scheduleIdResponse.scheduleId()))
+                .created(URI.create("/api/schedules/common"))
                 .body(Response.success(scheduleIdResponse));
     }
 

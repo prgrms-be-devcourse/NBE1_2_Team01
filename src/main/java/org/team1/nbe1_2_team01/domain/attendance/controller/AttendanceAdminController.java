@@ -17,7 +17,7 @@ import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResp
 import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
-@RequestMapping("/api/attendances/admin")
+@RequestMapping("/api/admin/attendances")
 @RequiredArgsConstructor
 public class AttendanceAdminController {
 

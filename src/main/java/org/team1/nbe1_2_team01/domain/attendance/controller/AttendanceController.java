@@ -56,7 +56,7 @@ public class AttendanceController {
     /**
      * 출결 요청 등록
      */
-    @PostMapping("/regist")
+    @PostMapping
     public ResponseEntity<Response<AttendanceIdResponse>> registAttendance(
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {

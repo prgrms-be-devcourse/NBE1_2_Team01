@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleCreateRequest;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleDeleteRequest;
@@ -34,15 +35,15 @@ public class ScheduleController {
     /**
      * 팀 내 일정 조회
      */
-    @GetMapping("/team")
+    @GetMapping
     public Response<List<ScheduleResponse>> getTeamSchedule(
-            @RequestBody Long belongingTeamId
+            @RequestParam Long teamId
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        groupAuthService.validateTeam(currentUsername, belongingTeamId);
+        groupAuthService.validateTeam(currentUsername, teamId);
 
-        return Response.success(scheduleQueryService.getTeamSchedules(belongingTeamId));
+        return Response.success(scheduleQueryService.getTeamSchedules(teamId));
     }
 
     /**
@@ -50,7 +51,7 @@ public class ScheduleController {
      */
     @GetMapping("/common")
     public Response<List<ScheduleResponse>> getNoticeSchedules(
-            @RequestBody String course
+            @RequestParam String course
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
@@ -62,7 +63,7 @@ public class ScheduleController {
     /**
      * 일정 등록
      */
-    @PostMapping("/regist")
+    @PostMapping
     public ResponseEntity<Response<ScheduleIdResponse>> registSchedule(
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
