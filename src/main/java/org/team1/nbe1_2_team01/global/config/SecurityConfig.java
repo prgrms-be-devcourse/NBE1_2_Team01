@@ -58,7 +58,6 @@ public class SecurityConfig {
                                 .requestMatchers("/api/user/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/email/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
-                                .anyRequest().permitAll()
 
                 );
          http.addFilterAfter(customUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
@@ -81,7 +80,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, refreshTokenRepository);
+        return new LoginSuccessHandler(jwtService);
     }
 
     @Bean
@@ -103,6 +102,5 @@ public class SecurityConfig {
         customUsernamePasswordAuthenticationFilter.setAuthenticationFailureHandler(loginFailureHandler());
         return customUsernamePasswordAuthenticationFilter;
     }
-
 
 }

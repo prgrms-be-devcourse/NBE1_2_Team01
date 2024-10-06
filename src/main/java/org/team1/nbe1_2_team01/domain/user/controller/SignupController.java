@@ -28,6 +28,7 @@ public class SignupController {
     public String verifyUUID(@PathVariable String code, Model model) {
         boolean validCode = emailService.isValidCode(code);
         if (validCode) {
+            model.addAttribute("email", emailService.findByCode(code).getEmail());
             return "signup";
         }
         model.addAttribute("error", "접근 금지: 인증되지 않은 이메일입니다.");
@@ -40,7 +41,8 @@ public class SignupController {
     @PostMapping("/sign-up")
     public String signUp(@Valid UserSignUpRequest userSignUpRequest, Model model) {
         userService.signUp(userSignUpRequest);
-        emailService.deleteByCode(userSignUpRequest.code());
+        // 회원가입 이후 email 정보 redis 저장소에서 삭제
+        emailService.deleteByEmail(userSignUpRequest.email());
         model.addAttribute("successMessage", "회원가입이 완료되었습니다");
         return "signup";
     }

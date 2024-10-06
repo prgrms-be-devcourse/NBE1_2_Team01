@@ -20,11 +20,7 @@ public record UserSignUpRequest(
 
         @NotBlank(message = "이름은 필수 입력 값입니다.")
         @Size(min = 2, message = "이름은 2자 이상이어야 합니다.")
-        String name,
-
-        // 인증 번호 삭제를 위해 추가
-        String code
-
+        String name
 ) {
 
 }
