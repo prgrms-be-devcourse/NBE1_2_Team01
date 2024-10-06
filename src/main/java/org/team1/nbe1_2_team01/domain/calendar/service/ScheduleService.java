@@ -11,7 +11,6 @@ import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;
 import org.team1.nbe1_2_team01.domain.calendar.service.response.ScheduleIdResponse;
-import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Service
@@ -21,7 +20,6 @@ public class ScheduleService {
 
     private final CalendarRepository calendarRepository;
     private final ScheduleRepository scheduleRepository;
-    private final GroupAuthService groupAuthService;
 
     public ScheduleIdResponse registSchedule(
             Long belongingTeamId,

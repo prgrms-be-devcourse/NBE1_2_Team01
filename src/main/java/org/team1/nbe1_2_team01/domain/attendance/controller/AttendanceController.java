@@ -44,7 +44,7 @@ public class AttendanceController {
     /**
      * 자신의 출결 요청 상세 보기
      */
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Response<AttendanceResponse> getMyAttendance(
             @PathVariable("id") Long attendanceId
     ) {
