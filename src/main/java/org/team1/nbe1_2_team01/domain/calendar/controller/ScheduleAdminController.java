@@ -33,8 +33,9 @@ public class ScheduleAdminController {
      * 모든 일정 조회
      */
     @GetMapping
-    public Response<List<ScheduleResponse>> getAllSchedules() {
-        return Response.success(scheduleQueryService.getAllSchedules());
+    public ResponseEntity<Response<List<ScheduleResponse>>> getAllSchedules() {
+        return ResponseEntity.ok(
+                Response.success(scheduleQueryService.getAllSchedules()));
     }
 
     /**
@@ -66,10 +67,11 @@ public class ScheduleAdminController {
      * 공통(공지) 일정 수정
      */
     @PatchMapping
-    public Response<ScheduleIdResponse> updateSchedule(
+    public ResponseEntity<Response<ScheduleIdResponse>> updateSchedule(
             @RequestBody ScheduleUpdateRequest scheduleUpdateRequest
     ) {
-        return Response.success(scheduleService.updateSchedule(scheduleUpdateRequest));
+        return ResponseEntity.ok(
+                Response.success(scheduleService.updateSchedule(scheduleUpdateRequest)));
     }
 
     /**

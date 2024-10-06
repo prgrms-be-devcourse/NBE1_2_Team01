@@ -37,28 +37,30 @@ public class ScheduleController {
      * 팀 내 일정 조회
      */
     @GetMapping
-    public Response<List<ScheduleResponse>> getTeamSchedule(
+    public ResponseEntity<Response<List<ScheduleResponse>>> getTeamSchedule(
             @RequestParam Long teamId
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
         groupAuthService.validateTeam(currentUsername, teamId);
 
-        return Response.success(scheduleQueryService.getTeamSchedules(teamId));
+        return ResponseEntity.ok(
+                Response.success(scheduleQueryService.getTeamSchedules(teamId)));
     }
 
     /**
      * 공지 일정 조회
      */
     @GetMapping("/common")
-    public Response<List<ScheduleResponse>> getNoticeSchedules(
+    public  ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
             @RequestParam String course
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
         Long validatedBelongingCourseId = groupAuthService.validateCourse(currentUsername, course);
 
-        return Response.success(scheduleQueryService.getNoticeSchedules(validatedBelongingCourseId));
+        return ResponseEntity.ok(
+                Response.success(scheduleQueryService.getNoticeSchedules(validatedBelongingCourseId)));
     }
 
     /**
@@ -99,14 +101,15 @@ public class ScheduleController {
      * 일정 수정
      */
     @PatchMapping
-    public Response<ScheduleIdResponse> updateSchedule(
+    public ResponseEntity<Response<ScheduleIdResponse>> updateSchedule(
             @RequestBody ScheduleUpdateRequest scheduleUpdateRequest
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
         groupAuthService.validateTeam(currentUsername, scheduleUpdateRequest.belongingId());
 
-        return Response.success(scheduleService.updateSchedule(scheduleUpdateRequest));
+        return ResponseEntity.ok(
+                Response.success(scheduleService.updateSchedule(scheduleUpdateRequest)));
     }
 
     /**
