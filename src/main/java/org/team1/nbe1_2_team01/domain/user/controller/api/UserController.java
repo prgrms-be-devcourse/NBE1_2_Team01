@@ -23,18 +23,6 @@ public class UserController {
     private final UserService userService;
     private final EmailService emailService;
 
-//    /**
-//     * 이메일 uuid 검증
-//     */
-//    @GetMapping("/sign-up/{code}")
-//    public ResponseEntity<Response<String>> verifyUUID(@PathVariable String code) {
-//        boolean validCode = emailService.isValidCode(code);
-//        if (validCode) {
-//            return ResponseEntity.ok().body(Response.success("검증 성공"));
-//        }
-//        return ResponseEntity.status(403).build();
-//    }
-//
     /**
      * 회원가입
      */
