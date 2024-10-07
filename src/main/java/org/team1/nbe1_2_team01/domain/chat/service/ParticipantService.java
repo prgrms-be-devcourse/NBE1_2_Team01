@@ -30,6 +30,7 @@ public class ParticipantService {
     private final UserChannelUtil userChannelUtil;
 
     // 채널에 참여
+    @Transactional
     public Participant joinChannel(Long channelId, Long userId) {
 
         // 이미 존재하는 참여자인지 확인
@@ -67,6 +68,7 @@ public class ParticipantService {
     }
 
     // 참여중인 채널 조회
+    @Transactional(readOnly = true)
     public List<Channel> checkUserChannel(Long userId) {
         List<Participant> participants = participantRepository.findByUserId(userId);
 
@@ -76,6 +78,7 @@ public class ParticipantService {
     }
 
     // 참여자가 스스로 방을 나감
+    @Transactional
     public void leaveChannel(ParticipantPK participantPK) {
         Participant participant = participantRepository.findById(participantPK)
                 .orElseThrow(() -> new AppException(PARTICIPANTS_NOT_FOUND));;
@@ -83,6 +86,7 @@ public class ParticipantService {
     }
 
     // 방장이 참여자를 강퇴
+    @Transactional
     public void removeParticipant(ParticipantPK participantPK, Long participantIdToRemove) {
         // 현재 참여자 정보 가져옴
         Participant participant = participantRepository.findById(participantPK)

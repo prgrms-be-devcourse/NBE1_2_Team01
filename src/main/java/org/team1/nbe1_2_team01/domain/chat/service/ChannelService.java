@@ -60,6 +60,7 @@ public class ChannelService {
 
 
     // 채널 수정
+    @Transactional
     public Long updateChannel(Long userId, Long channelId, String channelName) {
         Participant participant = userChannelUtil.findUser(userId, channelId);
 
@@ -77,6 +78,7 @@ public class ChannelService {
     }
 
     // 채널 삭제
+    @Transactional
     public void deleteChannel(Long userId, Long channelId) {
         Participant participant = userChannelUtil.findUser(userId, channelId);
 

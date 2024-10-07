@@ -18,13 +18,13 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @GetMapping("/showAll")
+    @GetMapping
     public ResponseEntity<List<String>> showAllChannel() {
         List<String> channelList = channelService.showAllChannel();
         return ResponseEntity.ok().body(channelList);
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Long> createChannel(@RequestBody ChannelCreateRequest channelCreateRequest) {
         Long pk = channelService.createChannel(channelCreateRequest.getCreatorUserId(), channelCreateRequest.getChannelName());
         return ResponseEntity.status(HttpStatus.CREATED).body(pk);
