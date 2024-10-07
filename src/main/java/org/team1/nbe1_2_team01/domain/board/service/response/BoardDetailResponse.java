@@ -1,34 +1,33 @@
 package org.team1.nbe1_2_team01.domain.board.service.response;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
 import org.team1.nbe1_2_team01.domain.board.service.converter.DateTimeToStringConverter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Getter @ToString
-public class BoardDetailResponse {
-
-    private final Long id;
-    private final String title;
-    private final String content;
-    private final String writer;
-    private final String createdAt;
-    private final boolean isAdmin;
-    private final boolean isMine;
+public record BoardDetailResponse(
+        Long id,
+        String title,
+        String content,
+        String writer,
+        Long readCount,
+        String createdAt,
+        boolean isAdmin,
+        boolean isMine
+) {
 
     @Builder
-    private BoardDetailResponse(Long id, String title, String content, String writer, LocalDateTime createdAt, boolean isAdmin, boolean isMine) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.writer = writer;
-        this.createdAt = DateTimeToStringConverter.convert(createdAt);
-        this.isAdmin = isAdmin;
-        this.isMine = isMine;
+    private BoardDetailResponse(
+            Long id,
+            String title,
+            String content,
+            String writer,
+            Long readCount,
+            LocalDateTime createdAt,
+            boolean isAdmin,
+            boolean isMine
+    ) {
+        this(id, title, content, writer, readCount, DateTimeToStringConverter.convert(createdAt), isAdmin, isMine);
     }
 
     public static BoardDetailResponse of(
@@ -36,16 +35,17 @@ public class BoardDetailResponse {
             String title,
             String content,
             String writer,
+            Long readCount,
             LocalDateTime createdAt,
             boolean isAdmin,
             boolean isMine
-
     ) {
         return BoardDetailResponse.builder()
                 .id(id)
                 .title(title)
                 .content(content)
                 .writer(writer)
+                .readCount(readCount)
                 .createdAt(createdAt)
                 .isAdmin(isAdmin)
                 .isMine(isMine)

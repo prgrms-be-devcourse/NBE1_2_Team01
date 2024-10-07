@@ -7,9 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.team1.nbe1_2_team01.domain.group.entity.Team;
+import org.team1.nbe1_2_team01.domain.board.controller.dto.CourseBoardUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
 import java.time.LocalDateTime;
 
@@ -53,7 +55,21 @@ public class CourseBoard {
         this.user = user;
         this.title = title;
         this.content = content;
-        user.addCourseBoard(this);;
+        this.readCount = 0L;
+        user.addCourseBoard(this);
         course.addCourseBoard(this);
+    }
+
+    public void updateBoard(CourseBoardUpdateRequest updateRequest) {
+        String newTitle = updateRequest.title();
+        String newContent = updateRequest.content();
+
+        if(this.title.equals(newTitle) && this.content.equals(newContent)) {
+            throw new AppException(ErrorCode.BOARD_NOT_UPDATED);
+        }
+
+        this.title = newTitle;
+        this.content = newContent;
+        this.updatedAt = LocalDateTime.now();
     }
 }

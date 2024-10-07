@@ -9,7 +9,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 public record CommentRequest(
         @NotBlank(message = "필수 파라미터가 누락되었습니다.")
         @Positive(message = "요청 파라미터의 형식이 잘못되었습니다.")
-        Long boardId,
+        Long teamBoardId,
 
         @NotBlank(message = "내용을 입력해주세요.")
         String content

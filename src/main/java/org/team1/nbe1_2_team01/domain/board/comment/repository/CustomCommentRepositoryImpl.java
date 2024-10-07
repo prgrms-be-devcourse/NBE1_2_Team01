@@ -11,7 +11,6 @@ import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.team1.nbe1_2_team01.domain.board.entity.QComment.comment;
 import static org.team1.nbe1_2_team01.domain.user.entity.QUser.user;
@@ -23,7 +22,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     private static final int PAGE_SIZE = 10;
 
     @Override
-    public Optional<List<CommentResponse>> getCommentsByBoardId(Long boardId, Long lastCommentId) {
+    public List<CommentResponse> getCommentsByBoardId(Long boardId, Long lastCommentId) {
         JPAQuery<Tuple> initialQuery = queryFactory.select(
                         comment.id,
                         user.username,
@@ -43,10 +42,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                 .fetch();
 
         User currentUser = findCurrentUser();
-        List<CommentResponse> comments = convertToResponses(tuples, currentUser);
-
-
-        return Optional.of(comments);
+        return convertToResponses(tuples, currentUser);
     }
 
     private static List<CommentResponse> convertToResponses(List<Tuple> tuples, User currentUSer) {

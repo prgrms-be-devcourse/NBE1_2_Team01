@@ -8,8 +8,8 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.CATEGORY_NOT_FOUND;
 @Getter
 public enum CommonBoardType {
 
-    NOTICE("notice"),
-    STUDY("study");
+    NOTICE("y"),
+    STUDY("n");
 
     private final String type;
 

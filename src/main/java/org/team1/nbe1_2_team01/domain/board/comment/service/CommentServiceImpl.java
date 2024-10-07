@@ -9,7 +9,7 @@ import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResp
 import org.team1.nbe1_2_team01.domain.board.comment.service.valid.CommentValidator;
 import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
-import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
+import org.team1.nbe1_2_team01.domain.board.repository.TeamBoardRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.util.Message;
@@ -17,7 +17,6 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.team1.nbe1_2_team01.domain.board.constants.MessageContent.*;
@@ -28,14 +27,13 @@ import static org.team1.nbe1_2_team01.domain.board.constants.MessageContent.*;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final BoardRepository boardRepository;
+    private final TeamBoardRepository teamBoardRepository;
     private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
     public List<CommentResponse> getReviewsByPage(Long boardId, Long lastCommentId) {
-        return commentRepository.getCommentsByBoardId(boardId, lastCommentId)
-                .orElseGet(ArrayList::new);
+        return commentRepository.getCommentsByBoardId(boardId, lastCommentId);
     }
 
     @Override
@@ -54,8 +52,8 @@ public class CommentServiceImpl implements CommentService {
     public Message addComment(CommentRequest commentRequest) {
         User currentUser = getUser();
 
-        Long boardId = commentRequest.boardId();
-        TeamBoard findBoard = boardRepository.findById(boardId)
+        Long boardId = commentRequest.teamBoardId();
+        TeamBoard findBoard = teamBoardRepository.findById(boardId)
                 .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
 
         Comment comment = commentRequest.toEntity(currentUser, findBoard);
