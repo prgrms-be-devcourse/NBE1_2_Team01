@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 
 import java.time.LocalDateTime;
@@ -32,7 +33,6 @@ public class CourseSchedule {
     @JoinColumn(name = "course_id")
     private Course course;
 
-
     @Builder
     private CourseSchedule(
             Course course,
@@ -48,4 +48,10 @@ public class CourseSchedule {
         course.addCourseSchedule(this);
     }
 
+    public void update(ScheduleUpdateRequest scheduleUpdateRequest) {
+        this.name = scheduleUpdateRequest.name();
+        this.startAt = scheduleUpdateRequest.startAt();
+        this.endAt = scheduleUpdateRequest.endAt();
+        this.description = scheduleUpdateRequest.description();
+    }
 }
