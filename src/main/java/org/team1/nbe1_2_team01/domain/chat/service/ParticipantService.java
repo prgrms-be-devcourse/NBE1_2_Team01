@@ -12,10 +12,13 @@ import org.team1.nbe1_2_team01.domain.chat.repository.ChannelRepository;
 import org.team1.nbe1_2_team01.domain.chat.repository.ParticipantRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +30,14 @@ public class ParticipantService {
     private final UserChannelUtil userChannelUtil;
 
     // 채널에 참여
+    @Transactional
     public Participant joinChannel(Long channelId, Long userId) {
 
         // 이미 존재하는 참여자인지 확인
         ParticipantPK participantPK = new ParticipantPK(userId, channelId);
         return participantRepository.findById(participantPK).orElseGet(() -> {
-            User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
-            Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new EntityNotFoundException("채널을 찾을 수 없습니다"));
+            User user = userRepository.findById(userId).orElseThrow(() -> new AppException(INVITER_NOT_FOUND));
+            Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new AppException(CHANEL_NOT_FOUND));
 
 
             Participant participant = Participant.builder()
@@ -54,16 +58,17 @@ public class ParticipantService {
     public void inviteUser(InviteRequest inviteRequest) {
         ParticipantPK participantPK = new ParticipantPK(inviteRequest.getInviteUserId(), inviteRequest.getChannelId());
         Participant inviter = participantRepository.findById(participantPK)
-                .orElseThrow(() -> new EntityNotFoundException("초대자를 찾을 수 없음."));
+                .orElseThrow(() -> new AppException(INVITER_NOT_FOUND));
 
         if (!inviter.isCreator()) {
-            throw new SecurityException("채널 생성자만이 초대를 할 수 있습니다.");
+            throw new AppException(NOT_CHANEL_CREATOR);
         }
 
         joinChannel(inviteRequest.getChannelId(), inviteRequest.getParticipantId());
     }
 
     // 참여중인 채널 조회
+    @Transactional(readOnly = true)
     public List<Channel> checkUserChannel(Long userId) {
         List<Participant> participants = participantRepository.findByUserId(userId);
 
@@ -73,25 +78,28 @@ public class ParticipantService {
     }
 
     // 참여자가 스스로 방을 나감
+    @Transactional
     public void leaveChannel(ParticipantPK participantPK) {
         Participant participant = participantRepository.findById(participantPK)
-                .orElseThrow(() -> new RuntimeException("해당 채널의 참여자가 아님."));;
+                .orElseThrow(() -> new AppException(PARTICIPANTS_NOT_FOUND));;
         participantRepository.delete(participant);
     }
 
     // 방장이 참여자를 강퇴
+    @Transactional
     public void removeParticipant(ParticipantPK participantPK, Long participantIdToRemove) {
         // 현재 참여자 정보 가져옴
         Participant participant = participantRepository.findById(participantPK)
-                .orElseThrow(() -> new RuntimeException("해당 채널의 참여자가 아님."));
+                .orElseThrow(() -> new AppException(NO_PARTICIPANTS));
 
+        // 채널 생성자가 아님
         if (!participant.isCreator()) {
-            throw new RuntimeException("채널 생성자만 참여자를 삭제할 수 있음.");
+            throw new AppException(NOT_CHANEL_CREATOR);
         }
 
         // 강퇴자 찾기
         Participant participantToRemove = participantRepository.findById(new ParticipantPK(participantIdToRemove, participantPK.getChannelId()))
-                .orElseThrow(() -> new RuntimeException("강퇴할 참여자가 해당 채널의 참여자가 아닙니다."));
+                .orElseThrow(() -> new AppException(PARTICIPANTS_NOT_FOUND));
 
         participantRepository.delete(participantToRemove);
     }

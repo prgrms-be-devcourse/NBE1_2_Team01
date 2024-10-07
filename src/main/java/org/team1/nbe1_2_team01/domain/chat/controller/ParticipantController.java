@@ -25,7 +25,7 @@ public class ParticipantController {
     private final ParticipantService participantService;
 
     // 참여자가 스스로 방 아이디를 치고 들어오는 경우
-    @PostMapping("/joinChannel")
+    @PostMapping("/join")
     public ResponseEntity<Participant> joinChannel(@RequestBody ChannelRequest channelRequest) {
         Participant participant = participantService.joinChannel(channelRequest.getChannelId(), channelRequest.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(participant);
@@ -45,7 +45,7 @@ public class ParticipantController {
     }
 
     // 참여자가 속해 있는 채널들 보기
-    @GetMapping("/{userId}/channels")
+    @GetMapping("/{userId}/show")
     public ResponseEntity<List<ChannelResponse>> checkUserChannels(@PathVariable("userId") Long userId) {
         List<Channel> channels = participantService.checkUserChannel(userId);
 
