@@ -9,12 +9,12 @@ import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.group.repository.TeamRepository;
 import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
-import org.team1.nbe1_2_team01.domain.group.service.response.UserResponse;
 import org.team1.nbe1_2_team01.domain.group.service.validator.TeamValidator;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.Message;
@@ -160,9 +160,9 @@ public class TeamService {
         return teamRepository.findByCourseId(courseId).stream().map(TeamResponse::from).toList();
     }
 
-    public List<UserResponse> teamMemberList(Long teamId) {
+    public List<UserDetailsResponse> teamMemberList(Long teamId) {
         List<User> users = belongingRepository.findUsersByTeamId(teamId);
-        return users.stream().map(UserResponse::from).toList();
+        return users.stream().map((u) -> new UserDetailsResponse(u.getId(), u.getUsername(), u.getEmail(), u.getName())).toList();
     }
 
     /* ------------------------ */

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.group.controller.request.*;
 import org.team1.nbe1_2_team01.domain.group.service.TeamService;
 import org.team1.nbe1_2_team01.domain.group.service.response.TeamResponse;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.global.util.Response;
 
@@ -70,7 +71,7 @@ public class TeamController {
     }
 
     @GetMapping("/members/{teamId}")
-    public ResponseEntity<?> getTeamMembers(@PathVariable Long teamId) {
+    public ResponseEntity<Response<List<UserDetailsResponse>>> getTeamMembers(@PathVariable Long teamId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Response.success(teamService.teamMemberList(teamId)));
     }
