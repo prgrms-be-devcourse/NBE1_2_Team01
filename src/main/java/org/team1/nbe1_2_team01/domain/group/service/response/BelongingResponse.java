@@ -18,7 +18,7 @@ public class BelongingResponse {
         this.teamId = teamId;
     }
 
-    public static BelongingResponse of(Belonging belonging) {
+    public static BelongingResponse from(Belonging belonging) {
         return BelongingResponse.builder()
                 .id(belonging.getId())
                 .userId(belonging.getUser() != null ? belonging.getUser().getId() : null)

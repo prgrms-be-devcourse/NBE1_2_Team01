@@ -12,6 +12,7 @@ import java.util.List;
 public class TeamResponse {
 
     private Long id;
+    private String courseName;
     private String teamType;
     private String name;
     private boolean creationWaiting;
@@ -19,8 +20,9 @@ public class TeamResponse {
     private List<BelongingResponse> belongings;
 
     @Builder
-    private TeamResponse(Long id, String teamType, String name, boolean creationWaiting, boolean deletionWaiting) {
+    private TeamResponse(Long id, String courseName, String teamType, String name, boolean creationWaiting, boolean deletionWaiting) {
         this.id = id;
+        this.courseName = courseName;
         this.teamType = teamType;
         this.name = name;
         this.creationWaiting = creationWaiting;
@@ -28,9 +30,10 @@ public class TeamResponse {
         this.belongings = new ArrayList<>();
     }
 
-    public static TeamResponse of(Team team) {
+    public static TeamResponse from(Team team) {
         TeamResponse teamResponse = TeamResponse.builder()
                 .id(team.getId())
+                .courseName(team.getCourse().getName())
                 .teamType(team.getTeamType().name())
                 .name(team.getName())
                 .creationWaiting(team.isCreationWaiting())
@@ -38,7 +41,7 @@ public class TeamResponse {
                 .build();
 
         for (Belonging b : team.getBelongings()) {
-            teamResponse.belongings.add(BelongingResponse.of(b));
+            teamResponse.belongings.add(BelongingResponse.from(b));
         }
 
         return teamResponse;

@@ -23,7 +23,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     @Query("select t " +
             "from Team t " +
-            "join fetch t.belongings b " +
-            "where b.course = :course")
-    List<Team> findByCourse(@Param("course") String course);
+            "join fetch t.course c " +
+            "where c.id = :courseId")
+    List<Team> findByCourseId(@Param("courseId") Long courseId);
 }
