@@ -9,7 +9,7 @@ import org.team1.nbe1_2_team01.domain.user.controller.request.CourseUpdateReques
 import org.team1.nbe1_2_team01.domain.user.service.CourseService;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseIdResponse;
-import org.team1.nbe1_2_team01.domain.user.service.response.UserBrifResponse;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class CourseController {
      * 관리자 전용
      */
     @GetMapping("/admin/{courseId}/users")
-    public ResponseEntity<Response<List<UserBrifResponse>>> getCourseUsersForAdmins(@PathVariable Long courseId){
+    public ResponseEntity<Response<List<UserBriefResponse>>> getCourseUsersForAdmins(@PathVariable Long courseId){
         return ResponseEntity.ok()
                 .body(Response.success(courseService.getCourseUsersForAdmins(courseId)));
     }
@@ -63,7 +63,7 @@ public class CourseController {
      * 사용자 전용
      */
     @GetMapping("/users")
-    public ResponseEntity<Response<List<UserBrifResponse>>> getCourseUsers(){
+    public ResponseEntity<Response<List<UserBriefResponse>>> getCourseUsers(){
         return ResponseEntity.ok().body(Response.success(courseService.getCourseUsers()));
     }
 

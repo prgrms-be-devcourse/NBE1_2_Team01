@@ -12,12 +12,11 @@ import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseIdResponse;
-import org.team1.nbe1_2_team01.domain.user.service.response.UserBrifResponse;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefResponse;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.COURSE_NOT_FOUND;
 
@@ -53,22 +52,22 @@ public class CourseService {
     }
 
 
-    public List<UserBrifResponse> getCourseUsersForAdmins(Long courseId) {
+    public List<UserBriefResponse> getCourseUsersForAdmins(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
         return mapToUserBriefResponse(course);
     }
 
-    public List<UserBrifResponse> getCourseUsers() {
+    public List<UserBriefResponse> getCourseUsers() {
         User currentUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 없습니다"));
         return mapToUserBriefResponse(currentUser.getCourse());
     }
 
-    private List<UserBrifResponse> mapToUserBriefResponse(Course course){
+    private List<UserBriefResponse> mapToUserBriefResponse(Course course){
         return userRepository.findByCourse(course)
                 .stream()
-                .map(user -> new UserBrifResponse(
+                .map(user -> new UserBriefResponse(
                         user.getId(),
                         user.getUsername(),
                         user.getName()
