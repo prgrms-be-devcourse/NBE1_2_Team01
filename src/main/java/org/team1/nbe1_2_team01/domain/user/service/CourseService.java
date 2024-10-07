@@ -17,6 +17,7 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.COURSE_NOT_FOUND;
 
@@ -72,5 +73,10 @@ public class CourseService {
                         user.getUsername(),
                         user.getName()
                 )).toList();
+    }
+
+    public Course findById(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
     }
 }

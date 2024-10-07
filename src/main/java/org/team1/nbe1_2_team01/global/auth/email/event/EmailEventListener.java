@@ -15,6 +15,6 @@ public class EmailEventListener {
     @Async
     @EventListener
     public void listen(EmailSendEvent event) throws MessagingException {
-        emailService.sendSignUpLinkToEmail(event.getEmail());
+        emailService.sendSignUpLinkToEmail(event.getEmail(), event.getCourseId());
     }
 }
