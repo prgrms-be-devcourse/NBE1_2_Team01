@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.group.entity.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,21 +25,15 @@ public class Category {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "belonging_id")
-    private Belonging belonging;
-
-    @OneToMany(mappedBy = "category")
-    private List<TeamBoard> boards = new ArrayList<>();
-
+    @JoinColumn("team_id")
+    private Team team;
 
     @Builder
-    private Category(Belonging belonging,
+    private Category(Team team,
                      String name) {
-        this.belonging = belonging;
+        this.team = team;
         this.name = name;
+        team.addCategory(this);
     }
 
-    public void addBoards(TeamBoard board) {
-        this.boards.add(board);
-    }
 }

@@ -3,6 +3,7 @@ package org.team1.nbe1_2_team01.domain.group.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.team1.nbe1_2_team01.domain.board.entity.Category;
 import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
 import org.team1.nbe1_2_team01.domain.calendar.entity.TeamSchedule;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
@@ -49,6 +50,9 @@ public class Team {
     @OneToMany(mappedBy = "team")
     private List<TeamSchedule> teamSchedules = new ArrayList<>();
 
+    @OneToMany(mappedBy = "team")
+    private List<Category> categories = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
@@ -79,5 +83,9 @@ public class Team {
 
     public void addTeamScheDule(TeamSchedule teamSchedule) {
         this.teamSchedules.add(teamSchedule);
+    }
+
+    public void addCategory(Category category) {
+        this.categories.add(category);
     }
 }
