@@ -10,7 +10,9 @@ import org.team1.nbe1_2_team01.domain.board.entity.Category;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.CategoryResponse;
 import org.team1.nbe1_2_team01.domain.board.service.valid.CategoryValidator;
+import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
+import org.team1.nbe1_2_team01.domain.group.repository.TeamRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.Message;
@@ -25,6 +27,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TeamRepository teamRepository;
     private final BelongingRepository belongingRepository;
 
     @Override
@@ -35,9 +38,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Message addCategory(CategoryRequest categoryRequest) {
-        Belonging belonging = getBelongingWithValidation(categoryRequest.teamId());
+        Long teamId = categoryRequest.teamId();
+        validTeamLeader(teamId);
 
-        Category newCategory = categoryRequest.toEntity(belonging);
+        Team team = teamRepository.findById(teamId)
+                        .orElseThrow(() -> new AppException(ErrorCode.TEAM_NOT_FOUND));
+
+        Category newCategory = categoryRequest.toEntity(team);
         categoryRepository.save(newCategory);
 
         String addMessage = MessageContent.ADD_CATEGORY_COMPLETED.getMessage();
@@ -50,8 +57,8 @@ public class CategoryServiceImpl implements CategoryService {
         Long teamId = request.teamId();
         Long categoryId = request.categoryId();
 
-        Belonging belonging = getBelongingWithValidation(teamId);
-        int result = categoryRepository.deleteByIdAndBelonging_Id(categoryId, belonging.getId());
+        validTeamLeader(teamId);
+        int result = categoryRepository.deleteByIdAndTeam_Id(categoryId, teamId);
 
         if(result == 0) {
             throw new AppException(ErrorCode.CATEGORY_NOT_DELETED);
@@ -67,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @param teamId
      * @return
      */
-    private Belonging getBelongingWithValidation(Long teamId) {
+    private void validTeamLeader(Long teamId) {
         String currentUsername = SecurityUtil.getCurrentUsername();
         Belonging belonging = belongingRepository.findByTeam_IdAndUser_Username(
                 teamId,
@@ -75,7 +82,5 @@ public class CategoryServiceImpl implements CategoryService {
         ).orElseThrow(() -> new AppException(ErrorCode.BELONGING_NOT_FOUND));
 
         CategoryValidator.validateTeamLeader(belonging);
-
-        return belonging;
     }
 }

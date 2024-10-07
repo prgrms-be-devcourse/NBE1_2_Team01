@@ -8,7 +8,7 @@ import org.team1.nbe1_2_team01.domain.board.service.converter.DateTimeToStringCo
 import java.time.LocalDateTime;
 
 @Getter @ToString
-public class BoardResponse {
+public class TeamBoardResponse {
 
     private final Long id;
     private final String title;
@@ -18,12 +18,12 @@ public class BoardResponse {
     private final Long commentCount;
 
     @Builder
-    private BoardResponse(Long id,
-                          String title,
-                          String writer,
-                          String categoryName,
-                          LocalDateTime createdAt,
-                          Long commentCount) {
+    private TeamBoardResponse(Long id,
+                              String title,
+                              String writer,
+                              String categoryName,
+                              LocalDateTime createdAt,
+                              Long commentCount) {
         this.id = id;
         this.title = title;
         this.writer = writer;
@@ -32,13 +32,13 @@ public class BoardResponse {
         this.commentCount = commentCount;
     }
 
-    public static BoardResponse of(Long id,
-                                   String title,
-                                   String writer,
-                                   String categoryName,
-                                   LocalDateTime createdAt,
-                                   Long commentCount) {
-        return BoardResponse.builder()
+    public static TeamBoardResponse of(Long id,
+                                       String title,
+                                       String writer,
+                                       String categoryName,
+                                       LocalDateTime createdAt,
+                                       Long commentCount) {
+        return TeamBoardResponse.builder()
                 .id(id)
                 .title(title)
                 .writer(writer)
