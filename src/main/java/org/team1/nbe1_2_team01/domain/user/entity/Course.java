@@ -56,5 +56,7 @@ public class Course {
         this.courseSchedules.add(courseSchedule);
     }
 
-
+    public void updateName(String name) {
+        this.name = name;
+    }
 }

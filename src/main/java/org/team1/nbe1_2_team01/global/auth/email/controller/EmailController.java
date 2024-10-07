@@ -21,8 +21,9 @@ public class EmailController {
 
     @PostMapping("/admin")
     public ResponseEntity<Response<String>> registerEmails(@Valid @RequestBody EmailsRequest emailsRequest) throws MessagingException {
+        Long courseId = emailsRequest.courseId();
         for (String email : emailsRequest.emails()) {
-            publisher.publishEvent(new EmailSendEvent(email));
+            publisher.publishEvent(new EmailSendEvent(email, courseId));
         }
         return ResponseEntity.ok().body(Response.success("메일 전송 완료"));
     }
