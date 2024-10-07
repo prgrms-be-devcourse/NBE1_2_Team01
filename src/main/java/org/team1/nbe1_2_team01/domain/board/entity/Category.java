@@ -25,7 +25,7 @@ public class Category {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn("team_id")
+    @JoinColumn(name = "team_id")
     private Team team;
 
     @Builder

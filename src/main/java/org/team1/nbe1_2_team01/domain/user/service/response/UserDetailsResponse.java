@@ -4,6 +4,7 @@ public record UserDetailsResponse(
         Long id,
         String username,
         String email,
-        String name
+        String name,
+        String courseName
 ) {
 }
