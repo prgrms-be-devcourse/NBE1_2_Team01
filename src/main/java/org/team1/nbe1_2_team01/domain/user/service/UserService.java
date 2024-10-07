@@ -54,6 +54,7 @@ public class UserService {
                 .role(Role.USER)
                 .course(course)
                 .build();
+        course.addUser(user);
         user.passwordEncode(passwordEncoder);
         return new UserIdResponse(userRepository.save(user).getId());
     }

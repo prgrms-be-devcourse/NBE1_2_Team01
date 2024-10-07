@@ -82,7 +82,6 @@ public class User {
         this.name = name;
         this.role = role;
         this.course = course;
-        course.addUser(this);
     }
 
     public void addTeamBoard(TeamBoard teamBoard) {
