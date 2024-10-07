@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleUpdateRequest;
+import org.team1.nbe1_2_team01.domain.group.entity.Team;
 
 @Entity
 @Getter
 @Table(name = "schedule")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Schedule {
+public class TeamSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,27 +30,27 @@ public class Schedule {
 
     private LocalDateTime endAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendar_id")
-    private Calendar calendar;
-
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
     @Builder
-    private Schedule(
-            Calendar calendar,
+    private TeamSchedule(
+            Team team,
             String name,
             ScheduleType scheduleType,
             LocalDateTime startAt,
             LocalDateTime endAt,
             String description) {
-        this.calendar = calendar;
+        this.team = team;
         this.name = name;
         this.scheduleType = scheduleType;
         this.startAt = startAt;
         this.endAt = endAt;
         this.description = description;
-        calendar.addSchedule(this);
+        team.addTeamScheDule(this);
     }
 
     public void update(ScheduleUpdateRequest scheduleUpdateRequest) {

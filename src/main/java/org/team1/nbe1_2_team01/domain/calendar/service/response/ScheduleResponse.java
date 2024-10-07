@@ -2,7 +2,6 @@ package org.team1.nbe1_2_team01.domain.calendar.service.response;
 
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
 

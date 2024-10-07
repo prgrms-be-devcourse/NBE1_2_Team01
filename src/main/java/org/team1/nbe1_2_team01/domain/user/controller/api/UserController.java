@@ -3,6 +3,7 @@ package org.team1.nbe1_2_team01.domain.user.controller.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
@@ -30,7 +31,7 @@ public class UserController {
     public ResponseEntity<Response<UserIdResponse>> signUp(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
         UserIdResponse userIdResponse = userService.signUp(userSignUpRequest);
         emailService.deleteByEmail(userSignUpRequest.email());
-        return ResponseEntity.ok().body(Response.success(userIdResponse));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(userIdResponse));
     }
 
     /**

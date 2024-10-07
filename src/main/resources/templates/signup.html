@@ -124,7 +124,7 @@
     </form>
 
     <div class="login-link">
-        <p>이미 회원이신가요? <a href="https://rinklove.github.io/groupware-front/">로그인 페이지로 가기</a></p>
+        <p>이미 회원이신가요? <a href="https://localhost:3000/groupware-front/">로그인 페이지로 가기</a></p>
     </div>
 </div>
 
@@ -162,7 +162,7 @@
             if (response.ok) {
                 // 성공 시 alert 메시지 표시 및 로그인 페이지로 리다이렉트
                 alert("회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.");
-                window.location.href = "https://rinklove.github.io/groupware-front/";
+                window.location.href = "https://localhost:3000/groupware-front/";
             } else if (response.status === 400) {
                 // 검증 실패 시, 각 필드에 에러 메시지 표시
                 displayValidationErrors(data.message);

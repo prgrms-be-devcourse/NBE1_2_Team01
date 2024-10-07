@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.constants.MessageContent;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
-import org.team1.nbe1_2_team01.domain.board.entity.Board;
+import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
 import org.team1.nbe1_2_team01.domain.board.entity.Category;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.board.repository.CategoryRepository;
@@ -67,7 +67,7 @@ public class BoardServiceImpl implements BoardService {
                     .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         }
 
-        Board newBoard = boardRequest.toEntity(user, category, course);
+        TeamBoard newBoard = boardRequest.toEntity(user, category, course);
         boardRepository.save(newBoard);
 
         return new Message(MessageContent.getAddMessage(boardRequest.isNotice()));
@@ -82,7 +82,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Message deleteBoardById(BoardDeleteRequest request) {
-        Board findBoard = getBoardWithValidateUser(
+        TeamBoard findBoard = getBoardWithValidateUser(
                 request.boardId(),
                 request.isNotice()
         );
@@ -95,7 +95,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Message updateBoard(BoardUpdateRequest updateRequest) {
-        Board findBoard = getBoardWithValidateUser(
+        TeamBoard findBoard = getBoardWithValidateUser(
                 updateRequest.boardId(),
                 updateRequest.isNotice()
         );
@@ -117,7 +117,7 @@ public class BoardServiceImpl implements BoardService {
                 boardId
         );
     }
-    private Board getBoardById(Long boardId) {
+    private TeamBoard getBoardById(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
     }
@@ -128,8 +128,8 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private Board getBoardWithValidateUser(Long boardId, boolean isNotice) {
-        Board findBoard = getBoardById(boardId);
+    private TeamBoard getBoardWithValidateUser(Long boardId, boolean isNotice) {
+        TeamBoard findBoard = getBoardById(boardId);
         User user = getUser();
 
         BoardValidator.validateWriter(findBoard, user);
