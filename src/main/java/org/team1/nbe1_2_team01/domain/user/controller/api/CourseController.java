@@ -13,7 +13,6 @@ import org.team1.nbe1_2_team01.domain.user.service.response.CourseIdResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefWithRoleResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
-import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ import java.util.List;
 @RequestMapping("/api/course")
 public class CourseController {
     private final CourseService courseService;
-    private final UserService userService;
 
     /**
      * 코스 등록
