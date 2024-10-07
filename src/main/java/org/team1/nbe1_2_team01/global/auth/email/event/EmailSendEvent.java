@@ -7,4 +7,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class EmailSendEvent {
     private final String email;
+    private final Long courseId;
 }

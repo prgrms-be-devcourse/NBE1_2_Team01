@@ -7,14 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
+import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.EmailRepository;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
@@ -27,9 +30,9 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXI
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailRepository emailRepository;
 
     @Transactional
     public UserIdResponse signUp(UserSignUpRequest userSignUpRequest) {
@@ -39,16 +42,20 @@ public class UserService {
         if (userRepository.findByEmail(userSignUpRequest.email()).isPresent()) {
             throw new AppException(EMAIL_ALREADY_EXISTS.withArgs(userSignUpRequest.email()));
         }
+
+        Course course = courseRepository.findById(userSignUpRequest.courseId())
+                .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
+
         User user = User.builder()
                 .username(userSignUpRequest.username())
                 .password(userSignUpRequest.password())
                 .email(userSignUpRequest.email())
                 .name(userSignUpRequest.name())
                 .role(Role.USER)
+                .course(course)
                 .build();
         user.passwordEncode(passwordEncoder);
-        Long id = userRepository.save(user).getId();
-        return new UserIdResponse(id);
+        return new UserIdResponse(userRepository.save(user).getId());
     }
 
     @Transactional
@@ -73,27 +80,20 @@ public class UserService {
 
     public UserDetailsResponse getCurrentUserDetails() {
         User user = getcurrentuser();
-
-        return new UserDetailsResponse(user.getId(),
+        // 관리자인 경우 소속이 없으므로
+        String courseName = user.getRole().equals(Role.ADMIN) ? "관리자" : user.getCourse().getName();
+        return new UserDetailsResponse(
+                user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getName());
+                user.getName(),
+                courseName);
     }
 
     private User getcurrentuser() {
         String username = SecurityUtil.getCurrentUsername();
-        User user = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다."));
-        return user;
-    }
-
-    public List<UserDetailsResponse> getAllUsers() {
-        return userRepository.findByRole(Role.USER)
-                .stream()
-                .map(user -> {
-                    return new UserDetailsResponse(user.getId(), user.getUsername(), user.getEmail(), user.getName());
-                })
-                .toList();
     }
 
 }
