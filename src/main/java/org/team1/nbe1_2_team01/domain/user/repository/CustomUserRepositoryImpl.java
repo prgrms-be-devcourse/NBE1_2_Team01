@@ -2,10 +2,12 @@ package org.team1.nbe1_2_team01.domain.user.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.team1.nbe1_2_team01.domain.user.entity.QUser;
+import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.util.List;
+
+import static org.team1.nbe1_2_team01.domain.user.entity.QUser.user;
 
 @RequiredArgsConstructor
 public class CustomUserRepositoryImpl implements CustomUserRepository {
@@ -14,11 +16,15 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     @Override
     public List<User> findAllUsersByIdList(List<Long> userIds) {
-        QUser user = QUser.user;
-        List<User> users = queryFactory.selectFrom(user)
+        return queryFactory.selectFrom(user)
                 .where(user.id.in(userIds))
                 .fetch();
+    }
 
-        return users;
+    @Override
+    public List<User> findUsersAndAdminsByCourseId(Long courseId) {
+        return queryFactory.selectFrom(user)
+                .where(user.role.eq(Role.ADMIN).or(user.course.id.eq(courseId)))
+                .fetch();
     }
 }

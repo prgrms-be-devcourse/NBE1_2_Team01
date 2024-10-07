@@ -7,10 +7,13 @@ import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.user.controller.request.CourseCreateRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.CourseUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.service.CourseService;
+import org.team1.nbe1_2_team01.domain.user.service.UserService;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseIdResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefResponse;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefWithRoleResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
+import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api/course")
 public class CourseController {
     private final CourseService courseService;
+    private final UserService userService;
 
     /**
      * 코스 등록
@@ -48,23 +52,42 @@ public class CourseController {
     }
 
     /**
-     * 특정 코스에 속한 유저 조회
+     * 특정 코스에 속한 유저(USER) 조회
      * 관리자 전용
      */
     @GetMapping("/admin/{courseId}/users")
-    public ResponseEntity<Response<List<UserBriefResponse>>> getCourseUsersForAdmins(@PathVariable Long courseId){
+    public ResponseEntity<Response<List<UserBriefResponse>>> getCourseUsers(@PathVariable Long courseId){
         return ResponseEntity.ok()
-                .body(Response.success(courseService.getCourseUsersForAdmins(courseId)));
+                .body(Response.success(courseService.getCourseUsers(courseId)));
     }
 
+    /**
+     * 특정 코스에 속한 유저(USER) + 관리자 조회
+     * 관리자 전용
+     */
+    @GetMapping("/admin/{courseId}/users/all")
+    public ResponseEntity<Response<List<UserBriefWithRoleResponse>>> getCourseUsersWithAdmins(@PathVariable Long courseId){
+        return ResponseEntity.ok()
+                .body(Response.success(courseService.getCourseUsersWithAdmins(courseId)));
+    }
 
     /**
-     * 자신의 코스에 속한 유저 조회
+     * 자신의 코스에 속한 유저(USER) 조회
      * 사용자 전용
      */
     @GetMapping("/users")
-    public ResponseEntity<Response<List<UserBriefResponse>>> getCourseUsers(){
-        return ResponseEntity.ok().body(Response.success(courseService.getCourseUsers()));
+    public ResponseEntity<Response<List<UserBriefResponse>>> getMyCourseUsers(){
+        return ResponseEntity.ok().body(Response.success(courseService.getMyCourseUsers()));
     }
+
+    /**
+     * 자신의 코스에 속한 유저(USER) + 관리자 조회
+     * 사용자 전용
+     */
+    @GetMapping("/users/all")
+    public ResponseEntity<Response<List<UserBriefWithRoleResponse>>> getMyCourseUsersWithAdmins(){
+        return ResponseEntity.ok(Response.success(courseService.getMyCourseUsersWithAdmins()));
+    }
+
 
 }
