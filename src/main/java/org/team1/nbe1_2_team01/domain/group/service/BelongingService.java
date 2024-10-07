@@ -2,7 +2,6 @@ package org.team1.nbe1_2_team01.domain.group.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.group.controller.request.CourseCreateRequest;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;

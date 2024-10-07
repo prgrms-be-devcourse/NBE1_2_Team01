@@ -3,6 +3,9 @@ package org.team1.nbe1_2_team01.domain.group.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
+import org.team1.nbe1_2_team01.domain.calendar.entity.TeamSchedule;
+import org.team1.nbe1_2_team01.domain.user.entity.Course;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,19 +43,41 @@ public class Team {
     )
     private List<Belonging> belongings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "team")
+    private List<TeamBoard> teamBoards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "team")
+    private List<TeamSchedule> teamSchedules = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
+
     @Builder
-    private Team(TeamType teamType,
-                 String name,
-                 boolean creationWaiting,
-                 boolean deletionWaiting) {
+    private Team(
+            Course course,
+            TeamType teamType,
+            String name,
+            boolean creationWaiting,
+            boolean deletionWaiting) {
+        this.course = course;
         this.teamType = teamType;
         this.name = name;
         this.creationWaiting = creationWaiting;
         this.deletionWaiting = deletionWaiting;
+        course.addTeam(this);
     }
 
-    public void assignBelonging(Belonging belonging){
+    public void assignBelonging(Belonging belonging) {
         this.belongings.add(belonging);
         belonging.assignTeam(this);
+    }
+
+    public void addTeamBoard(TeamBoard teamBoard) {
+        this.teamBoards.add(teamBoard);
+    }
+
+    public void addTeamScheDule(TeamSchedule teamSchedule) {
+        this.teamSchedules.add(teamSchedule);
     }
 }

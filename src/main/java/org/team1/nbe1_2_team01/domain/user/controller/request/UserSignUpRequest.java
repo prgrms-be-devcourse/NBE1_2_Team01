@@ -11,7 +11,7 @@ public record UserSignUpRequest(
 
         @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
         @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
-        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$", message = "비밀번호는 영문과 숫자를 포함해야 합니다.")
+        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]*$", message = "비밀번호는 영문과 숫자를 포함해야 합니다.")
         String password,
 
         @NotBlank(message = "이메일은 필수 입력 값입니다.")
@@ -20,11 +20,7 @@ public record UserSignUpRequest(
 
         @NotBlank(message = "이름은 필수 입력 값입니다.")
         @Size(min = 2, message = "이름은 2자 이상이어야 합니다.")
-        String name,
-
-        // 인증 번호 삭제를 위해 추가
-        String code
-
+        String name
 ) {
 
 }

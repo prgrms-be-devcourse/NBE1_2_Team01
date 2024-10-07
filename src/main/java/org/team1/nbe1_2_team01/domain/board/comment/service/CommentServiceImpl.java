@@ -7,7 +7,7 @@ import org.team1.nbe1_2_team01.domain.board.comment.controller.dto.CommentReques
 import org.team1.nbe1_2_team01.domain.board.comment.repository.CommentRepository;
 import org.team1.nbe1_2_team01.domain.board.comment.service.response.CommentResponse;
 import org.team1.nbe1_2_team01.domain.board.comment.service.valid.CommentValidator;
-import org.team1.nbe1_2_team01.domain.board.entity.Board;
+import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
 import org.team1.nbe1_2_team01.domain.board.repository.BoardRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
         User currentUser = getUser();
 
         Long boardId = commentRequest.boardId();
-        Board findBoard = boardRepository.findById(boardId)
+        TeamBoard findBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new AppException(ErrorCode.BOARD_NOT_FOUND));
 
         Comment comment = commentRequest.toEntity(currentUser, findBoard);

@@ -7,45 +7,53 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.team1.nbe1_2_team01.domain.group.entity.Team;
+import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "comment")
+@Table(name = "course_board")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
-
+public class CourseBoard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
     private Long id;
 
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    private Long readCount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private TeamBoard board;
-
-
     @Builder
-    private Comment(User user, TeamBoard board, String content) {
+    private CourseBoard(
+            Course course,
+            User user,
+            String title,
+            String content) {
+        this.course = course;
         this.user = user;
-        this.board = board;
+        this.title = title;
         this.content = content;
-        user.addComment(this);
-        board.addComment(this);
+        user.addCourseBoard(this);;
+        course.addCourseBoard(this);
     }
-
 }

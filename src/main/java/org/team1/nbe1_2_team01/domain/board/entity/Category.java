@@ -28,7 +28,7 @@ public class Category {
     private Belonging belonging;
 
     @OneToMany(mappedBy = "category")
-    private List<Board> boards = new ArrayList<>();
+    private List<TeamBoard> boards = new ArrayList<>();
 
 
     @Builder
@@ -38,7 +38,7 @@ public class Category {
         this.name = name;
     }
 
-    public void addBoards(Board board) {
+    public void addBoards(TeamBoard board) {
         this.boards.add(board);
     }
 }

@@ -2,7 +2,6 @@ package org.team1.nbe1_2_team01.domain.calendar.repository;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 
 public interface CalendarRepository extends JpaRepository<Calendar, Long> {

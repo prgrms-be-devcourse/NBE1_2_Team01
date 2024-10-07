@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleCreateRequest;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleUpdateRequest;
-import org.team1.nbe1_2_team01.domain.calendar.entity.Calendar;
 import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
 import org.team1.nbe1_2_team01.domain.calendar.repository.CalendarRepository;
 import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;

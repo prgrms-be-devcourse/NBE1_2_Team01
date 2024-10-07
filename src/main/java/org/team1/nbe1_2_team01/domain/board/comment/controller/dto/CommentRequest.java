@@ -2,7 +2,7 @@ package org.team1.nbe1_2_team01.domain.board.comment.controller.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-import org.team1.nbe1_2_team01.domain.board.entity.Board;
+import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
@@ -14,7 +14,7 @@ public record CommentRequest(
         @NotBlank(message = "내용을 입력해주세요.")
         String content
 ) {
-    public Comment toEntity(User user, Board board) {
+    public Comment toEntity(User user, TeamBoard board) {
         return Comment.builder()
                 .user(user)
                 .board(board)

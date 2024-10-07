@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.board.entity.Board;
+import org.team1.nbe1_2_team01.domain.board.entity.CourseBoard;
+import org.team1.nbe1_2_team01.domain.board.entity.TeamBoard;
 import org.team1.nbe1_2_team01.domain.board.entity.Comment;
 import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
@@ -54,27 +55,42 @@ public class User {
     private List<Attendance> attendances = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Board> boards = new ArrayList<>();
+    private List<TeamBoard> teamBoards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<CourseBoard> courseBoards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Participant> participants = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
+
 
     @Builder
     private User(String username,
-                String password,
-                String email,
-                String name,
-                Role role) {
+                 String password,
+                 String email,
+                 String name,
+                 Role role,
+                 Course course
+    ) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.name = name;
         this.role = role;
+        this.course = course;
+        course.addUser(this);
     }
 
-    public void addBoard(Board board) {
-        this.boards.add(board);
+    public void addTeamBoard(TeamBoard teamBoard) {
+        this.teamBoards.add(teamBoard);
+    }
+
+    public void addCourseBoard(CourseBoard courseBoard){
+        this.courseBoards.add(courseBoard);
     }
 
     public void addComment(Comment comment) {
@@ -93,15 +109,15 @@ public class User {
         this.belongings.add(belonging);
     }
 
-    public void passwordEncode(PasswordEncoder passwordEncoder){
+    public void passwordEncode(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(this.password);
     }
 
-    public void updateName(String name){
+    public void updateName(String name) {
         this.name = name;
     }
 
-    public void updatePassword(String password){
+    public void updatePassword(String password) {
         this.password = password;
     }
 }

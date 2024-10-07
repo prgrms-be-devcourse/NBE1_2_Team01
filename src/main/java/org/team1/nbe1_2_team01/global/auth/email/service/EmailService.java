@@ -2,6 +2,8 @@ package org.team1.nbe1_2_team01.global.auth.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -56,9 +58,12 @@ public class EmailService {
         return exists;
     }
 
-    public void deleteByCode(String code) {
-        EmailToken emailToken = emailRepository.findByCode(code)
+    public EmailToken findByCode(String code) {
+        return emailRepository.findByCode(code)
                 .orElseThrow(() -> new AppException(CODE_NOT_FOUND));
-        emailRepository.deleteById(emailToken.getEmail());
+    }
+
+    public void deleteByEmail(String email) {
+        emailRepository.deleteById(email);
     }
 }
