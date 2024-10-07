@@ -3,6 +3,7 @@ package org.team1.nbe1_2_team01.domain.chat.controller;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.dialect.function.array.ArrayAndElementArgumentTypeResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -31,30 +32,14 @@ public class ChatController {
     @MessageMapping("/chat/{channelId}")
     @SendTo("/topic/chat/{channelId}")
     public ChatMessageResponse sendMessage(@DestinationVariable Long channelId, @Payload ChatMessageRequest msgRequest) {
-        try {
-            Chat chat = chatService.createChat(msgRequest.getChannelId(), msgRequest.getContent(), msgRequest.getUserId());
-
-            return ChatMessageResponse.builder()
-                    .channelId(channelId) // channelId를 사용
-                    .userId(chat.getParticipant().getUserId()) // 참가자의 userId를 가져옴
-                    .content(chat.getContent()) // 저장된 메시지를 가져옴
-                    .createdAt(LocalDateTime.now()) // 현재 시간으로 설정
-                    .build();
-        } catch (EntityNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null; // 추후에 예외처리
+        return chatService.sendMessage(channelId, msgRequest);
     }
 
     // 채팅방 목록을 불러오기
+    // (지속적으로 업데이트 되는 방식? 계속해서 호출되는 방식? 이라 일단 트랜잭션 안 붙였습니다.)
     @GetMapping("/chats/{channelId}")
     public ResponseEntity<List<ChatResponse>> getChatsByChannelId(@PathVariable("channelId") Long channelId) {
-        System.out.println("Received channelId: " + channelId); // 로그 추가
-
-        List<Chat> chats = chatService.getChatsByChannelId(channelId);
-        List<ChatResponse> chatResponses = chats.stream()
-                .map(chat -> new ChatResponse(chat.getId(), chat.getContent(), chat.getParticipant().getUser().getName(), chat.getCreatedAt()))
-                .collect(Collectors.toList());
+        List<ChatResponse> chatResponses = chatService.getChatsByChannelId(channelId);
         return ResponseEntity.ok(chatResponses);
     }
 }
