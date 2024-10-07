@@ -18,25 +18,25 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @GetMapping("/showAllChannel")
+    @GetMapping("/showAll")
     public ResponseEntity<List<String>> showAllChannel() {
         List<String> channelList = channelService.showAllChannel();
         return ResponseEntity.ok().body(channelList);
     }
 
-    @PostMapping("/createChannel")
+    @PostMapping("/create")
     public ResponseEntity<Long> createChannel(@RequestBody ChannelCreateRequest channelCreateRequest) {
         Long pk = channelService.createChannel(channelCreateRequest.getCreatorUserId(), channelCreateRequest.getChannelName());
         return ResponseEntity.status(HttpStatus.CREATED).body(pk);
     }
 
-    @PatchMapping("/updateChannel")
+    @PatchMapping("/update")
     public ResponseEntity<Long> updateChannel(@RequestBody ChannelUpdateRequest channelUpdateRequest) {
         Long pk = channelService.updateChannel(channelUpdateRequest.getUserId(), channelUpdateRequest.getChannelId(), channelUpdateRequest.getChannelName());
         return ResponseEntity.status(HttpStatus.OK).body(pk);
     }
 
-    @DeleteMapping("/deleteChannel")
+    @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteChannel(@RequestBody ChannelRequest channelRequest) {
         channelService.deleteChannel(channelRequest.getUserId(), channelRequest.getChannelId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

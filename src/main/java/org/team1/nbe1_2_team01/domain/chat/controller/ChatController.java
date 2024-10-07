@@ -8,9 +8,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.chat.service.response.ChatMessageResponse;
 import org.team1.nbe1_2_team01.domain.chat.service.response.ChatResponse;
 import org.team1.nbe1_2_team01.domain.chat.controller.request.ChatMessageRequest;
@@ -24,6 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/api")
 public class ChatController {
 
     private final ChatService chatService;
@@ -48,7 +47,7 @@ public class ChatController {
     }
 
     // 채팅방 목록을 불러오기
-    @GetMapping("/api/chats/{channelId}")
+    @GetMapping("/chats/{channelId}")
     public ResponseEntity<List<ChatResponse>> getChatsByChannelId(@PathVariable("channelId") Long channelId) {
         System.out.println("Received channelId: " + channelId); // 로그 추가
 
