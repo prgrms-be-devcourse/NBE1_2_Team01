@@ -8,9 +8,13 @@ import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.entity.ParticipantPK;
 import org.team1.nbe1_2_team01.domain.chat.repository.ChatRepository;
 import org.team1.nbe1_2_team01.domain.chat.repository.ParticipantRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.NO_PARTICIPANTS;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.PARTICIPANTS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -22,15 +26,13 @@ public class ChatService {
 
     public Chat createChat(Long channelId, String message, Long userId) {
         ParticipantPK participantPK = new ParticipantPK(userId, channelId);
-        System.out.println("이건 안나오나" + participantPK);
 
         Participant participant = participantRepository.findById(participantPK)
-                .orElseThrow(() -> new EntityNotFoundException("참여자 userId: " + userId + ", channelId: " + channelId + " 가 존재하지 않습니다."));
-
-
+                .orElseThrow(() -> new AppException(PARTICIPANTS_NOT_FOUND));
+        
         // 채널 ID를 통해 참가자가 해당 채널에 소속되어 있는지 확인
         if (!participant.getChannelId().equals(channelId)) {
-            throw new IllegalArgumentException("참여자가 없음 ");
+            throw new AppException(NO_PARTICIPANTS);
         }
 
         return chatRepository.save(Chat.builder()

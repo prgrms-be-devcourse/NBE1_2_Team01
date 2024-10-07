@@ -9,9 +9,12 @@ import org.team1.nbe1_2_team01.domain.chat.repository.ChannelRepository;
 import org.team1.nbe1_2_team01.domain.chat.repository.ParticipantRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.global.exception.AppException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class ChannelService {
     @Transactional
     public Long createChannel(Long creatorUserId, String channelName) {
         User creator = userRepository.findById(creatorUserId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new AppException(INVITER_NOT_FOUND));
 
         Channel channel = Channel.builder()
                 .channelName(channelName)
@@ -61,7 +64,7 @@ public class ChannelService {
         Participant participant = userChannelUtil.findUser(userId, channelId);
 
         if (!participant.isCreator()) {
-            throw new RuntimeException("채널 생성자만 수정할 수 있습니다.");
+            throw new AppException(NOT_CHANEL_CREATOR);
         }
 
         Channel channel = participant.getChannel();
@@ -78,7 +81,7 @@ public class ChannelService {
         Participant participant = userChannelUtil.findUser(userId, channelId);
 
         if (!participant.isCreator()) {
-            throw new RuntimeException("채널 생성자만 삭제할 수 있습니다.");
+            throw new AppException(NOT_CHANEL_DELETE);
         }
 
         List<Participant> participants = participantRepository.findByChannelId(channelId);

@@ -33,10 +33,11 @@ public enum ErrorCode {
 
     //chat
     CHANEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다"),
-    NO_PARTICIPANTS(HttpStatus.NOT_FOUND, "참여자가 없음"),
+    NO_PARTICIPANTS(HttpStatus.NOT_FOUND, "참여자를 찾을 수 없습니다."),
     INVITER_NOT_FOUND(HttpStatus.NOT_FOUND, "초대자를 찾을 수 없음."),
     NOT_CHANEL_CREATOR(HttpStatus.FORBIDDEN, "채널 생성자만이 초대를 할 수 있습니다."),
-    PARTICIPANTS_NOT_FOUND(HttpStatus.NOT_FOUND, "참여자 userId: %d가 channelId: %d에 존재하지 않습니다."),
+    PARTICIPANTS_NOT_FOUND(HttpStatus.NOT_FOUND, "참여자가 채널에 존재하지 않습니다."),
+    NOT_CHANEL_DELETE(HttpStatus.FORBIDDEN, "채널 생성자만이 삭제를 할 수 있습니다."),
 
 
     //calender
