@@ -64,9 +64,9 @@ public class ScheduleController {
      * 공지 일정 조회
      */
     @GroupAuth(role = Role.COURSE)
-    @GetMapping("/commons/{id}")
+    @GetMapping("/commons")
     public ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
-            @PathVariable("id") Long courseId
+            @RequestParam Long courseId
     ) {
         return ResponseEntity.ok(
                 Response.success(courseScheduleQueryService.getCourseSchedules(courseId)));
