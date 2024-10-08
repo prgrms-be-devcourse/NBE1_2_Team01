@@ -42,6 +42,7 @@ public enum ErrorCode {
 
     //calender
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다."),
+    ACCESS_TYPE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "지원하지 않는 접근 타입입니다."),
 
     //group
     MISSING_TEAM_TYPE(HttpStatus.BAD_REQUEST, "팀 타입이 필요합니다."),

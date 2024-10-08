@@ -17,7 +17,7 @@ import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResp
 import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
-@RequestMapping("/api/attendances/admin")
+@RequestMapping("/api/admin/attendances")
 @RequiredArgsConstructor
 public class AttendanceAdminController {
 
@@ -28,28 +28,31 @@ public class AttendanceAdminController {
      * 관리자 - 모든 출결 요청 보기
      */
     @GetMapping
-    public Response<List<AttendanceResponse>> findAll() {
-        return Response.success(attendanceQueryService.getAll());
+    public ResponseEntity<Response<List<AttendanceResponse>>> findAll() {
+        return ResponseEntity.ok(
+                Response.success(attendanceQueryService.getAll()));
     }
 
     /**
      * 관리자 - 출결 요청 상세 내역 보기
      */
     @GetMapping("/{id}")
-    public Response<AttendanceResponse> getAttendanceById(
+    public ResponseEntity<Response<AttendanceResponse>> getAttendanceById(
             @PathVariable("id") Long attendanceId
     ) {
-        return Response.success(attendanceQueryService.getById(attendanceId));
+        return ResponseEntity.ok(
+                Response.success(attendanceQueryService.getById(attendanceId)));
     }
 
     /**
      * 관리자 - 출결 요청 승인
      */
     @PostMapping("/approve")
-    public Response<AttendanceIdResponse> approveAttendance(
+    public ResponseEntity<Response<AttendanceIdResponse>> approveAttendance(
             @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
-        return Response.success(attendanceService.approveAttendance(attendanceIdRequest.id()));
+        return ResponseEntity.ok(
+                Response.success(attendanceService.approveAttendance(attendanceIdRequest.id())));
     }
 
     /**

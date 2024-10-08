@@ -1,9 +1,11 @@
 package org.team1.nbe1_2_team01.domain.calendar.controller.dto;
 
 import java.time.LocalDateTime;
-
-import org.team1.nbe1_2_team01.domain.calendar.entity.Schedule;
+import org.team1.nbe1_2_team01.domain.calendar.entity.CourseSchedule;
 import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
+import org.team1.nbe1_2_team01.domain.calendar.entity.TeamSchedule;
+import org.team1.nbe1_2_team01.domain.group.entity.Team;
+import org.team1.nbe1_2_team01.domain.user.entity.Course;
 
 public record ScheduleCreateRequest(
         Long belongingId,
@@ -14,14 +16,24 @@ public record ScheduleCreateRequest(
         String description
 ) {
 
-    public Schedule toEntity(Calendar calendar) {
-        return Schedule.builder()
-                .calendar(calendar)
+    public CourseSchedule toCourseSchedule(Course course) {
+        return CourseSchedule.builder()
+                .name(name)
+                .startAt(startAt)
+                .endAt(endAt)
+                .description(description)
+                .course(course)
+                .build();
+    }
+
+    public TeamSchedule toTeamSchedule(Team team) {
+        return TeamSchedule.builder()
                 .name(name)
                 .scheduleType(scheduleType)
                 .startAt(startAt)
                 .endAt(endAt)
                 .description(description)
+                .team(team)
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.calendar.service.response;
+package org.team1.nbe1_2_team01.domain.calendar.application.response;
 
 import lombok.Builder;
 

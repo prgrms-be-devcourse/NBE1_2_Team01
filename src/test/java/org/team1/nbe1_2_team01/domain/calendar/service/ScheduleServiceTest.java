@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.team1.nbe1_2_team01.domain.calendar.repository.ScheduleRepository;
+import org.team1.nbe1_2_team01.domain.calendar.repository.TeamScheduleRepository;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
@@ -28,7 +28,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 public class ScheduleServiceTest {
 
     @Mock
-    private ScheduleRepository scheduleRepository;
+    private TeamScheduleRepository teamScheduleRepository;
 
     @Mock
     private GroupAuthService groupAuthService;
@@ -54,7 +54,7 @@ public class ScheduleServiceTest {
         var calendar = createCalendar(belonging);
         var schedule_1 = createSchedule_MEETING(calendar);
         var schedule_2 = createSchedule_RBF(calendar);
-        given(scheduleRepository.findByBelongingId(1L)).willReturn(List.of(schedule_1, schedule_2));
+        given(teamScheduleRepository.findByBelongingId(1L)).willReturn(List.of(schedule_1, schedule_2));
 
         // when
         var noticeScheduleResponses = scheduleQueryService.getNoticeSchedules(belongingCourseId);
@@ -70,7 +70,7 @@ public class ScheduleServiceTest {
         var calendar = createCalendar(belonging);
         var schedule_1 = createSchedule_MEETING(calendar);
         var schedule_2 = createSchedule_RBF(calendar);
-        given(scheduleRepository.findByBelongingId(1L)).willReturn(List.of(schedule_1, schedule_2));
+        given(teamScheduleRepository.findByBelongingId(1L)).willReturn(List.of(schedule_1, schedule_2));
 
         // when
         var teamScheduleResponses = scheduleQueryService.getTeamSchedules(belongingTeamId);

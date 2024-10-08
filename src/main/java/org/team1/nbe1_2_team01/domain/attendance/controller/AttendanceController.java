@@ -35,28 +35,30 @@ public class AttendanceController {
      * 자신의 출결 요청 보기
      */
     @GetMapping
-    public Response<List<AttendanceResponse>> getMyAttendances() {
+    public ResponseEntity<Response<List<AttendanceResponse>>> getMyAttendances() {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        return Response.success(attendanceQueryService.getMyAttendances(currentUsername));
+        return ResponseEntity.ok(
+                Response.success(attendanceQueryService.getMyAttendances(currentUsername)));
     }
 
     /**
      * 자신의 출결 요청 상세 보기
      */
-    @GetMapping("{id}")
-    public Response<AttendanceResponse> getMyAttendance(
+    @GetMapping("/{id}")
+    public ResponseEntity<Response<AttendanceResponse>> getMyAttendance(
             @PathVariable("id") Long attendanceId
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        return Response.success(attendanceQueryService.getByIdAndUserId(attendanceId, currentUsername));
+        return ResponseEntity.ok(
+                Response.success(attendanceQueryService.getByIdAndUserId(attendanceId, currentUsername)));
     }
 
     /**
      * 출결 요청 등록
      */
-    @PostMapping("/regist")
+    @PostMapping
     public ResponseEntity<Response<AttendanceIdResponse>> registAttendance(
             @RequestBody @Valid AttendanceCreateRequest attendanceCreateRequest
     ) {
@@ -72,12 +74,13 @@ public class AttendanceController {
      * 출결 요청 수정
      */
     @PatchMapping
-    public Response<AttendanceIdResponse> updateAttendance(
+    public ResponseEntity<Response<AttendanceIdResponse>> updateAttendance(
             @RequestBody @Valid AttendanceUpdateRequest attendanceUpdateRequest
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        return Response.success(attendanceService.updateAttendance(currentUsername, attendanceUpdateRequest));
+        return ResponseEntity.ok(
+                Response.success(attendanceService.updateAttendance(currentUsername, attendanceUpdateRequest)));
     }
 
     /**
