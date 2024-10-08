@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface CustomCourseBoardRepository {
 
-    List<CourseBoardResponse> findAllCourseBoard(CommonBoardType type, Long belongId, Long boardId);
+    List<CourseBoardResponse> findAllCourseBoard(CommonBoardType type, Long courseId, Long boardId);
 
     Optional<BoardDetailResponse> findCourseBoardDetailById(Long id);
 
