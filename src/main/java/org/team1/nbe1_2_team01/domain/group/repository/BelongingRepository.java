@@ -15,7 +15,8 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     @Query("select u " +
             "from Belonging b " +
             "join b.user u " +
-            "where b.team.id = :teamId and b.user is not null")
+            "left join u.course c " +
+            "where b.team.id = :teamId")
     List<User> findUsersByTeamId(@Param("teamId") Long teamId);
 
     @Query("select b " +
@@ -33,10 +34,6 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     int deleteBelongings(@Param("teamId") Long teamId, @Param("userIds") List<Long> userIds);
 
     Belonging findByTeamIdAndIsOwner(Long teamId, boolean isOwner);
-
-    List<Belonging> findByCourseAndUserIsNotNull(String course);
-
-    Belonging findByCourseAndUserIsNullAndTeamIsNull(String course);
 
     Optional<Belonging> findByTeam_IdAndUser_Username(Long teamId, String username);
 }
