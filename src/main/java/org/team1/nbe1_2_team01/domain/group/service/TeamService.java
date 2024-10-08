@@ -15,6 +15,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
+import org.team1.nbe1_2_team01.domain.user.util.UserConverter;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.Message;
@@ -162,7 +163,12 @@ public class TeamService {
 
     public List<UserDetailsResponse> teamMemberList(Long teamId) {
         List<User> users = belongingRepository.findUsersByTeamId(teamId);
-        return users.stream().map((u) -> new UserDetailsResponse(u.getId(), u.getUsername(), u.getEmail(), u.getName())).toList();
+        return users.stream().map((u) -> {
+            if (u.getCourse() == null) {
+                return new UserDetailsResponse(u.getId(), u.getUsername(), u.getEmail(), u.getName(), "관리자");
+            }
+            else return UserConverter.toUserDetailsResponse(u);
+        }).toList();
     }
 
     /* ------------------------ */
