@@ -1,14 +1,15 @@
 package org.team1.nbe1_2_team01.domain.calendar.controller.dto;
 
 import java.time.LocalDateTime;
+import lombok.Builder;
 import org.team1.nbe1_2_team01.domain.calendar.entity.CourseSchedule;
 import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
 import org.team1.nbe1_2_team01.domain.calendar.entity.TeamSchedule;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 
+@Builder
 public record ScheduleCreateRequest(
-        Long belongingId,
         String name,
         ScheduleType scheduleType,
         LocalDateTime startAt,

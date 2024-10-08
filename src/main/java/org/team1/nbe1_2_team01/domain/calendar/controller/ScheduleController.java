@@ -1,7 +1,5 @@
 package org.team1.nbe1_2_team01.domain.calendar.controller;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.ACCESS_TYPE_NOT_ALLOWED;
-
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +22,9 @@ import org.team1.nbe1_2_team01.domain.calendar.application.response.ScheduleResp
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleCreateRequest;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleDeleteRequest;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleUpdateRequest;
-import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
-import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.auth.interceptor.GroupAuth;
+import org.team1.nbe1_2_team01.global.auth.interceptor.GroupAuth.Role;
 import org.team1.nbe1_2_team01.global.util.Response;
-import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -38,90 +35,66 @@ public class ScheduleController {
     private final CourseScheduleService courseScheduleService;
     private final TeamScheduleQueryService teamScheduleQueryService;
     private final TeamScheduleService teamScheduleService;
-    private final GroupAuthService groupAuthService;
-
-    /**
-     * 일정 상세 조회
-     * (조회 로직은 타입 별로 어떻게 받아오는지 추후 분기 처리 고민 필요)
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<ScheduleResponse>> getSchedule(
-            @RequestParam String accessType,
-            @PathVariable("id") Long scheduleId
-    ) {
-        if (accessType.equals("TEAM")) {
-            return ResponseEntity.ok(
-                    Response.success(teamScheduleQueryService.getTeamSchedule(scheduleId)));
-        }
-        else if (accessType.equals("COMMON")) {
-            return ResponseEntity.ok(
-                    Response.success(courseScheduleQueryService.getCourseSchedule(scheduleId)));
-        }
-        else {
-            throw new AppException(ACCESS_TYPE_NOT_ALLOWED);
-        }
-    }
 
     /**
      * 팀 내 일정 조회
      */
+    @GroupAuth(role = Role.TEAM)
     @GetMapping("/teams")
-    public ResponseEntity<Response<List<ScheduleResponse>>> getTeamSchedule(
+    public ResponseEntity<Response<List<ScheduleResponse>>> getTeamSchedules(
             @RequestParam Long teamId
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, teamId);
-
         return ResponseEntity.ok(
                 Response.success(teamScheduleQueryService.getTeamSchedules(teamId)));
     }
 
     /**
-     * 공지 일정 조회
-     * (groupAuthService 수정 필요)
+     * 팀 내 일정 상세 조회
      */
-    @GetMapping("/commons")
-    public  ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
-            @RequestParam Long courseId
+    @GroupAuth(role = Role.TEAM)
+    @GetMapping("/teams/{id}")
+    public ResponseEntity<Response<ScheduleResponse>> getTeamSchedule(
+            @PathVariable("id") Long teamScheduleId
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
+        return ResponseEntity.ok(
+                Response.success(teamScheduleQueryService.getTeamSchedule(teamScheduleId)));
+    }
 
-        //Long courseId = groupAuthService.validateCourse(currentUsername, courseId);
-
+    /**
+     * 공지 일정 조회
+     */
+    @GroupAuth(role = Role.COURSE)
+    @GetMapping("/commons/{id}")
+    public ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
+            @PathVariable("id") Long courseId
+    ) {
         return ResponseEntity.ok(
                 Response.success(courseScheduleQueryService.getCourseSchedules(courseId)));
     }
 
     /**
-     * 일정 상세 조회
+     * 공지 일정 상세 조회
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<ScheduleResponse>> getSchedule(
-            @RequestParam Long teamId,
-            @PathVariable("id") Long scheduleId
+    @GroupAuth(role = Role.COURSE)
+    @GetMapping("/commons/{id}")
+    public ResponseEntity<Response<ScheduleResponse>> getNoticeSchedule(
+            @PathVariable("id") Long courseId
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, teamId);
-
         return ResponseEntity.ok(
-                Response.success(teamScheduleQueryService.getTeamSchedule(scheduleId)));
+                Response.success(teamScheduleQueryService.getTeamSchedule(courseId)));
     }
 
     /**
      * 일정 등록
      */
+    @GroupAuth(role = Role.TEAM)
     @PostMapping
     public ResponseEntity<Response<ScheduleIdResponse>> registSchedule(
+            @RequestParam Long teamId,
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
-        var register = SecurityUtil.getCurrentUsername();
+        var scheduleIdResponse = teamScheduleService.registSchedule(teamId, scheduleCreateRequest);
 
-        groupAuthService.validateTeam(register, scheduleCreateRequest.belongingId());
-
-        var scheduleIdResponse = teamScheduleService.registSchedule(scheduleCreateRequest.belongingId(),
-                scheduleCreateRequest);
         return ResponseEntity
                 .created(URI.create("/api/schedules/" + scheduleIdResponse.scheduleId()))
                 .body(Response.success(scheduleIdResponse));
@@ -130,14 +103,11 @@ public class ScheduleController {
     /**
      * 일정 수정
      */
+    @GroupAuth(role = Role.TEAM)
     @PatchMapping
     public ResponseEntity<Response<ScheduleIdResponse>> updateSchedule(
             @RequestBody ScheduleUpdateRequest scheduleUpdateRequest
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, scheduleUpdateRequest.belongingId());
-
         return ResponseEntity.ok(
                 Response.success(teamScheduleService.updateSchedule(scheduleUpdateRequest)));
     }
@@ -145,15 +115,13 @@ public class ScheduleController {
     /**
      * 일정 삭제
      */
+    @GroupAuth(role = Role.TEAM)
     @DeleteMapping
     public ResponseEntity<Void> deleteSchedule(
             @RequestBody ScheduleDeleteRequest scheduleDeleteRequest
     ) {
-        var currentUsername = SecurityUtil.getCurrentUsername();
-
-        groupAuthService.validateTeam(currentUsername, scheduleDeleteRequest.belongingId());
-
         teamScheduleService.deleteSchedule(scheduleDeleteRequest.id());
+
         return ResponseEntity.noContent()
                 .build();
     }

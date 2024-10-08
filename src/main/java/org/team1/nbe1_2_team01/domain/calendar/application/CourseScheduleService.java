@@ -23,10 +23,7 @@ public class CourseScheduleService {
     private final CourseScheduleRepository courseScheduleRepository;
     private final CourseRepository courseRepository;
 
-    public ScheduleIdResponse registSchedule(
-            Long courseId,
-            ScheduleCreateRequest scheduleCreateRequest
-    ) {
+    public ScheduleIdResponse registSchedule(Long courseId, ScheduleCreateRequest scheduleCreateRequest) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
 
@@ -36,9 +33,7 @@ public class CourseScheduleService {
         return ScheduleIdResponse.from(saved.getId());
     }
 
-    public ScheduleIdResponse updateSchedule(
-            ScheduleUpdateRequest scheduleUpdateRequest
-    ) {
+    public ScheduleIdResponse updateSchedule(ScheduleUpdateRequest scheduleUpdateRequest) {
         CourseSchedule courseSchedule = courseScheduleRepository.findById(scheduleUpdateRequest.id())
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
 
@@ -47,9 +42,7 @@ public class CourseScheduleService {
         return ScheduleIdResponse.from(courseSchedule.getId());
     }
 
-    public void deleteSchedule(
-            Long scheduleId
-    ) {
+    public void deleteSchedule(Long scheduleId) {
         CourseSchedule courseSchedule = courseScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
 

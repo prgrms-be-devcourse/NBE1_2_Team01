@@ -13,6 +13,11 @@ import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
+import org.team1.nbe1_2_team01.domain.calendar.application.TeamScheduleService;
+import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleCreateRequest;
+import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
+import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -25,6 +30,8 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final DateTimeHolder dateTimeHolder;
     private final UserRepository userRepository;
+    private final TeamScheduleService teamScheduleService;
+    private final BelongingRepository belongingRepository;
 
     public AttendanceIdResponse registAttendance(
             String registerName,
@@ -82,7 +89,22 @@ public class AttendanceService {
 
         attendance.approve();
 
+        belongingRepository.findByUserId(attendance.getUser().getId())
+                .ifPresent(belonging -> registAttendanceSchedule(attendance, belonging));
+
         return AttendanceIdResponse.from(attendance.getId());
+    }
+
+    private void registAttendanceSchedule(Attendance attendance, Belonging belonging) {
+        Long teamId = belonging.getTeam().getId();
+        ScheduleCreateRequest scheduleCreateRequest = ScheduleCreateRequest.builder()
+                .name("출결 이슈")
+                .scheduleType(ScheduleType.ATTENDANCE)
+                .startAt(attendance.getStartAt())
+                .endAt(attendance.getEndAt())
+                .description(attendance.getDescription())
+                .build();
+        teamScheduleService.registSchedule(teamId, scheduleCreateRequest);
     }
 
     public void rejectAttendance(Long attendanceId) {

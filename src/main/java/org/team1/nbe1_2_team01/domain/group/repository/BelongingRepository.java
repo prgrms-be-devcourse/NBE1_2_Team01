@@ -36,4 +36,8 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     Belonging findByTeamIdAndIsOwner(Long teamId, boolean isOwner);
 
     Optional<Belonging> findByTeam_IdAndUser_Username(Long teamId, String username);
+
+    Optional<Belonging> findByUserId(Long userId);
+
+    boolean existsByTeamIdAndUserId(Long teamId, Long userId);
 }
