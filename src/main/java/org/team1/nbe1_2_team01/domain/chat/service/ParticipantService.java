@@ -32,13 +32,15 @@ public class ParticipantService {
     // 채널에 참여
     @Transactional
     public Participant joinChannel(Long channelId, Long userId) {
-
         // 이미 존재하는 참여자인지 확인
-        ParticipantPK participantPK = new ParticipantPK(userId, channelId);
-        return participantRepository.findById(participantPK).orElseGet(() -> {
+        try {
+            UserChannelUtil userChannelUtil = new UserChannelUtil(channelRepository, participantRepository);
+            Participant existParticipant = userChannelUtil.findUser(userId, channelId);
+            return existParticipant; // 이미 참여 중인 경우
+        } catch (RuntimeException e) {
+            // 참여자가 없을 경우 새로 새로 추가
             User user = userRepository.findById(userId).orElseThrow(() -> new AppException(INVITER_NOT_FOUND));
             Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new AppException(CHANEL_NOT_FOUND));
-
 
             Participant participant = Participant.builder()
                     .isCreator(false)  // 초대받으면 생성자 x
@@ -49,9 +51,8 @@ public class ParticipantService {
                     .build();
 
             return participantRepository.save(participant);
-        });
+        }
     }
-
 
     // 사용자 초대
     @Transactional

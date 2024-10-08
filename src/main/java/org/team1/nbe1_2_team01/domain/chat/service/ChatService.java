@@ -27,7 +27,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ParticipantRepository participantRepository;
 
-    // 채팅 메소드 분리
+    // 채팅 보내기
     @Transactional
     public ChatMessageResponse sendMessage(Long channelId, ChatMessageRequest msgRequest) {
         try {
@@ -44,7 +44,32 @@ public class ChatService {
         }
     }
 
+    // 채팅 수정하기
+    public Long updateMessage(Long chatId, Long userId, String newChatMessage) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new AppException(NOT_CHAT_MESSAGE));
 
+        if (!chat.getParticipant().getUser().getId().equals(userId)) {
+            throw new AppException(USER_NOT_AUTHORIZE);
+        }
+        chat.setContent(newChatMessage);
+        chat.setCreatedAt(LocalDateTime.now()); // 필드가 생성 필드만 있어서 조금 애매
+        return chat.getId();
+    }
+
+    // 채팅 삭제하기
+    public void deleteMessage(Long chatId, Long userId) {
+        // chat 확인
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new AppException(NOT_CHAT_MESSAGE));
+
+        // 메시지 보낸 사람과 동일인인지 확인
+        if (!chat.getParticipant().getUser().getId().equals(userId)) {
+            throw new AppException(USER_NOT_AUTHORIZE);
+        }
+    }
+
+    // 채팅방 만들기
     @Transactional
     public Chat createChat(Long channelId, String message, Long userId) {
         ParticipantPK participantPK = new ParticipantPK(userId, channelId);
@@ -74,6 +99,19 @@ public class ChatService {
         }
         return chats.stream()
                 .map(chat -> new ChatResponse(chat.getId(), chat.getContent(), chat.getParticipant().getUser().getName(), chat.getCreatedAt()))
+                .collect(Collectors.toList());
+    }
+
+    // 현재 채팅방에 누가 있는지 확인 (이름으로 반환)
+    public List<String> showParticipant(Long channelId) {
+        List<Participant> participants = participantRepository.findByChannelId(channelId);
+
+        if (participants.isEmpty()) {
+            throw new AppException(PARTICIPANTS_NOT_FOUND);
+        }
+
+        return participants.stream()
+                .map(participant -> participant.getUser().getName())
                 .collect(Collectors.toList());
     }
 }

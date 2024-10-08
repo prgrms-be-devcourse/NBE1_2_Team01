@@ -1,16 +1,14 @@
 package org.team1.nbe1_2_team01.domain.chat.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "chat")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Chat {

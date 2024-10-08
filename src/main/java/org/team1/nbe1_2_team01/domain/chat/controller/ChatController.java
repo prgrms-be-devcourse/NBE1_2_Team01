@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.dialect.function.array.ArrayAndElementArgumentTypeResolver;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,5 +42,27 @@ public class ChatController {
     public ResponseEntity<List<ChatResponse>> getChatsByChannelId(@PathVariable("channelId") Long channelId) {
         List<ChatResponse> chatResponses = chatService.getChatsByChannelId(channelId);
         return ResponseEntity.ok(chatResponses);
+    }
+
+    // 현재 채팅방에 누가 있는지 확인 (카톡처럼 이름으로 반환)
+    @GetMapping("/chat/{channelId}/participants")
+    public ResponseEntity<List<String>> getParticipants(@PathVariable Long channelId) {
+        List<String> participantNames = chatService.showParticipant(channelId);
+        return ResponseEntity.ok(participantNames);
+    }
+
+    // 채팅 수정하기
+    @PatchMapping("/chat/{channelId}/{chatId}")
+    public ResponseEntity<?> updateChatMessage(@PathVariable Long channelId, @PathVariable Long chatId,
+                                               @RequestParam Long userId, @RequestParam String newChatMessage) {
+        Long updateChatPk = chatService.updateMessage(chatId, userId, newChatMessage);
+        return ResponseEntity.ok().body(updateChatPk);
+    }
+
+    // 채팅 삭제하기
+    @DeleteMapping("/chat/{channelId}/{chatId}")
+    public ResponseEntity<?> deleteChatMessage(@PathVariable Long channelId, @PathVariable Long chatId, @RequestParam Long userId) {
+        chatService.deleteMessage(chatId, userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
