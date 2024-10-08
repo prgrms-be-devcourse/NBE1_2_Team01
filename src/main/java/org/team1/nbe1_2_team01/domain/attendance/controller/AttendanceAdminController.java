@@ -14,6 +14,7 @@ import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResponse;
+import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
 import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
@@ -23,6 +24,7 @@ public class AttendanceAdminController {
 
     private final AttendanceService attendanceService;
     private final AttendanceQueryService attendanceQueryService;
+    private final GroupAuthService groupAuthService;
 
     /**
      * 관리자 - 모든 출결 요청 보기

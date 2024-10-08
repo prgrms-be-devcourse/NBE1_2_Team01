@@ -39,4 +39,6 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     Belonging findByCourseAndUserIsNullAndTeamIsNull(String course);
 
     Optional<Belonging> findByTeam_IdAndUser_Username(Long teamId, String username);
+
+    Optional<Belonging> findByUserId(Long userId);
 }
