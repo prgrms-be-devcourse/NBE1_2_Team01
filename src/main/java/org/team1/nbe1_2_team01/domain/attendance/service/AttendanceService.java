@@ -98,7 +98,6 @@ public class AttendanceService {
     private void registAttendanceSchedule(Attendance attendance, Belonging belonging) {
         Long teamId = belonging.getTeam().getId();
         ScheduleCreateRequest scheduleCreateRequest = ScheduleCreateRequest.builder()
-                .belongingId(belonging.getId())
                 .name("출결 이슈")
                 .scheduleType(ScheduleType.ATTENDANCE)
                 .startAt(attendance.getStartAt())
