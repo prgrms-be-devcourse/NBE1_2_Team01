@@ -9,4 +9,5 @@ public interface CustomUserRepository {
 
     List<User> findAllUsersByIdList(List<Long> userIds);
 
+    List<User> findUsersAndAdminsByCourseId(Long courseId);
 }

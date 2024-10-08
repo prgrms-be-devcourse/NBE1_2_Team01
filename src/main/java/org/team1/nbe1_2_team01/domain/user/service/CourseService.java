@@ -1,5 +1,4 @@
 package org.team1.nbe1_2_team01.domain.user.service;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,12 +11,13 @@ import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.CourseIdResponse;
-import org.team1.nbe1_2_team01.domain.user.service.response.UserBrifResponse;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefResponse;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefWithRoleResponse;
+import org.team1.nbe1_2_team01.domain.user.util.UserConverter;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.COURSE_NOT_FOUND;
 
@@ -52,31 +52,46 @@ public class CourseService {
         return new CourseIdResponse(course.getId());
     }
 
+    public List<UserBriefResponse> getMyCourseUsers(){
+        Course course = userRepository.findByUsername(SecurityUtil.getCurrentUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."))
+                .getCourse();
 
-    public List<UserBrifResponse> getCourseUsersForAdmins(Long courseId) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
+        return mapToUserBriefResponse(course);
+    }
+    public List<UserBriefResponse> getCourseUsers(Long courseId) {
+        Course course = findById(courseId);
         return mapToUserBriefResponse(course);
     }
 
-    public List<UserBrifResponse> getCourseUsers() {
-        User currentUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 없습니다"));
-        return mapToUserBriefResponse(currentUser.getCourse());
-    }
-
-    private List<UserBrifResponse> mapToUserBriefResponse(Course course){
+    private List<UserBriefResponse> mapToUserBriefResponse(Course course){
         return userRepository.findByCourse(course)
                 .stream()
-                .map(user -> new UserBrifResponse(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getName()
-                )).toList();
+                .map(UserConverter::toUserBriefResponse)
+                .toList();
     }
 
     public Course findById(Long courseId) {
         return courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
+    }
+
+    public List<UserBriefWithRoleResponse> getCourseUsersWithAdmins(Long courseId) {
+        return mapToUserBriefWithRoleResponse(courseId);
+    }
+
+    public List<UserBriefWithRoleResponse> getMyCourseUsersWithAdmins(){
+        Long courseId = userRepository.findByUsername(SecurityUtil.getCurrentUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."))
+                .getCourse()
+                .getId();
+        return mapToUserBriefWithRoleResponse(courseId);
+    }
+
+    private List<UserBriefWithRoleResponse> mapToUserBriefWithRoleResponse(Long courseId){
+        return userRepository.findUsersAndAdminsByCourseId(courseId)
+                .stream()
+                .map(UserConverter::toUserBriefWithRoleResponse)
+                .toList();
     }
 }

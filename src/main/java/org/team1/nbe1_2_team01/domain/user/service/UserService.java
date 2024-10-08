@@ -14,6 +14,7 @@ import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
+import org.team1.nbe1_2_team01.domain.user.util.UserConverter;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.EmailRepository;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -54,8 +55,9 @@ public class UserService {
                 .role(Role.USER)
                 .course(course)
                 .build();
+        course.addUser(user);
         user.passwordEncode(passwordEncoder);
-        return new UserIdResponse(userRepository.save(user).getId());
+        return UserConverter.toUserIdResponse(userRepository.save(user));
     }
 
     @Transactional
@@ -74,20 +76,13 @@ public class UserService {
             user.updatePassword(userUpdateRequest.password());
             user.passwordEncode(passwordEncoder);
         }
-        return new UserIdResponse(user.getId());
+        return UserConverter.toUserIdResponse(user);
     }
 
 
     public UserDetailsResponse getCurrentUserDetails() {
         User user = getcurrentuser();
-        // 관리자인 경우 소속이 없으므로
-        String courseName = user.getRole().equals(Role.ADMIN) ? "관리자" : user.getCourse().getName();
-        return new UserDetailsResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getName(),
-                courseName);
+        return UserConverter.toUserDetailsResponse(user);
     }
 
     private User getcurrentuser() {
