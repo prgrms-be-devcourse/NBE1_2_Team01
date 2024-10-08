@@ -1,8 +1,7 @@
 package org.team1.nbe1_2_team01.domain.calendar.controller;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.ACCESS_TYPE_NOT_ALLOWED;
-
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +22,8 @@ import org.team1.nbe1_2_team01.domain.calendar.application.response.ScheduleResp
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleCreateRequest;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleDeleteRequest;
 import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleUpdateRequest;
-import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.auth.interceptor.GroupAuth;
+import org.team1.nbe1_2_team01.global.auth.interceptor.GroupAuth.Role;
 import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
@@ -38,6 +38,7 @@ public class ScheduleAdminController {
 
     /**
      * 모든 일정 조회
+     * (모든 일정을 가져올 수 있는 API 필요?)
      */
     /*@GetMapping
     public ResponseEntity<Response<List<ScheduleResponse>>> getAllSchedules() {
@@ -46,24 +47,51 @@ public class ScheduleAdminController {
     }*/
 
     /**
-     * 일정 상세 조회
+     * 팀 내 일정 조회
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<ScheduleResponse>> getSchedule(
-            @RequestParam String accessType,
-            @PathVariable("id") Long scheduleId
+    @GroupAuth(role = Role.ADMIN)
+    @GetMapping("/teams")
+    public ResponseEntity<Response<List<ScheduleResponse>>> getTeamSchedules(
+            @RequestParam Long teamId
     ) {
-        if (accessType.equals("TEAM")) {
-            return ResponseEntity.ok(
-                    Response.success(teamScheduleQueryService.getTeamSchedule(scheduleId)));
-        }
-        else if (accessType.equals("COMMON")) {
-            return ResponseEntity.ok(
-                    Response.success(courseScheduleQueryService.getCourseSchedule(scheduleId)));
-        }
-        else {
-            throw new AppException(ACCESS_TYPE_NOT_ALLOWED);
-        }
+        return ResponseEntity.ok(
+                Response.success(teamScheduleQueryService.getTeamSchedules(teamId)));
+    }
+
+    /**
+     * 팀 일정 상세 조회
+     */
+    @GroupAuth(role = Role.ADMIN)
+    @GetMapping("/teams/{id}")
+    public ResponseEntity<Response<ScheduleResponse>> getTeamSchedule(
+            @PathVariable("id") Long teamScheduleId
+    ) {
+        return ResponseEntity.ok(
+                Response.success(teamScheduleQueryService.getTeamSchedule(teamScheduleId)));
+    }
+
+    /**
+     * 공지 일정 조회
+     */
+    @GroupAuth(role = Role.ADMIN)
+    @GetMapping("/commons/{id}")
+    public ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
+            @PathVariable("id") Long courseId
+    ) {
+        return ResponseEntity.ok(
+                Response.success(courseScheduleQueryService.getCourseSchedules(courseId)));
+    }
+
+    /**
+     * 공지 일정 상세 조회
+     */
+    @GroupAuth(role = Role.ADMIN)
+    @GetMapping("/commons/{id}")
+    public ResponseEntity<Response<ScheduleResponse>> getNoticeSchedule(
+            @PathVariable("id") Long noticeScheduleId
+    ) {
+        return ResponseEntity.ok(
+                Response.success(courseScheduleQueryService.getCourseSchedule(noticeScheduleId)));
     }
 
     /**
@@ -71,10 +99,10 @@ public class ScheduleAdminController {
      */
     @PostMapping
     public ResponseEntity<Void> registSchedule(
+            @RequestParam Long teamId,
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
-        var scheduleIdResponse = courseScheduleService.registSchedule(scheduleCreateRequest.belongingId(),
-                scheduleCreateRequest);
+        var scheduleIdResponse = courseScheduleService.registSchedule(teamId, scheduleCreateRequest);
         return ResponseEntity
                 .created(URI.create("/api/schedules/common/" + scheduleIdResponse))
                 .build();

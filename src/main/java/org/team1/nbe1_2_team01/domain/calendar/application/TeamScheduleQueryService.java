@@ -18,9 +18,7 @@ public class TeamScheduleQueryService {
 
     private final TeamScheduleRepository teamScheduleRepository;
 
-    public List<ScheduleResponse> getTeamSchedules(
-            Long teamId
-    ) {
+    public List<ScheduleResponse> getTeamSchedules(Long teamId) {
         List<TeamSchedule> teamSchedules = teamScheduleRepository.findByTeamId(teamId);
 
         return teamSchedules.stream()
@@ -28,9 +26,7 @@ public class TeamScheduleQueryService {
                 .toList();
     }
 
-    public ScheduleResponse getTeamSchedule(
-            Long scheduleId
-    ) {
+    public ScheduleResponse getTeamSchedule(Long scheduleId) {
         TeamSchedule teamSchedule = teamScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
 

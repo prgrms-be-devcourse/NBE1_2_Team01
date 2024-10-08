@@ -10,7 +10,6 @@ import org.team1.nbe1_2_team01.domain.user.entity.Course;
 
 @Builder
 public record ScheduleCreateRequest(
-        Long belongingId,
         String name,
         ScheduleType scheduleType,
         LocalDateTime startAt,

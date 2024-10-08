@@ -20,7 +20,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.calendar.repository.TeamScheduleRepository;
 import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
-import org.team1.nbe1_2_team01.domain.group.service.GroupAuthService;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 
 @ExtendWith(MockitoExtension.class)

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
 
 public record ScheduleUpdateRequest(
-        Long belongingId,
         Long id,
         String name,
         ScheduleType scheduleType,

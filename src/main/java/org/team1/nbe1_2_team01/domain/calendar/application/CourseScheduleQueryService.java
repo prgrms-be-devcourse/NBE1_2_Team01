@@ -18,19 +18,15 @@ public class CourseScheduleQueryService {
 
     private final CourseScheduleRepository courseScheduleRepository;
 
-    public List<ScheduleResponse> getCourseSchedules(
-            Long teamId
-    ) {
-        List<CourseSchedule> courseSchedules = courseScheduleRepository.findByCourseId(teamId);
+    public List<ScheduleResponse> getCourseSchedules(Long courseId) {
+        List<CourseSchedule> courseSchedules = courseScheduleRepository.findByCourseId(courseId);
 
         return courseSchedules.stream()
                 .map(ScheduleResponse::from)
                 .toList();
     }
 
-    public ScheduleResponse getCourseSchedule(
-            Long scheduleId
-    ) {
+    public ScheduleResponse getCourseSchedule(Long scheduleId) {
         CourseSchedule courseSchedule = courseScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new AppException(SCHEDULE_NOT_FOUND));
 
