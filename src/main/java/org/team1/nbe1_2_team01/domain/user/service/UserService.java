@@ -23,6 +23,7 @@ import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
 
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.EMAIL_ALREADY_EXISTS;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.USERNAME_ALREADY_EXISTS;
 
@@ -45,7 +46,7 @@ public class UserService {
         }
 
         Course course = courseRepository.findById(userSignUpRequest.courseId())
-                .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
 
         User user = User.builder()
                 .username(userSignUpRequest.username())
