@@ -3,53 +3,35 @@ package org.team1.nbe1_2_team01.domain.attendance.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.Mockito.when;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceCreateRequest;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createAdmin;
-import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @SuppressWarnings("NonAsciiCharacters")
 public class AttendanceTest {
 
-    User user;
-
-    @BeforeEach
-    void setUp() {
-        user = createUser();
-    }
-
     @Test
-    void 출결_정보_생성() {
-        // when
-        var attendance = createAttendance(createUser());
-
-        // then
-        assertThat(attendance).isNotNull();
-    }
-
-    @Test
-    void 출결_정보를_생성할_때_출결_시작_시간이_끝_시간보다_나중이면_예외를_발생시킨다() {
-        var createRequest = createAttendanceCreateRequest(9, 30, 9, 10);
-
-        assertThatThrownBy(() -> createRequest.toEntity(user))
-                .isInstanceOf(AppException.class);
-    }
-
-    @Test
-    void 출결_정보를_생성할_때_출결_시간_모두_9시부터_18시_사이가_아니라면_예외를_발생시킨다() {
+    void 출결을_생성할_때_출결_시간_모두_9시부터_18시_사이가_아니라면_예외를_발생시킨다() {
         assertSoftly(softly -> {
             assertThatThrownBy(() -> {
-                var createRequest = createAttendanceCreateRequest(8, 59, 9, 30);
-                createRequest.toEntity(user);
+                Attendance.builder()
+                        .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 59, 0)))
+                        .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 30, 0)))
+                        .build();
             }).isInstanceOf(AppException.class);
             assertThatThrownBy(() -> {
-                var createRequest = createAttendanceCreateRequest(9, 10, 18, 30);
-                createRequest.toEntity(user);
+                Attendance.builder()
+                        .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 10, 0)))
+                        .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 30, 0)))
+                        .build();
             }).isInstanceOf(AppException.class);
         });
     }
@@ -69,11 +51,28 @@ public class AttendanceTest {
     @Test
     void 출결이_이미_승인되었다면_예외를_발생시킨다() {
         // given
-        var attendance = createAttendance(createAdmin());
+        var attendance = Attendance.builder()
+                .creationWaiting(true)
+                .build();
         attendance.approve();
 
         // when & then
         assertThatThrownBy(() -> attendance.approve())
+                .isInstanceOf(AppException.class);
+    }
+
+    @Test
+    void 출결을_등록한_사람이_아닐_때() {
+        var user_REGISTER = Mockito.spy(User.class);
+        when(user_REGISTER.getId()).thenReturn(1L);
+        var user_ANOTHER = Mockito.spy(User.class);
+        when(user_ANOTHER.getId()).thenReturn(2L);
+
+        var attendance = Attendance.builder()
+                .user(user_REGISTER)
+                .build();
+
+        assertThatThrownBy(() -> attendance.validateRegister(user_ANOTHER.getId()))
                 .isInstanceOf(AppException.class);
     }
 }
