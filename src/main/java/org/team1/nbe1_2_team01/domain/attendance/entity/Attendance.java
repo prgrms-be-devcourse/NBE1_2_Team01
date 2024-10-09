@@ -70,7 +70,7 @@ public class Attendance {
         this.endAt = endAt;
         this.description = description;
         this.creationWaiting = creationWaiting;
-        user.addAttendance(this);
+        //user.addAttendance(this);
     }
 
     public void update(AttendanceUpdateRequest attendanceUpdateRequest) {
