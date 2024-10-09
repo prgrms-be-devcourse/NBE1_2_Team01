@@ -32,17 +32,17 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 1 - @GroupAuth 적용 여부
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         GroupAuth annotation = handlerMethod.getMethodAnnotation(GroupAuth.class);
-        if (annotation != null) {
+        if (annotation == null) {
             return true;
         }
-        Role role = annotation.role();
 
         // 2 - ADMIN 통과
+        Role role = annotation.role();
         if (role.equals(ADMIN)) {
             return true;
         }
 
-        // 2 - query parameter parsing
+        // 3 - query parameter parsing
         Long courseId = Long.parseLong(request.getParameter("course-id"));
         Long teamId = Long.parseLong(request.getParameter("team-id"));
 
