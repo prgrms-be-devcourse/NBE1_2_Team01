@@ -8,12 +8,13 @@ import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 
 public class UserConverter {
+    private static final String ADMIN = "관리자";
     public static UserIdResponse toUserIdResponse(User user){
         return new UserIdResponse(user.getId());
     }
 
     public static UserDetailsResponse toUserDetailsResponse(User user){
-        String courseName = user.getRole().equals(Role.ADMIN) ? "관리자" : user.getCourse().getName();
+        String courseName = user.getRole().equals(Role.ADMIN) ? ADMIN : user.getCourse().getName();
         return new UserDetailsResponse(
                 user.getId(),
                 user.getUsername(),
