@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.create_ATTENDANCE_ABSENT;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.create_ATTENDANCE_REGISTER;
 import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceRequestFixture.create_ATTENDANCE_CREATE_REQUEST_ABSENT;
@@ -71,10 +70,12 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_등록_시_오늘_이미_등록했다면_예외를_발생시킨다() {
         // given
-        given(attendanceRepository.findByUserIdAndStartAt(any(), any())).willReturn(Optional.of(any(Attendance.class)));
+        var createRequest = create_ATTENDANCE_CREATE_REQUEST_ABSENT();
+        var attendance = Mockito.spy(createRequest.toEntity(user));
+        given(attendanceRepository.findByUserIdAndStartAt(any(), any())).willReturn(Optional.of(attendance));
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.updateAttendance(any(), any()))
+        assertThatThrownBy(() -> attendanceService.registAttendance(user.getUsername(), createRequest))
                 .isInstanceOf(AppException.class);
     }
 
@@ -83,7 +84,7 @@ public class AttendanceServiceTest {
         // given
         var updateRequest = create_ATTENDANCE_UPDATE_REQUEST_ABSENT();
         var attendance = create_ATTENDANCE_REGISTER(user);
-        when(attendanceRepository.findById(any())).thenReturn(Optional.of(attendance));
+        given(attendanceRepository.findById(any())).willReturn(Optional.of(attendance));
 
         // when
         attendanceService.updateAttendance(user.getUsername(), updateRequest);
@@ -96,7 +97,7 @@ public class AttendanceServiceTest {
     void 출결_요청_삭제() {
         // given
         var attendance = create_ATTENDANCE_ABSENT(user);
-        when(attendanceRepository.findById(any())).thenReturn(Optional.of(attendance));
+        given(attendanceRepository.findById(any())).willReturn(Optional.of(attendance));
         doNothing().when(attendanceRepository).delete(attendance);
 
         // when
@@ -106,11 +107,12 @@ public class AttendanceServiceTest {
         verify(attendanceRepository).delete(attendance);
     }
 
+    // 잠시 보류
     @Test
     void 출결_승인() {
         // given
         var attendance = create_ATTENDANCE_ABSENT(user);
-        when(attendanceRepository.findById(any())).thenReturn(Optional.of(attendance));
+        given(attendanceRepository.findById(any())).willReturn(Optional.of(attendance));
 
         // when
         attendanceService.approveAttendance(attendance.getId());

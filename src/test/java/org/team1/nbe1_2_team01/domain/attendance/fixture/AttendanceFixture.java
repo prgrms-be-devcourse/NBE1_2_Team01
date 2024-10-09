@@ -25,12 +25,16 @@ public class AttendanceFixture {
 
     public static Attendance create_ATTENDANCE_NOT_APPROVE() {
         return Attendance.builder()
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .creationWaiting(true)
                 .build();
     }
 
     public static Attendance create_ATTENDANCE_ALREADY_APPROVED() {
         return Attendance.builder()
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .creationWaiting(false)
                 .build();
     }
@@ -38,6 +42,8 @@ public class AttendanceFixture {
     public static Attendance create_ATTENDANCE_REGISTER(User register) {
         return Attendance.builder()
                 .user(register)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .build();
     }
 
@@ -47,6 +53,7 @@ public class AttendanceFixture {
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .creationWaiting(true)
                 .description("국취제로 인한 외출")
                 .build();
     }

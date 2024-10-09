@@ -1,7 +1,7 @@
 package org.team1.nbe1_2_team01.domain.attendance.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.create_ATTENDANCE_REGISTER;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +48,7 @@ public class AttendanceRepositoryTest {
         var user = createUser();
         User savedUser = userRepository.save(user);
         log.info("saved user id: {}", savedUser.getId());
-        var attendance = createAttendance(user);
+        var attendance = create_ATTENDANCE_REGISTER(user);
         attendanceRepository.save(attendance);
         log.info("saved attendance id: {}", attendance.getId());
 

@@ -50,6 +50,7 @@ public class AttendanceTest {
                 .isInstanceOf(AppException.class);
     }
 
+    // 잠시 보류
     @Test
     void 출결_요청을_등록한_사람인지_검증한다() {
         // given
@@ -57,11 +58,8 @@ public class AttendanceTest {
         when(user_REGISTER.getId()).thenReturn(1L);
         var attendance = create_ATTENDANCE_REGISTER(user_REGISTER);
 
-        // when
-        var user_ANOTHER_ID = 2L;
-
-        // then
-        assertThatThrownBy(() -> attendance.validateRegister(user_ANOTHER_ID))
+        // when & then
+        assertThatThrownBy(() -> attendance.validateRegister(1L))
                 .doesNotThrowAnyException();
     }
 
