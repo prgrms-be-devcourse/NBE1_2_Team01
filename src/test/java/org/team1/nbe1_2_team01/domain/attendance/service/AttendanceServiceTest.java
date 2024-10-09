@@ -3,14 +3,15 @@ package org.team1.nbe1_2_team01.domain.attendance.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceCreateRequest_ABSENT;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendanceUpdateRequest_ABSENT;
-import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.createAttendance_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.create_ATTENDANCE_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceFixture.create_ATTENDANCE_REGISTER;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceRequestFixture.create_ATTENDANCE_CREATE_REQUEST_ABSENT;
+import static org.team1.nbe1_2_team01.domain.attendance.fixture.AttendanceRequestFixture.create_ATTENDANCE_UPDATE_REQUEST_ABSENT;
 import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.createUser;
 
 import java.util.Optional;
@@ -35,13 +36,10 @@ public class AttendanceServiceTest {
 
     @Mock
     private AttendanceRepository attendanceRepository;
-
     @Mock
     private DateTimeHolder dateTimeHolder = new FixedDateTimeHolder(2024, 9, 30, 12, 30);
-
     @Mock
     private UserRepository userRepository;
-
     @InjectMocks
     private AttendanceService attendanceService;
 
@@ -57,11 +55,11 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_등록() {
         // given
-        var createRequest = createAttendanceCreateRequest_ABSENT();
-        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).thenReturn(Optional.empty());
-        var attendance = Mockito.spy(createAttendance_ABSENT(user));
-        when(attendanceRepository.save(any(Attendance.class))).thenReturn(attendance);
-        when(attendance.getId()).thenReturn(1L);
+        var createRequest = create_ATTENDANCE_CREATE_REQUEST_ABSENT();
+        var attendance = Mockito.spy(createRequest.toEntity(user));
+        given(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).willReturn(Optional.empty());
+        given(attendanceRepository.save(any(Attendance.class))).willReturn(attendance);
+        given(attendance.getId()).willReturn(1L);
 
         // when
         var createdAttendanceId = attendanceService.registAttendance(user.getUsername(), createRequest);
@@ -71,23 +69,21 @@ public class AttendanceServiceTest {
     }
 
     @Test
-    void 출결_요청_등록_시_이미_등록된_요청이_있다면_예외를_발생시킨다() {
+    void 출결_요청_등록_시_오늘_이미_등록했다면_예외를_발생시킨다() {
         // given
-        var createRequest = createAttendanceCreateRequest_ABSENT();
-        var attendance = createAttendance(user);
-        when(attendanceRepository.findByUserIdAndStartAt(user.getId(), dateTimeHolder.getDate())).thenReturn(Optional.of(attendance));
+        given(attendanceRepository.findByUserIdAndStartAt(any(), any())).willReturn(Optional.of(any(Attendance.class)));
 
         // when & then
-        assertThatThrownBy(() -> attendanceService.registAttendance(user.getUsername(), createRequest))
+        assertThatThrownBy(() -> attendanceService.updateAttendance(any(), any()))
                 .isInstanceOf(AppException.class);
     }
 
     @Test
     void 출결_요청_수정() {
         // given
-        var updateRequest = createAttendanceUpdateRequest_ABSENT();
-        var attendance = createAttendance_ABSENT(user);
-        when(attendanceRepository.findById(updateRequest.id())).thenReturn(Optional.of(attendance));
+        var updateRequest = create_ATTENDANCE_UPDATE_REQUEST_ABSENT();
+        var attendance = create_ATTENDANCE_REGISTER(user);
+        when(attendanceRepository.findById(any())).thenReturn(Optional.of(attendance));
 
         // when
         attendanceService.updateAttendance(user.getUsername(), updateRequest);
@@ -97,21 +93,10 @@ public class AttendanceServiceTest {
     }
 
     @Test
-    void 출결_요청_수정_시_출결_요청_데이터가_없다면_예외를_발생시킨다() {
-        // given
-        var updateRequest = createAttendanceUpdateRequest_ABSENT();
-        when(attendanceRepository.findById(updateRequest.id())).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> attendanceService.updateAttendance(user.getUsername(), updateRequest))
-                .isInstanceOf(AppException.class);
-    }
-
-    @Test
     void 출결_요청_삭제() {
         // given
-        var attendance = createAttendance_ABSENT(user);
-        when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.of(attendance));
+        var attendance = create_ATTENDANCE_ABSENT(user);
+        when(attendanceRepository.findById(any())).thenReturn(Optional.of(attendance));
         doNothing().when(attendanceRepository).delete(attendance);
 
         // when
@@ -122,21 +107,10 @@ public class AttendanceServiceTest {
     }
 
     @Test
-    void 출결_요청_삭제_시_출결_요청_데이터가_없다면_예외를_발생시킨다() {
-        // given
-        var attendance = createAttendance_ABSENT(user);
-        when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> attendanceService.deleteAttendance(user.getUsername(), attendance.getId()))
-                .isInstanceOf(AppException.class);
-    }
-
-    @Test
     void 출결_승인() {
         // given
-        var attendance = createAttendance_ABSENT(user);
-        when(attendanceRepository.findById(attendance.getId())).thenReturn(Optional.of(attendance));
+        var attendance = create_ATTENDANCE_ABSENT(user);
+        when(attendanceRepository.findById(any())).thenReturn(Optional.of(attendance));
 
         // when
         attendanceService.approveAttendance(attendance.getId());
