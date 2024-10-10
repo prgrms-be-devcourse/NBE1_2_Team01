@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 import org.team1.nbe1_2_team01.domain.board.entity.CourseBoard;
 import org.team1.nbe1_2_team01.domain.calendar.entity.CourseSchedule;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
@@ -15,6 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "course")
+@SQLRestriction("is_delete = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Course {
     @Id
@@ -22,6 +25,9 @@ public class Course {
     private Long id;
 
     private String name;
+
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean isDelete;
 
     @OneToMany(mappedBy = "course")
     private List<User> users = new ArrayList<>();
@@ -38,6 +44,7 @@ public class Course {
     @Builder
     private Course(String name) {
         this.name = name;
+        this.isDelete = false;
     }
 
     public void addUser(User user) {
@@ -58,5 +65,9 @@ public class Course {
 
     public void updateName(String name) {
         this.name = name;
+    }
+
+    public void delete(){
+        this.isDelete = true;
     }
 }

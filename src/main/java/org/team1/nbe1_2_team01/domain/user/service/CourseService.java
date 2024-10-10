@@ -15,10 +15,12 @@ import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserBriefWithRoleResponse;
 import org.team1.nbe1_2_team01.domain.user.util.UserConverter;
 import org.team1.nbe1_2_team01.global.exception.AppException;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
 import java.util.List;
 
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.COURSE_NOT_FOUND;
 
 @Service
@@ -30,6 +32,9 @@ public class CourseService {
 
     @Transactional
     public CourseIdResponse createCourse(CourseCreateRequest courseCreateRequest) {
+        if (courseRepository.findByName(courseCreateRequest.name()).isPresent()) {
+            throw new AppException(COURSE_ALREADY_EXISTS);
+        }
         Course course = Course.builder()
                 .name(courseCreateRequest.name())
                 .build();
@@ -50,6 +55,11 @@ public class CourseService {
                 .orElseThrow(() -> new AppException(COURSE_NOT_FOUND));
         course.updateName(courseUpdateRequest.name());
         return new CourseIdResponse(course.getId());
+    }
+
+    @Transactional
+    public void deleteCourse(Long courseId){
+        findById(courseId).delete();
     }
 
     public List<UserBriefResponse> getMyCourseUsers(){
@@ -94,4 +104,5 @@ public class CourseService {
                 .map(UserConverter::toUserBriefWithRoleResponse)
                 .toList();
     }
+
 }

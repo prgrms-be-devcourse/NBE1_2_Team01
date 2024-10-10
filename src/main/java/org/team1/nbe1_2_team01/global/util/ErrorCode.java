@@ -48,13 +48,10 @@ public enum ErrorCode {
 
     //group
     MISSING_TEAM_TYPE(HttpStatus.BAD_REQUEST, "팀 타입이 필요합니다."),
-    COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "코스가 존재하지 않습니다."),
-    COURSE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 코스명입니다."),
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀이 존재하지 않습니다."),
     TEAM_NOT_WAITING(HttpStatus.BAD_REQUEST, "승인 대기 중인 팀이 아닙니다."),
     BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "소속이 존재하지 않습니다"),
 
-    COURSE_AUTH_DENIED(HttpStatus.FORBIDDEN, "코스에 소속된 유저만 접근할 수 있습니다."),
     TEAM_AUTH_DENIED(HttpStatus.FORBIDDEN, "팀에 소속된 유저만 접근할 수 있습니다."),
 
     NOT_TEAM_LEADER(HttpStatus.UNAUTHORIZED, "팀장만 이용 가능합니다."),
@@ -63,14 +60,18 @@ public enum ErrorCode {
     LEADER_BELONGING_NOT_FOUND(HttpStatus.NOT_FOUND, "팀장 소속 정보를 찾아오는 중 오류가 발생했습니다."),
     CANNOT_DELETE_LEADER(HttpStatus.BAD_REQUEST, "팀장을 삭제할 수는 없습니다. 삭제하시려면 팀을 삭제하세요."),
 
+    //course
+    COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "코스가 존재하지 않습니다."),
+    COURSE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 코스명입니다."),
+    COURSE_AUTH_DENIED(HttpStatus.FORBIDDEN, "코스에 소속된 유저만 접근할 수 있습니다."),
 
     //user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
     NOT_ADMIN_USER(HttpStatus.UNAUTHORIZED, "관리자만 이용가능합니다."),
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "%s는 이미 존재하는 아이디입니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "%s는 이미 존재하는 이메일 입니다."),
-    USER_NOT_OWNER(HttpStatus.FORBIDDEN, "팀원은 수행할 수 없습니다.")
-    ;
+    USER_NOT_OWNER(HttpStatus.FORBIDDEN, "팀원은 수행할 수 없습니다."),
+    PASSWORD_NOT_VALID(HttpStatus.BAD_REQUEST, "비밀번호가 올바르지 않습니다."),;
 
     @Getter
     private final HttpStatus status;

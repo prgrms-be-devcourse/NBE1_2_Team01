@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.team1.nbe1_2_team01.domain.user.controller.request.UserDeleteRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.service.UserService;
@@ -38,6 +39,15 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(){
         userService.logout();
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestBody UserDeleteRequest userDeleteRequest){
+        userService.delete(userDeleteRequest);
         return ResponseEntity.noContent().build();
     }
 
