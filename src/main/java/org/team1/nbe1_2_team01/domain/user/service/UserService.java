@@ -13,6 +13,7 @@ import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserAdminCheckResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.domain.user.util.UserConverter;
@@ -101,4 +102,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다."));
     }
 
+    public UserAdminCheckResponse isAdmin() {
+        return UserConverter.toUserAdminCheckResponse(getcurrentuser());
+    }
 }

@@ -10,6 +10,7 @@ import org.team1.nbe1_2_team01.domain.user.controller.request.UserDeleteRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.service.UserService;
+import org.team1.nbe1_2_team01.domain.user.service.response.UserAdminCheckResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.global.auth.email.service.EmailService;
@@ -69,4 +70,11 @@ public class UserController {
         return ResponseEntity.ok().body(Response.success(userIdResponse));
     }
 
+    /**
+     * 관리자 인지 체크
+     */
+    @GetMapping("/role")
+    public ResponseEntity<Response<UserAdminCheckResponse>> isAdmin(){
+        return ResponseEntity.ok().body(Response.success(userService.isAdmin()));
+    }
 }
