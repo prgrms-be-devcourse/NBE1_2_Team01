@@ -6,6 +6,7 @@ import org.team1.nbe1_2_team01.domain.board.controller.dto.CourseBoardRequest;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.CourseBoardUpdateRequest;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.CourseBoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.PagingResponse;
 import org.team1.nbe1_2_team01.global.util.Message;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface CourseBoardService {
     Message updateCourseBoard(CourseBoardUpdateRequest request);
 
     Message deleteCourseBoardById(BoardDeleteRequest deleteRequest);
+
+    List<PagingResponse> getPaginationInfo(CourseBoardListRequest request);
 }

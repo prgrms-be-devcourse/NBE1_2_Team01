@@ -9,6 +9,7 @@ import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.service.CourseBoardService;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.CourseBoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.PagingResponse;
 import org.team1.nbe1_2_team01.global.util.Message;
 import org.team1.nbe1_2_team01.global.util.Response;
 
@@ -24,18 +25,33 @@ public class CourseBoardController {
     private static final String BASE_URL = "/api/course/board";
 
     /**
-     * 공지사항 목록 조회 api
+     * 공지사항 || 스터디 모집글 목록 조회 api
      * 관리자가 작성하고, 해당 코스 번호에 해당하는 게시글 리스트
      * @param request
      * @return
      */
     @GetMapping
-    public ResponseEntity<Response<List<CourseBoardResponse>>> getCommonBoardList(
+    public ResponseEntity<Response<List<CourseBoardResponse>>> getCourseBoardList(
             @ModelAttribute CourseBoardListRequest request
     ) {
         List<CourseBoardResponse> commonBoardList = courseBoardService.getCourseBoardList(request);
         return ResponseEntity.ok()
                 .body(Response.success(commonBoardList));
+    }
+
+    /**
+     * 페이징 데이터 전달하는 쿼리
+     * 각 페이지와 마지막 boardId값 반환
+     * @param request
+     * @return
+     */
+    @GetMapping("/page")
+    public ResponseEntity<Response<List<PagingResponse>>> getPaginationInfo(
+            @ModelAttribute CourseBoardListRequest request
+    ) {
+        List<PagingResponse> response = courseBoardService.getPaginationInfo(request);
+        return ResponseEntity.ok()
+                .body(Response.success(response));
     }
 
 

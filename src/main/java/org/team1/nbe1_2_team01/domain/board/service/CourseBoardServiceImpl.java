@@ -14,6 +14,7 @@ import org.team1.nbe1_2_team01.domain.board.entity.CourseBoard;
 import org.team1.nbe1_2_team01.domain.board.repository.CourseBoardRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.CourseBoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.PagingResponse;
 import org.team1.nbe1_2_team01.domain.board.service.valid.CourseBoardValidator;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
@@ -90,6 +91,15 @@ public class CourseBoardServiceImpl implements CourseBoardService {
 
         String deleteMessage = MessageContent.getDeleteMessage(request.isNotice());
         return new Message(deleteMessage);
+    }
+
+    @Override
+    public List<PagingResponse> getPaginationInfo(CourseBoardListRequest request) {
+        CommonBoardType boardType = CommonBoardType.getType(request.isNotice());
+        return courseBoardRepository.findPaginationInfo(
+                request.courseId(),
+                boardType
+        );
     }
 
     private User getCurrentUser() {

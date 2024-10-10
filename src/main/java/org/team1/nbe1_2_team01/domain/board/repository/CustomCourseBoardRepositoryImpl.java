@@ -3,10 +3,12 @@ package org.team1.nbe1_2_team01.domain.board.repository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.service.response.BoardDetailResponse;
 import org.team1.nbe1_2_team01.domain.board.service.response.CourseBoardResponse;
+import org.team1.nbe1_2_team01.domain.board.service.response.PagingResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
@@ -17,11 +19,13 @@ import static org.team1.nbe1_2_team01.domain.user.entity.QUser.user;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 public class CustomCourseBoardRepositoryImpl implements CustomCourseBoardRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
     private static final int PAGE_SIZE = 10;
 
     @Override
@@ -70,11 +74,46 @@ public class CustomCourseBoardRepositoryImpl implements CustomCourseBoardReposit
 
     }
 
+    @Override
+    public List<PagingResponse> findPaginationInfo(Long courseId, CommonBoardType boardType) {
+        String sql = "SELECT subquery.id FROM ("
+                + " SELECT course_board.id as id, ROW_NUMBER() OVER (ORDER BY course_board.id DESC) AS row_num"
+                + " FROM course_board"
+                + " JOIN users ON course_board.user_id = users.id"
+                + " WHERE course_board.course_id = :courseId"
+                + " AND users.role = :role"
+                + " ) subquery WHERE subquery.row_num % 10 = 0"
+                + " ORDER BY subquery.row_num DESC";
+
+        String role = getRole(boardType);
+        List<Object[]> results = entityManager.createNativeQuery(sql)
+                .setParameter("courseId", courseId)
+                .setParameter("role", role)
+                .getResultList();
+
+        results.add(0, null);
+        AtomicInteger index = new AtomicInteger(1);
+
+        return results.stream().map(result -> {
+            if (result == null) {
+                return PagingResponse.of((long) index.getAndIncrement(), (Long) null); // null인 경우
+            } else {
+                return PagingResponse.of((long) index.getAndIncrement(), ((Number) result[0]).longValue()); // boardId 값
+            }
+        }).toList();
+    }
+
+
+    private static String getRole(CommonBoardType boardType) {
+        return boardType.equals(CommonBoardType.NOTICE) ? "ADMIN" : "USER";
+    }
+
     private JPAQuery<Tuple> buildBoardQueryByType(CommonBoardType type, Long courseId) {
         JPAQuery<Tuple> commonQuery = queryFactory
                 .select(
                         courseBoard.id,
                         courseBoard.title,
+                        courseBoard.readCount,
                         user.name,
                         courseBoard.createdAt
                 )
@@ -105,6 +144,7 @@ public class CustomCourseBoardRepositoryImpl implements CustomCourseBoardReposit
                 .id(tuple.get(courseBoard.id))
                 .title(tuple.get(courseBoard.title))
                 .writer(tuple.get(user.name))
+                .readCount(Optional.ofNullable(tuple.get(courseBoard.readCount)).orElse(0L))
                 .createdAt(tuple.get(courseBoard.createdAt))
                 .build();
     }
