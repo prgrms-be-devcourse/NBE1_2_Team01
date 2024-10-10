@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.attendance.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -66,7 +67,7 @@ public class AttendanceController {
 
         var attendanceIdResponse = attendanceService.registAttendance(registerUsername, attendanceCreateRequest);
         return ResponseEntity
-                .created(URI.create("/attendance/" + attendanceIdResponse.attendanceId()))
+                .created(URI.create(MessageFormat.format("/api/attendances/{0}", attendanceIdResponse.attendanceId())))
                 .body(Response.success(attendanceIdResponse));
     }
 
