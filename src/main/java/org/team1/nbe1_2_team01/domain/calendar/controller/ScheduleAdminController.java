@@ -1,6 +1,7 @@
 package org.team1.nbe1_2_team01.domain.calendar.controller;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -99,12 +100,12 @@ public class ScheduleAdminController {
      */
     @PostMapping
     public ResponseEntity<Void> registSchedule(
-            @RequestParam Long teamId,
+            @RequestParam Long courseId,
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
-        var scheduleIdResponse = courseScheduleService.registSchedule(teamId, scheduleCreateRequest);
+        var scheduleIdResponse = courseScheduleService.registSchedule(courseId, scheduleCreateRequest);
         return ResponseEntity
-                .created(URI.create("/api/schedules/common/" + scheduleIdResponse))
+                .created(URI.create(MessageFormat.format("/api/schedules/commons/{0}", scheduleIdResponse.scheduleId())))
                 .build();
     }
 
