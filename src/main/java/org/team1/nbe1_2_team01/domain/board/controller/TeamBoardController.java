@@ -3,7 +3,6 @@ package org.team1.nbe1_2_team01.domain.board.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import org.team1.nbe1_2_team01.domain.board.controller.dto.*;
 import org.team1.nbe1_2_team01.domain.board.service.TeamBoardService;
@@ -15,13 +14,13 @@ import org.team1.nbe1_2_team01.global.util.Response;
 import java.net.URI;
 import java.util.List;
 
-@Repository
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/board/team")
+@RequestMapping("/api/team/board")
 public class TeamBoardController {
 
     private final TeamBoardService teamBoardService;
-    private static final String BASE_URL = "/api/course/board";
+    private static final String BASE_URL = "/api/team/board";
 
 
     /**

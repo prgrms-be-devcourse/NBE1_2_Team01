@@ -10,7 +10,6 @@ import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
-import static org.team1.nbe1_2_team01.domain.board.entity.QCourseBoard.courseBoard;
 import static org.team1.nbe1_2_team01.domain.board.entity.QTeamBoard.teamBoard;
 
 
@@ -54,13 +53,13 @@ public class CustomTeamBoardRepositoryImpl implements CustomTeamBoardRepository 
                         teamBoard.id,
                         teamBoard.title,
                         teamBoard.readCount,
-                        courseBoard.content,
+                        teamBoard.content,
                         user.name,
                         teamBoard.createdAt,
                         teamBoard.user.id
                 )
                 .from(teamBoard)
-                .innerJoin(user).on(courseBoard.user.eq(user))
+                .innerJoin(user).on(teamBoard.user.eq(user))
                 .where(teamBoard.id.eq(teamBoardId))
                 .fetchOne();
 
@@ -93,7 +92,7 @@ public class CustomTeamBoardRepositoryImpl implements CustomTeamBoardRepository 
 
     private void setPagingStart(JPAQuery<Tuple> commonQuery, Long boardId) {
         if (boardId != null) {
-            commonQuery.where(courseBoard.id.lt(boardId));
+            commonQuery.where(teamBoard.id.lt(boardId));
         }
     }
 
