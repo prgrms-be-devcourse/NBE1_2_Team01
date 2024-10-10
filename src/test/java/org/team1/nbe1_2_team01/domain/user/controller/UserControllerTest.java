@@ -286,8 +286,18 @@ class UserControllerTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "adminA", roles = {"ADMIN"})
     void 관리자면_true_반환() throws Exception {
+
+        User user = User.builder()
+                .username("adminA")
+                .password("1234abcd")
+                .email("user@gmail.com")
+                .name("김철수")
+                .role(Role.ADMIN)
+                .build();
+
+        User saveduser = userRepository.save(user);
         mockMvc.perform(get("/api/user/role"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.msg").value("Success"))
