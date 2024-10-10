@@ -13,6 +13,7 @@ import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.entity.ParticipantPK;
 import org.team1.nbe1_2_team01.domain.chat.service.ParticipantService;
 import org.team1.nbe1_2_team01.domain.chat.service.response.ChannelResponse;
+import org.team1.nbe1_2_team01.domain.chat.service.response.ParticipantResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,9 +27,9 @@ public class ParticipantController {
 
     // 참여자가 스스로 방 아이디를 치고 들어오는 경우
     @PostMapping("/join")
-    public ResponseEntity<Participant> joinChannel(@RequestBody ChannelRequest channelRequest) {
-        Participant participant = participantService.joinChannel(channelRequest.getChannelId(), channelRequest.getUserId());
-        return ResponseEntity.status(HttpStatus.OK).body(participant);
+    public ResponseEntity<ParticipantResponse> joinChannel(@RequestBody ChannelRequest channelRequest) {
+        ParticipantResponse participantResponse = participantService.joinChannel(channelRequest.getChannelId(), channelRequest.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(participantResponse);
     }
 
     // 방장(생성자) -> 참여자를 초대

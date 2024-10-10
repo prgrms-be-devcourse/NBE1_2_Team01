@@ -10,6 +10,7 @@ import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.entity.ParticipantPK;
 import org.team1.nbe1_2_team01.domain.chat.repository.ChannelRepository;
 import org.team1.nbe1_2_team01.domain.chat.repository.ParticipantRepository;
+import org.team1.nbe1_2_team01.domain.chat.service.response.ParticipantResponse;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -31,28 +32,28 @@ public class ParticipantService {
 
     // 채널에 참여
     @Transactional
-    public Participant joinChannel(Long channelId, Long userId) {
-        // 이미 존재하는 참여자인지 확인
+    public ParticipantResponse joinChannel(Long channelId, Long userId) {
         try {
             UserChannelUtil userChannelUtil = new UserChannelUtil(channelRepository, participantRepository);
             Participant existParticipant = userChannelUtil.findUser(userId, channelId);
-            return existParticipant; // 이미 참여 중인 경우
+            return new ParticipantResponse(existParticipant.getUser().getId()); // 이미 참여 중인 경우 userId만 반환
         } catch (RuntimeException e) {
-            // 참여자가 없을 경우 새로 새로 추가
             User user = userRepository.findById(userId).orElseThrow(() -> new AppException(INVITER_NOT_FOUND));
             Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new AppException(CHANEL_NOT_FOUND));
 
             Participant participant = Participant.builder()
-                    .isCreator(false)  // 초대받으면 생성자 x
-                    .participatedAt(LocalDateTime.now())  // 참여 시간 설정
-                    .isParticipated(true)  // 참여 여부 설정
+                    .isCreator(false)
+                    .participatedAt(LocalDateTime.now())
+                    .isParticipated(true)
                     .user(user)
                     .channel(channel)
                     .build();
 
-            return participantRepository.save(participant);
+            participantRepository.save(participant);
+            return new ParticipantResponse(user.getId());  // 새로운 참여자의 userId만 반환
         }
     }
+
 
     // 사용자 초대
     @Transactional
