@@ -48,21 +48,22 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         // 4 - query parameter parsing
-        Long courseId = Long.parseLong(request.getParameter("course-id"));
-        Long teamId = Long.parseLong(request.getParameter("team-id"));
-
         String username = SecurityUtil.getCurrentUsername();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(USER_NOT_FOUND));
 
         if (role.equals(COURSE)) {
+            Long courseId = Long.parseLong(request.getParameter("course-id"));
+
             if (!user.getCourse().getId().equals(courseId)) {
                 throw new AppException(COURSE_AUTH_DENIED);
             }
         }
 
         if (role.equals(TEAM)) {
-            if (belongingRepository.existsByTeamIdAndUserId(teamId, user.getId())) {
+            Long teamId = Long.parseLong(request.getParameter("team-id"));
+
+            if (!belongingRepository.existsByTeamIdAndUserId(teamId, user.getId())) {
                 throw new AppException(TEAM_AUTH_DENIED);
             }
         }

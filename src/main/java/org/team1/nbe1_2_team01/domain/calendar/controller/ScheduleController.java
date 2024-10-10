@@ -67,7 +67,7 @@ public class ScheduleController {
     @GroupAuth(role = Role.COURSE)
     @GetMapping("/commons")
     public ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
-            @RequestParam Long courseId
+            @RequestParam(name = "course-id") Long courseId
     ) {
         return ResponseEntity.ok(
                 Response.success(courseScheduleQueryService.getCourseSchedules(courseId)));
@@ -79,10 +79,10 @@ public class ScheduleController {
     @GroupAuth(role = Role.COURSE)
     @GetMapping("/commons/{id}")
     public ResponseEntity<Response<ScheduleResponse>> getNoticeSchedule(
-            @PathVariable("id") Long courseId
+            @PathVariable("id") Long courseScheduleId
     ) {
         return ResponseEntity.ok(
-                Response.success(teamScheduleQueryService.getTeamSchedule(courseId)));
+                Response.success(teamScheduleQueryService.getTeamSchedule(courseScheduleId)));
     }
 
     /**
@@ -91,7 +91,7 @@ public class ScheduleController {
     @GroupAuth(role = Role.TEAM)
     @PostMapping
     public ResponseEntity<Response<ScheduleIdResponse>> registSchedule(
-            @RequestParam Long teamId,
+            @RequestParam(name = "team-id") Long teamId,
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
         var scheduleIdResponse = teamScheduleService.registSchedule(teamId, scheduleCreateRequest);
