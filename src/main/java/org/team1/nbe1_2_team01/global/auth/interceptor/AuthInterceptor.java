@@ -29,20 +29,25 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 1 - @GroupAuth 적용 여부
+        // 1 - HandlerMethod 타입 체크
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
+
+        // 2 - @GroupAuth 적용 여부
         GroupAuth annotation = handlerMethod.getMethodAnnotation(GroupAuth.class);
         if (annotation == null) {
             return true;
         }
 
-        // 2 - ADMIN 통과
+        // 3 - ADMIN 통과
         Role role = annotation.role();
         if (role.equals(ADMIN)) {
             return true;
         }
 
-        // 3 - query parameter parsing
+        // 4 - query parameter parsing
         Long courseId = Long.parseLong(request.getParameter("course-id"));
         Long teamId = Long.parseLong(request.getParameter("team-id"));
 
