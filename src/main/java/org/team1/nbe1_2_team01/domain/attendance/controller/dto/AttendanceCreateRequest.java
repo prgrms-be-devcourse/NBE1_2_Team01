@@ -6,10 +6,11 @@ import lombok.Builder;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
-import org.team1.nbe1_2_team01.domain.attendance.service.validation.AttendanceValidator;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.global.validation.PeriodCheck;
 
 @Builder
+@PeriodCheck
 public record AttendanceCreateRequest(
         @NotNull(message = "출결 상태를 선택 해야 합니다.")
         AttendanceIssueType attendanceIssueType,
@@ -21,8 +22,6 @@ public record AttendanceCreateRequest(
 ) {
 
     public Attendance toEntity(User user) {
-        AttendanceValidator.validateAttendTime(startAt, endAt);
-
         return Attendance.builder()
                 .user(user)
                 .attendanceIssueType(attendanceIssueType)

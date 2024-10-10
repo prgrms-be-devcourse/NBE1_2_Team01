@@ -12,7 +12,7 @@ import org.team1.nbe1_2_team01.domain.group.entity.Team;
 
 @Entity
 @Getter
-@Table(name = "schedule")
+@Table(name = "team_schedule")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TeamSchedule {
 

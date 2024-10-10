@@ -4,6 +4,7 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_NOT_FOUND
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_EXISTS;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.USER_NOT_FOUND;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ public class AttendanceService {
     ) {
         User register = getCurrentUser(registerName);
 
-        validateAlreadyRegistToday(register);
+        validateAlreadyRegistToday(register, attendanceCreateRequest.startAt().toLocalDate());
 
         Attendance attendance = attendanceCreateRequest.toEntity(register);
         Attendance savedAttendance = attendanceRepository.save(attendance);
@@ -47,8 +48,8 @@ public class AttendanceService {
         return AttendanceIdResponse.from(savedAttendance.getId());
     }
 
-    private void validateAlreadyRegistToday(User register) {
-        attendanceRepository.findByUserIdAndStartAt(register.getId(), dateTimeHolder.getDate())
+    private void validateAlreadyRegistToday(User register, LocalDate registDate) {
+        attendanceRepository.findByUserIdAndStartAt(register.getId(), registDate)
                 .ifPresent(attendance -> {
                     throw new AppException(REQUEST_ALREADY_EXISTS);
                 });
