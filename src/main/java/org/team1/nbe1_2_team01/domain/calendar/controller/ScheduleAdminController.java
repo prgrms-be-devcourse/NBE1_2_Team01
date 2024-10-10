@@ -53,7 +53,7 @@ public class ScheduleAdminController {
     @GroupAuth(role = Role.ADMIN)
     @GetMapping("/teams")
     public ResponseEntity<Response<List<ScheduleResponse>>> getTeamSchedules(
-            @RequestParam Long teamId
+            @RequestParam(name = "team-id") Long teamId
     ) {
         return ResponseEntity.ok(
                 Response.success(teamScheduleQueryService.getTeamSchedules(teamId)));
@@ -77,7 +77,7 @@ public class ScheduleAdminController {
     @GroupAuth(role = Role.ADMIN)
     @GetMapping("/commons")
     public ResponseEntity<Response<List<ScheduleResponse>>> getNoticeSchedules(
-            @RequestParam Long courseId
+            @RequestParam(name = "course-id") Long courseId
     ) {
         return ResponseEntity.ok(
                 Response.success(courseScheduleQueryService.getCourseSchedules(courseId)));
@@ -100,7 +100,7 @@ public class ScheduleAdminController {
      */
     @PostMapping
     public ResponseEntity<Void> registSchedule(
-            @RequestParam Long courseId,
+            @RequestParam(name = "course-id") Long courseId,
             @RequestBody ScheduleCreateRequest scheduleCreateRequest
     ) {
         var scheduleIdResponse = courseScheduleService.registSchedule(courseId, scheduleCreateRequest);
