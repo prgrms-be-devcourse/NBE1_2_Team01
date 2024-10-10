@@ -50,6 +50,15 @@ public class CourseController {
     }
 
     /**
+     * 특정 코스 삭제
+     */
+    @DeleteMapping("/admin/{courseId}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId){
+        courseService.deleteCourse(courseId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * 특정 코스에 속한 유저(USER) 조회
      * 관리자 전용
      */

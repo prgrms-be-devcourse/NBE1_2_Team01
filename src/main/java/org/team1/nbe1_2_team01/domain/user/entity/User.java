@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.board.entity.CourseBoard;
@@ -20,6 +21,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "users")
+@SQLRestriction("is_delete = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -44,6 +46,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean isDelete;
 
     @OneToMany(mappedBy = "user")
     private List<Belonging> belongings = new ArrayList<>();
@@ -81,6 +85,7 @@ public class User {
         this.email = email;
         this.name = name;
         this.role = role;
+        this.isDelete = false;
         this.course = course;
     }
 
@@ -118,5 +123,9 @@ public class User {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void delete(){
+        this.isDelete = true;
     }
 }

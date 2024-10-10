@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.team1.nbe1_2_team01.domain.user.controller.request.UserDeleteRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
@@ -80,6 +81,14 @@ public class UserService {
         return UserConverter.toUserIdResponse(user);
     }
 
+    @Transactional
+    public void delete(UserDeleteRequest userDeleteRequest){
+        User user = getcurrentuser();
+        if (!passwordEncoder.matches(userDeleteRequest.password(), user.getPassword())) {
+            throw new AppException(PASSWORD_NOT_VALID);
+        }
+        user.delete();
+    }
 
     public UserDetailsResponse getCurrentUserDetails() {
         User user = getcurrentuser();

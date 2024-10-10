@@ -57,6 +57,11 @@ public class CourseService {
         return new CourseIdResponse(course.getId());
     }
 
+    @Transactional
+    public void deleteCourse(Long courseId){
+        findById(courseId).delete();
+    }
+
     public List<UserBriefResponse> getMyCourseUsers(){
         Course course = userRepository.findByUsername(SecurityUtil.getCurrentUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."))
@@ -99,4 +104,5 @@ public class CourseService {
                 .map(UserConverter::toUserBriefWithRoleResponse)
                 .toList();
     }
+
 }
