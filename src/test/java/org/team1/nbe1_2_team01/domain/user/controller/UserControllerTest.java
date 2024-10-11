@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.IntegrationTestSupport;
+import org.team1.nbe1_2_team01.domain.user.controller.request.UserDeleteRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
@@ -23,15 +24,13 @@ import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.UserService;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
+import org.team1.nbe1_2_team01.global.auth.login.service.LoginService;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
-
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @AutoConfigureMockMvc
@@ -239,6 +238,78 @@ class UserControllerTest extends IntegrationTestSupport {
         assertThat(refreshToken).isPresent();
         assertThat(extractUsername.get()).isEqualTo("userA");
     }
+
+    @Test
+    void 로그인_실패_비밀번호_틀림() throws Exception{
+        UserSignUpRequest request = new UserSignUpRequest(
+                "userA",
+                "1234abcd",
+                "user@gmail.com",
+                "김철수",
+                course.getId()
+        );
+        userService.signUp(request);
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"userA\", \"password\": \"1234abce\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("로그인에 실패 했습니다 아이디나 비밀번호를 확인해주세요."));
+    }
+
+    @Test
+    void 로그인_실패_아이디_틀림() throws Exception{
+        UserSignUpRequest request = new UserSignUpRequest(
+                "userA",
+                "1234abcd",
+                "user@gmail.com",
+                "김철수",
+                course.getId()
+        );
+        userService.signUp(request);
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"userB\", \"password\": \"1234abcd\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("로그인에 실패 했습니다 아이디나 비밀번호를 확인해주세요."));
+    }
+
+    @Test
+    @WithMockUser(username = "userA")
+    void 로그아웃_성공() throws Exception{
+        UserSignUpRequest request = new UserSignUpRequest(
+                "userA",
+                "1234abcd",
+                "user@gmail.com",
+                "김철수",
+                course.getId()
+        );
+        userService.signUp(request);
+        jwtService.createRefreshToken("userA");
+        mockMvc.perform(post("/api/user/logout")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        assertThat(refreshTokenRepository.findById("userA")).isNotPresent();
+    }
+
+    @Test
+    @WithMockUser(username = "userA")
+    void 회원탈퇴() throws Exception{
+        UserSignUpRequest signUpRequest = new UserSignUpRequest(
+                "userA",
+                "1234abcd",
+                "user@gmail.com",
+                "김철수",
+                course.getId()
+        );
+        userService.signUp(signUpRequest);
+        UserDeleteRequest deleteRequest = new UserDeleteRequest("1234abcd");
+        mockMvc.perform(delete("/api/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deleteRequest)))
+                .andExpect(status().isNoContent());
+        assertThat(userRepository.findByUsername("userA")).isEmpty();
+    }
+
 
     @Test
     @WithMockUser(username = "userA", roles = {"USER"})

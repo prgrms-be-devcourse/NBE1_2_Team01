@@ -106,7 +106,7 @@ class UserServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void 회원수정_이름_변경() {
         //given
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
@@ -123,7 +123,7 @@ class UserServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void 회원정보_조회() {
         //when
         UserDetailsResponse userDetailsResponse = userService.getCurrentUserDetails();
@@ -135,6 +135,7 @@ class UserServiceTest extends IntegrationTestSupport {
         assertThat(user.getUsername()).isEqualTo(userDetailsResponse.username());
         assertThat(user.getEmail()).isEqualTo(userDetailsResponse.email());
     }
+    
 
 
 }
