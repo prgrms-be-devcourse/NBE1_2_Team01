@@ -22,6 +22,11 @@ import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.UserService;
+import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
+import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,6 +45,9 @@ class UserControllerTest extends IntegrationTestSupport {
     private UserService userService;
 
     @Autowired
+    private JwtService jwtService;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -50,6 +58,9 @@ class UserControllerTest extends IntegrationTestSupport {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     private final Course course = Course.builder()
             .name("데브코스 1기 벡엔드")
@@ -204,6 +215,29 @@ class UserControllerTest extends IntegrationTestSupport {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message.name").value("이름은 2자 이상이어야 합니다."));
+    }
+
+    @Test
+    void 로그인_성공() throws Exception{
+        UserSignUpRequest request = new UserSignUpRequest(
+                "userA",
+                "1234abcd",
+                "user@gmail.com",
+                "김철수",
+                course.getId()
+        );
+        userService.signUp(request);
+        MvcResult result = mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"userA\", \"password\": \"1234abcd\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String accessToken = result.getResponse().getHeader("Authorization");
+        Optional<String> extractUsername = jwtService.extractUsername(accessToken);
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById("userA");
+        assertThat(extractUsername).isPresent();
+        assertThat(refreshToken).isPresent();
+        assertThat(extractUsername.get()).isEqualTo("userA");
     }
 
     @Test
