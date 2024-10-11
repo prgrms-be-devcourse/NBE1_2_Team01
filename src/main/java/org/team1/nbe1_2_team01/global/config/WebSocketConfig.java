@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.global;
+package org.team1.nbe1_2_team01.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
