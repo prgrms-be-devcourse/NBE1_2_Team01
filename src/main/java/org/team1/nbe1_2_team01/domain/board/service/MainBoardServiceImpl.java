@@ -2,6 +2,7 @@ package org.team1.nbe1_2_team01.domain.board.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.board.constants.CommonBoardType;
 import org.team1.nbe1_2_team01.domain.board.repository.CourseBoardRepository;
 import org.team1.nbe1_2_team01.domain.board.service.response.CourseBoardResponse;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MainBoardServiceImpl implements MainBoardService {
 
     private final UserRepository userRepository;
@@ -26,6 +28,21 @@ public class MainBoardServiceImpl implements MainBoardService {
         User currentUser = getCurrentUser();
         Long courseId = currentUser.getCourse().getId();
 
+        return getMainCourseBoardListResponse(courseId);
+    }
+
+    @Override
+    public MainCourseBoardListResponse getMainCourseBoardForAdmin(Long courseId) {
+        return getMainCourseBoardListResponse(courseId);
+    }
+
+    private User getCurrentUser() {
+        String currentUsername = SecurityUtil.getCurrentUsername();
+        return userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private MainCourseBoardListResponse getMainCourseBoardListResponse(Long courseId) {
         List<CourseBoardResponse> noticeBoards = courseBoardRepository.findAllCourseBoard(
                 CommonBoardType.NOTICE,
                 courseId,
@@ -45,9 +62,4 @@ public class MainBoardServiceImpl implements MainBoardService {
         );
     }
 
-    private User getCurrentUser() {
-        String currentUsername = SecurityUtil.getCurrentUsername();
-        return userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-    }
 }
