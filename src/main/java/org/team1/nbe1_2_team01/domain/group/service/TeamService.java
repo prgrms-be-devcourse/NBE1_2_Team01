@@ -161,6 +161,7 @@ public class TeamService {
         return teamRepository.findByCourseId(courseId).stream().map(TeamResponse::from).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<UserDetailsResponse> teamMemberList(Long teamId) {
         List<User> users = belongingRepository.findUsersByTeamId(teamId);
         return users.stream().map((u) -> {
@@ -169,6 +170,14 @@ public class TeamService {
             }
             else return UserConverter.toUserDetailsResponse(u);
         }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TeamResponse> myTeamList() {
+        User curUser = userRepository.findByUsername(SecurityUtil.getCurrentUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        List<Belonging> belongings = belongingRepository.findByUser(curUser);
+        List<Team> teams = belongings.stream().map(Belonging::getTeam).toList();
+        return teams.stream().map(TeamResponse::from).toList();
     }
 
     /* ------------------------ */
