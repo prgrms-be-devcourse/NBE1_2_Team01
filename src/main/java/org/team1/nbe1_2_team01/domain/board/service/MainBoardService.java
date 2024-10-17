@@ -5,4 +5,6 @@ import org.team1.nbe1_2_team01.domain.board.service.response.MainCourseBoardList
 public interface MainBoardService {
 
     MainCourseBoardListResponse getCourseBoardListForMain();
+
+    MainCourseBoardListResponse getMainCourseBoardForAdmin(Long courseId);
 }
