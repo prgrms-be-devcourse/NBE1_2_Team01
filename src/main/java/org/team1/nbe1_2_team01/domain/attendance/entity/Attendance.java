@@ -3,8 +3,10 @@ package org.team1.nbe1_2_team01.domain.attendance.entity;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_ACCESS_DENIED;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_TIME_OUT_OF_RANGE;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_APPROVED;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_EXISTS;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.AccessLevel;
@@ -48,11 +51,14 @@ public class Attendance {
     @Column(columnDefinition = "TINYINT(1)")
     private boolean creationWaiting;
 
+    @Embedded
+    private AttendanceRegistrant registrant;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Builder
+    /*@Builder
     private Attendance(
             User user,
             AttendanceIssueType attendanceIssueType,
@@ -71,6 +77,26 @@ public class Attendance {
         this.description = description;
         this.creationWaiting = creationWaiting;
         //user.addAttendance(this);
+    }*/
+
+    @Builder
+    public Attendance(
+            AttendanceIssueType attendanceIssueType,
+            LocalDateTime startAt,
+            LocalDateTime endAt,
+            String description,
+            boolean creationWaiting,
+            Long registrantId
+    ) {
+        validateTime(startAt);
+        validateTime(endAt);
+
+        this.attendanceIssueType = attendanceIssueType;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.description = description;
+        this.creationWaiting = creationWaiting;
+        this.registrant = new AttendanceRegistrant(registrantId);
     }
 
     public void update(AttendanceUpdateRequest attendanceUpdateRequest) {
@@ -84,13 +110,13 @@ public class Attendance {
     }
 
     public void approve() {
-        if (!creationWaiting) {
+        if (isApprove()) {
             throw new AppException(REQUEST_ALREADY_APPROVED);
         }
         creationWaiting = false;
     }
 
-    public void validateRegister(Long currentUserId) {
+    public void validateRegistrant(Long currentUserId) {
         Long registerId = user.getId();
         if (!registerId.equals(currentUserId)) {
             throw new AppException(ATTENDANCE_ACCESS_DENIED);
@@ -104,5 +130,24 @@ public class Attendance {
                 || date.isAfter(LocalTime.of(18, 0, 1))) {
             throw new AppException(ATTENDANCE_TIME_OUT_OF_RANGE);
         }
+    }
+
+    public void validateCanRegister() {
+        if (isApprove()) {
+            throw new AppException(REQUEST_ALREADY_APPROVED);
+        }
+        if (isRegisteredToday()) {
+            throw new AppException(REQUEST_ALREADY_EXISTS);
+        }
+    }
+
+    private boolean isApprove() {
+        return !creationWaiting;
+    }
+
+    private boolean isRegisteredToday() {
+        LocalDate startAtLocalDate = startAt.toLocalDate();
+        LocalDate endAtLocalDate = endAt.toLocalDate();
+        return startAtLocalDate.isEqual(LocalDate.now()) || endAtLocalDate.isEqual(LocalDate.now());
     }
 }
