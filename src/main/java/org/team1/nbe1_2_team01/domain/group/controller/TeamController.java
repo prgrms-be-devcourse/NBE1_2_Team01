@@ -82,4 +82,10 @@ public class TeamController {
                 .body(Response.success(teamService.courseTeamList(courseId)));
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<Response<List<TeamResponse>>> myTeamList() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success(teamService.myTeamList()));
+    }
+
 }

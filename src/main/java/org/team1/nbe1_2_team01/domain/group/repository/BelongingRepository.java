@@ -40,4 +40,12 @@ public interface BelongingRepository extends JpaRepository<Belonging, Long> {
     Optional<Belonging> findByUserId(Long userId);
 
     boolean existsByTeamIdAndUserId(Long teamId, Long userId);
+
+    @Query("select b " +
+            "from Belonging b " +
+            "join fetch b.team t " +
+            "join fetch t.course c " +
+            "where b.user = :user")
+    List<Belonging> findByUser(@Param("user") User user);
+
 }
