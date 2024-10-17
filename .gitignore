@@ -38,6 +38,7 @@ out/
 
 /src/main/resources/config/**
 /src/main/generated/
+/src/test/resources/**
 
 ### MacOS Directory Config Files ###
 .DS_Store

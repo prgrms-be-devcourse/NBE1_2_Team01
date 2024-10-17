@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.IntegrationTestSupport;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserSignUpRequest;
 import org.team1.nbe1_2_team01.domain.user.controller.request.UserUpdateRequest;
+import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
@@ -30,12 +32,18 @@ class UserServiceTest extends IntegrationTestSupport {
     PasswordEncoder passwordEncoder;
 
     @Autowired
+    CourseRepository courseRepository;
+
+    @Autowired
     private UserService userService;
 
     private final String username = "user";
     private final String password = "1234abcd";
     private final String email = "user@gmail.com";
     private final String name = "김철수";
+    private final Course course = Course.builder()
+            .name("데브코스 1기 백엔드")
+            .build();
 
 
     /**
@@ -43,11 +51,13 @@ class UserServiceTest extends IntegrationTestSupport {
      */
     @BeforeEach
     void setUp() {
+        courseRepository.save(course);
         UserSignUpRequest request = new UserSignUpRequest(
                 username,
                 password,
                 email,
-                name);
+                name,
+                course.getId());
         userService.signUp(request);
 
     }
@@ -62,6 +72,7 @@ class UserServiceTest extends IntegrationTestSupport {
         assertThat(user.getEmail()).isEqualTo(email);
         assertThat(user.getName()).isEqualTo(name);
         assertThat(user.getRole()).isEqualTo(Role.USER);
+        assertThat(user.getCourse()).isEqualTo(course);
     }
 
     @Test
@@ -71,7 +82,8 @@ class UserServiceTest extends IntegrationTestSupport {
                 "user",
                 "abcd1234",
                 "user@naver.com",
-                "김영희");
+                "김영희",
+                 course.getId());
         // then
         assertThat(assertThrows(AppException.class, () -> userService.signUp(userSignUpRequest)).getErrorCode())
                 .isEqualTo(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -85,7 +97,8 @@ class UserServiceTest extends IntegrationTestSupport {
                 "usre",
                 "1234",
                 "user@gmail.com",
-                "김영희");
+                "김영희",
+                course.getId());
 
         // then
         assertThat(assertThrows(AppException.class, () -> userService.signUp(userSignUpRequest)).getErrorCode())
@@ -93,7 +106,7 @@ class UserServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void 회원수정_이름_변경() {
         //given
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
@@ -110,7 +123,7 @@ class UserServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void 회원정보_조회() {
         //when
         UserDetailsResponse userDetailsResponse = userService.getCurrentUserDetails();
@@ -122,6 +135,7 @@ class UserServiceTest extends IntegrationTestSupport {
         assertThat(user.getUsername()).isEqualTo(userDetailsResponse.username());
         assertThat(user.getEmail()).isEqualTo(userDetailsResponse.email());
     }
+    
 
 
 }
