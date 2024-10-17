@@ -18,6 +18,7 @@ import org.team1.nbe1_2_team01.domain.board.service.response.PagingResponse;
 import org.team1.nbe1_2_team01.domain.board.service.valid.CourseBoardValidator;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.user.repository.CourseRepository;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
@@ -33,6 +34,7 @@ import java.util.List;
 public class CourseBoardServiceImpl implements CourseBoardService {
 
     private final CourseBoardRepository courseBoardRepository;
+    private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -50,7 +52,7 @@ public class CourseBoardServiceImpl implements CourseBoardService {
     public Message addCourseBoard(CourseBoardRequest request) {
         User user = getCurrentUser();
         CourseBoardValidator.validateAdminForNotice(user, request.isNotice());
-        Course course = user.getCourse();
+        Course course = courseRepository.findById(request.courseId()).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         log.info("course = {}", course);
 
