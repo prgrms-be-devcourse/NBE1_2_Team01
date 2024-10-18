@@ -28,7 +28,7 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
-public class AttendanceServiceTest {
+public class AttendanceCommandServiceTest {
 
     private final AttendanceRepository attendanceRepository;
     private final AttendanceReader attendanceReader;
@@ -38,7 +38,7 @@ public class AttendanceServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    public AttendanceServiceTest() {
+    public AttendanceCommandServiceTest() {
         this.attendanceRepository = new AttendanceFakeRepository();
         this.attendanceReader = new AttendanceReader(attendanceRepository);
         this.attendanceRegistrar = new AttendanceRegistrar(attendanceRepository);
@@ -74,10 +74,10 @@ public class AttendanceServiceTest {
                 .build();
 
         // when
-        AttendanceService attendanceService = new AttendanceService(
+        AttendanceCommandService attendanceCommandService = new AttendanceCommandService(
                 attendanceRegistrar, attendanceReader, null, null, userRepository
         );
-        AttendanceIdResponse response = attendanceService.register(registrantName, attendanceCreateRequest);
+        AttendanceIdResponse response = attendanceCommandService.register(registrantName, attendanceCreateRequest);
 
         // then
         assertThat(response.attendanceId()).isEqualTo(1L);
@@ -104,12 +104,12 @@ public class AttendanceServiceTest {
                 .build();
 
         // when
-        AttendanceService attendanceService = new AttendanceService(
+        AttendanceCommandService attendanceCommandService = new AttendanceCommandService(
                 attendanceRegistrar, attendanceReader, null, null, userRepository
         );
 
         // then
-        assertThatThrownBy(() -> attendanceService.register(registrantName, attendanceCreateRequest))
+        assertThatThrownBy(() -> attendanceCommandService.register(registrantName, attendanceCreateRequest))
                 .isInstanceOf(AppException.class);
     }
 
@@ -136,10 +136,10 @@ public class AttendanceServiceTest {
                 .build();
 
         // when
-        AttendanceService attendanceService = new AttendanceService(
+        AttendanceCommandService attendanceCommandService = new AttendanceCommandService(
                 null, attendanceReader, attendanceUpdater, null, userRepository
         );
-        AttendanceIdResponse attendanceIdResponse = attendanceService.update(registrantName, attendanceUpdateRequest);
+        AttendanceIdResponse attendanceIdResponse = attendanceCommandService.update(registrantName, attendanceUpdateRequest);
 
         // then
         assertThat(attendanceIdResponse.attendanceId()).isEqualTo(attendanceId);
@@ -168,12 +168,12 @@ public class AttendanceServiceTest {
                 .build();
 
         // when
-        AttendanceService attendanceService = new AttendanceService(
+        AttendanceCommandService attendanceCommandService = new AttendanceCommandService(
                 null, attendanceReader, attendanceUpdater, null, userRepository
         );
 
         // then
-        assertThatThrownBy(() -> attendanceService.update(registrantName, attendanceUpdateRequest))
+        assertThatThrownBy(() -> attendanceCommandService.update(registrantName, attendanceUpdateRequest))
                 .isInstanceOf(AppException.class);
     }
 
@@ -193,10 +193,10 @@ public class AttendanceServiceTest {
         Long attendanceId = 1L;
 
         // when
-        AttendanceService attendanceService = new AttendanceService(
+        AttendanceCommandService attendanceCommandService = new AttendanceCommandService(
                 null, attendanceReader, null, attendanceDeleter, userRepository
         );
-        attendanceService.delete(registrantName, attendanceId);
+        attendanceCommandService.delete(registrantName, attendanceId);
 
         // then
         assertThat(attendanceRepository.findById(1L).isEmpty())
@@ -219,12 +219,12 @@ public class AttendanceServiceTest {
         Long attendanceId = 1L;
 
         // when
-        AttendanceService attendanceService = new AttendanceService(
+        AttendanceCommandService attendanceCommandService = new AttendanceCommandService(
                 null, attendanceReader, null, attendanceDeleter, userRepository
         );
 
         // then
-        assertThatThrownBy(() -> attendanceService.delete(registrantName, attendanceId))
+        assertThatThrownBy(() -> attendanceCommandService.delete(registrantName, attendanceId))
                 .isInstanceOf(AppException.class);
     }
 }

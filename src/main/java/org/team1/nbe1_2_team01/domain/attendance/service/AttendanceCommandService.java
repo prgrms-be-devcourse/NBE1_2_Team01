@@ -16,7 +16,7 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AttendanceService {
+public class AttendanceCommandService {
 
     private final AttendanceRegistrar attendanceRegistrar;
     private final AttendanceReader attendanceReader;

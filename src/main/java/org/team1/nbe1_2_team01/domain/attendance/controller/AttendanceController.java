@@ -18,7 +18,7 @@ import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceCreateReq
 import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceIdRequest;
 import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
-import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
+import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceCommandService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.attendance.controller.response.AttendanceResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
@@ -29,7 +29,7 @@ import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 @RequiredArgsConstructor
 public class AttendanceController {
 
-    private final AttendanceService attendanceService;
+    private final AttendanceCommandService attendanceCommandService;
     private final AttendanceQueryService attendanceQueryService;
 
     /**
@@ -65,7 +65,7 @@ public class AttendanceController {
     ) {
         var registerUsername = SecurityUtil.getCurrentUsername();
 
-        var attendanceIdResponse = attendanceService.register(registerUsername, attendanceCreateRequest);
+        var attendanceIdResponse = attendanceCommandService.register(registerUsername, attendanceCreateRequest);
         return ResponseEntity
                 .created(URI.create(MessageFormat.format("/api/attendances/{0}", attendanceIdResponse.attendanceId())))
                 .body(Response.success(attendanceIdResponse));
@@ -81,7 +81,7 @@ public class AttendanceController {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
         return ResponseEntity.ok(
-                Response.success(attendanceService.update(currentUsername, attendanceUpdateRequest)));
+                Response.success(attendanceCommandService.update(currentUsername, attendanceUpdateRequest)));
     }
 
     /**
@@ -93,7 +93,7 @@ public class AttendanceController {
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        attendanceService.delete(currentUsername, attendanceIdRequest.id());
+        attendanceCommandService.delete(currentUsername, attendanceIdRequest.id());
         return ResponseEntity.noContent()
                 .build();
     }
