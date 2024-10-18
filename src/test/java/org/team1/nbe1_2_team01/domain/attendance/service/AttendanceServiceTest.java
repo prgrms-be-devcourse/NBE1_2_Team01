@@ -3,7 +3,6 @@ package org.team1.nbe1_2_team01.domain.attendance.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.lenient;
-import static org.team1.nbe1_2_team01.domain.user.fixture.UserFixture.create_USER;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
@@ -21,6 +21,7 @@ import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
+import org.team1.nbe1_2_team01.domain.user.entity.Role;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -49,7 +50,14 @@ public class AttendanceServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = create_USER();
+        user = User.builder()
+                .username("user")
+                .password("1234")
+                .email("user@gmail.com")
+                .name("김철수")
+                .role(Role.USER)
+                .build();
+        ReflectionTestUtils.setField(user, "id", 1L);
         // stub
         lenient().when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
     }
