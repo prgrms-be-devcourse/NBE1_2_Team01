@@ -22,11 +22,6 @@ public class AttendanceReader {
     }
 
     @Transactional(readOnly = true)
-    public List<Attendance> getList() {
-        return attendanceRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
     public Attendance get(Long id) {
         return attendanceRepository.findById(id)
                 .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));

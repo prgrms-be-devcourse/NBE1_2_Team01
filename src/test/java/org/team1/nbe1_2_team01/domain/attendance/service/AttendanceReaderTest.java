@@ -90,16 +90,4 @@ public class AttendanceReaderTest {
         // then
         assertThat(attendances.isEmpty()).isTrue();
     }
-
-    @Test
-    void 출결_요청_데이터를_모두_조회한다() {
-        // given
-
-        // when
-        List<Attendance> attendances = attendanceReader.getList();
-
-        // then
-        assertThat(attendances.get(0).getRegistrant().getUserId())
-                .isEqualTo(1L);
-    }
 }

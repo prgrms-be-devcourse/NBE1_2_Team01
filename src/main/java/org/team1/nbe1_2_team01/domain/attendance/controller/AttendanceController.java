@@ -20,7 +20,7 @@ import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateReq
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
-import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResponse;
+import org.team1.nbe1_2_team01.domain.attendance.controller.response.AttendanceResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
 
