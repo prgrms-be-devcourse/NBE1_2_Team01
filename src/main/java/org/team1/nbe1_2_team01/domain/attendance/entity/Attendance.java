@@ -85,7 +85,6 @@ public class Attendance {
             LocalDateTime startAt,
             LocalDateTime endAt,
             String description,
-            boolean creationWaiting,
             Long registrantId
     ) {
         validateTime(startAt);
@@ -95,7 +94,7 @@ public class Attendance {
         this.startAt = startAt;
         this.endAt = endAt;
         this.description = description;
-        this.creationWaiting = creationWaiting;
+        this.creationWaiting = true;
         this.registrant = new AttendanceRegistrant(registrantId);
     }
 
@@ -133,10 +132,7 @@ public class Attendance {
     }
 
     public void validateCanRegister() {
-        if (isApprove()) {
-            throw new AppException(REQUEST_ALREADY_APPROVED);
-        }
-        if (isRegisteredToday()) {
+        if (!isApprove() && isRegisteredToday()) {
             throw new AppException(REQUEST_ALREADY_EXISTS);
         }
     }
