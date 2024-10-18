@@ -116,7 +116,7 @@ public class Attendance {
     }
 
     public void validateRegistrant(Long currentUserId) {
-        Long registerId = user.getId();
+        Long registerId = registrant.getRegistrantId();
         if (!registerId.equals(currentUserId)) {
             throw new AppException(ATTENDANCE_ACCESS_DENIED);
         }

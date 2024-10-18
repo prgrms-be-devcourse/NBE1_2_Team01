@@ -22,6 +22,7 @@ public class AttendanceRegistrarTest {
 
     @Test
     void 출결_요청을_성공적으로_저장한다() {
+        // given
         Long registrantId = 1L;
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
@@ -30,8 +31,10 @@ public class AttendanceRegistrarTest {
                 .description("국취제로 인한 외출입니다.")
                 .build();
 
+        // when
         Long attendanceId = attendanceRegistrar.register(registrantId, attendanceCreateRequest);
 
+        // then
         assertThat(attendanceId).isEqualTo(1L);
     }
 

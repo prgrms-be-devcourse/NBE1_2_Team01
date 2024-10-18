@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.AttendanceRepository;
@@ -94,7 +95,70 @@ public class AttendanceServiceTest {
                 .isInstanceOf(AppException.class);
     }
 
-    // 잠시 보류
+    @Test
+    void 출결_요청을_성공적으로_수정한다() {
+        // given
+        Long registrantId = 1L;
+        AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출입니다.")
+                .build();
+        attendanceRegistrar.register(registrantId, attendanceCreateRequest);
+
+        Long attendanceId = 1L;
+        String registrantName = user.getUsername();
+        AttendanceUpdateRequest attendanceUpdateRequest = AttendanceUpdateRequest.builder()
+                .id(attendanceId)
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(13, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출입니다.")
+                .build();
+
+        // when
+        AttendanceService attendanceService = new AttendanceService(
+                null, attendanceReader, attendanceUpdater, null, userRepository
+        );
+        AttendanceIdResponse attendanceIdResponse = attendanceService.update(registrantName, attendanceUpdateRequest);
+
+        // then
+        assertThat(attendanceIdResponse.attendanceId()).isEqualTo(attendanceId);
+    }
+
+    @Test
+    void 출결_요청_수정_시_등록자가_아니라면_예외를_발생시킨다() {
+        // given
+        Long registrantId = 2L;
+        AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출입니다.")
+                .build();
+        attendanceRegistrar.register(registrantId, attendanceCreateRequest);
+
+        Long attendanceId = 1L;
+        String registrantName = user.getUsername();
+        AttendanceUpdateRequest attendanceUpdateRequest = AttendanceUpdateRequest.builder()
+                .id(attendanceId)
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(13, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출입니다.")
+                .build();
+
+        // when
+        AttendanceService attendanceService = new AttendanceService(
+                null, attendanceReader, attendanceUpdater, null, userRepository
+        );
+
+        // then
+        assertThatThrownBy(() -> attendanceService.update(registrantName, attendanceUpdateRequest))
+                .isInstanceOf(AppException.class);
+    }
+
     @Test
     void 출결_승인() {
     }
