@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceIdRequest;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceIdRequest;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceApprover;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;

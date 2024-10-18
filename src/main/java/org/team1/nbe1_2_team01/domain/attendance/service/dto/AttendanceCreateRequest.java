@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.domain.attendance.controller.dto;
+package org.team1.nbe1_2_team01.domain.attendance.service.dto;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;

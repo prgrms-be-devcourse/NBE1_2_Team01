@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
-import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.IssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 

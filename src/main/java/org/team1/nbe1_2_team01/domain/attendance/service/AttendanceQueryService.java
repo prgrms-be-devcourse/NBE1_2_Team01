@@ -18,10 +18,11 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 public class AttendanceQueryService {
 
     private final AttendanceJpaRepository attendanceJpaRepository;
+    private final AttendanceReader attendanceReader;
     private final UserRepository userRepository;
 
     public List<AttendanceResponse> getAll() {
-        List<Attendance> attendances = attendanceJpaRepository.findAll();
+        List<Attendance> attendances = attendanceReader.getList();
 
         return attendances.stream()
                 .map(attendance -> AttendanceResponse.from(
@@ -30,26 +31,27 @@ public class AttendanceQueryService {
     }
 
     public List<AttendanceResponse> getMyAttendances(String currentUsername) {
-        User currentUser = getUserByUsername(currentUsername);
+        User currentUser = getUser(currentUsername);
 
-        List<Attendance> myAttendances = attendanceJpaRepository.findByRegistrant_UserId(currentUser.getId());
+        List<Attendance> attendances = attendanceReader.getList(currentUser.getId());
 
-        return myAttendances.stream()
+        return attendances.stream()
                 .map(attendance -> AttendanceResponse.from(
-                        attendance.getRegistrant().getUserId(), "user", attendance))
+                        attendance.getRegistrant().getUserId(), currentUser.getUsername(), attendance))
                 .toList();
     }
 
     public AttendanceResponse getById(Long id) {
-        Attendance attendance = attendanceJpaRepository.findById(id)
-                .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
+        Attendance attendance = attendanceReader.get(id);
+
+        User registrant = getUser(attendance.getRegistrant().getUserId());
 
         return AttendanceResponse.from(
-                attendance.getRegistrant().getUserId(), "user", attendance);
+                attendance.getRegistrant().getUserId(), registrant.getUsername(), attendance);
     }
 
     public AttendanceResponse getByIdAndUserId(Long attendanceId, String currentUsername) {
-        User currentUser = getUserByUsername(currentUsername);
+        User currentUser = getUser(currentUsername);
 
         Attendance attendance = attendanceJpaRepository.findByIdAndRegistrant_UserId(attendanceId, currentUser.getId())
                 .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
@@ -59,8 +61,13 @@ public class AttendanceQueryService {
     }
 
     // 타 서비스 메서드
-    private User getUserByUsername(String username) {
+    private User getUser(String username) {
         return userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(USER_NOT_FOUND));
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(USER_NOT_FOUND));
     }
 }

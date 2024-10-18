@@ -18,7 +18,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Entity
