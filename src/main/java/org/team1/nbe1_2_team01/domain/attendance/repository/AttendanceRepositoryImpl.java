@@ -20,7 +20,7 @@ public class AttendanceRepositoryImpl implements AttendanceRepository {
 
     @Override
     public List<Attendance> findByUserId(Long userId) {
-        return attendanceJpaRepository.findByUserId(userId);
+        return attendanceJpaRepository.findByRegistrant_UserId(userId);
     }
 
     @Override

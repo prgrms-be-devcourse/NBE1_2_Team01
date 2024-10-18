@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
+import org.team1.nbe1_2_team01.domain.attendance.entity.IssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.AttendanceRepository;
 
@@ -26,7 +26,7 @@ public class AttendanceDeleterTest {
     void setUp() {
         Attendance attendance = Attendance.builder()
                 .registrantId(1L)
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")

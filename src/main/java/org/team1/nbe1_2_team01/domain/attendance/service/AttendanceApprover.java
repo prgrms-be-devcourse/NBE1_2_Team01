@@ -22,7 +22,7 @@ public class AttendanceApprover {
         /**
          * @TODO 출결 일정 등록 로직 구현
          */
-        /*belongingRepository.findByUserId(attendance.getUser().getId())
+        /*belongingRepository.findByRegistrant_UserId(attendance.getUser().getId())
                 .ifPresent(belonging -> registAttendanceSchedule(attendance, belonging));*/
 
         return AttendanceIdResponse.from(attendance.getId());

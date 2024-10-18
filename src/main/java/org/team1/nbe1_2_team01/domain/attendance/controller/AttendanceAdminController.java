@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceIdRequest;
+import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceApprover;
 import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceQueryService;
-import org.team1.nbe1_2_team01.domain.attendance.service.AttendanceService;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceResponse;
 import org.team1.nbe1_2_team01.global.util.Response;
@@ -21,7 +21,7 @@ import org.team1.nbe1_2_team01.global.util.Response;
 @RequiredArgsConstructor
 public class AttendanceAdminController {
 
-    private final AttendanceService attendanceService;
+    private final AttendanceApprover attendanceApprover;
     private final AttendanceQueryService attendanceQueryService;
 
     /**
@@ -52,7 +52,7 @@ public class AttendanceAdminController {
             @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
         return ResponseEntity.ok(
-                Response.success(attendanceService.approveAttendance(attendanceIdRequest.id())));
+                Response.success(attendanceApprover.approve(attendanceIdRequest.id())));
     }
 
     /**
@@ -62,7 +62,7 @@ public class AttendanceAdminController {
     public ResponseEntity<Void> rejectAttendance(
             @RequestBody AttendanceIdRequest attendanceIdRequest
     ) {
-        attendanceService.rejectAttendance(attendanceIdRequest.id());
+        attendanceApprover.reject(attendanceIdRequest.id());
         return ResponseEntity.noContent()
                 .build();
     }

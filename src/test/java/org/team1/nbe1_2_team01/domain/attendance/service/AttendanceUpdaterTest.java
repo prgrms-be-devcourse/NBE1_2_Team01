@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
+import org.team1.nbe1_2_team01.domain.attendance.entity.IssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -31,7 +31,7 @@ public class AttendanceUpdaterTest {
     void setUp() {
         Long registrantId = 1L;
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
@@ -46,7 +46,7 @@ public class AttendanceUpdaterTest {
         Attendance attendance = attendanceReader.get(attendanceId);
         AttendanceUpdateRequest attendanceUpdateRequest = AttendanceUpdateRequest.builder()
                 .id(attendanceId)
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(13, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")

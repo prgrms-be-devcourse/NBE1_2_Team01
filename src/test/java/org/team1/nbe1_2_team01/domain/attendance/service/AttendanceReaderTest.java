@@ -11,7 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
+import org.team1.nbe1_2_team01.domain.attendance.entity.IssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.AttendanceRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -30,7 +30,7 @@ public class AttendanceReaderTest {
     @BeforeEach
     void setUp() {
         Attendance attendance = Attendance.builder()
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")
@@ -75,7 +75,7 @@ public class AttendanceReaderTest {
         List<Attendance> attendances = attendanceReader.getList(registrantId);
 
         // then
-        assertThat(attendances.get(0).getRegistrant().getRegistrantId())
+        assertThat(attendances.get(0).getRegistrant().getUserId())
                 .isEqualTo(registrantId);
     }
 
@@ -99,7 +99,7 @@ public class AttendanceReaderTest {
         List<Attendance> attendances = attendanceReader.getList();
 
         // then
-        assertThat(attendances.get(0).getRegistrant().getRegistrantId())
+        assertThat(attendances.get(0).getRegistrant().getUserId())
                 .isEqualTo(1L);
     }
 }

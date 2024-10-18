@@ -65,7 +65,7 @@ public class AttendanceController {
     ) {
         var registerUsername = SecurityUtil.getCurrentUsername();
 
-        var attendanceIdResponse = attendanceService.registAttendance(registerUsername, attendanceCreateRequest);
+        var attendanceIdResponse = attendanceService.register(registerUsername, attendanceCreateRequest);
         return ResponseEntity
                 .created(URI.create(MessageFormat.format("/api/attendances/{0}", attendanceIdResponse.attendanceId())))
                 .body(Response.success(attendanceIdResponse));
@@ -81,7 +81,7 @@ public class AttendanceController {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
         return ResponseEntity.ok(
-                Response.success(attendanceService.updateAttendance(currentUsername, attendanceUpdateRequest)));
+                Response.success(attendanceService.update(currentUsername, attendanceUpdateRequest)));
     }
 
     /**
@@ -93,7 +93,7 @@ public class AttendanceController {
     ) {
         var currentUsername = SecurityUtil.getCurrentUsername();
 
-        attendanceService.deleteAttendance(currentUsername, attendanceIdRequest.id());
+        attendanceService.delete(currentUsername, attendanceIdRequest.id());
         return ResponseEntity.noContent()
                 .build();
     }

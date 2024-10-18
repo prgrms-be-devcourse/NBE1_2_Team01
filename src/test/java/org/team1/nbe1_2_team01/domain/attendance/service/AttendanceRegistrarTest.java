@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
-import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
+import org.team1.nbe1_2_team01.domain.attendance.entity.IssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -25,7 +25,7 @@ public class AttendanceRegistrarTest {
         // given
         Long registrantId = 1L;
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
@@ -43,7 +43,7 @@ public class AttendanceRegistrarTest {
         var registrantId = 1L;
         var attendanceCreateRequest = create_ATTENDANCE_CREATE_REQUEST_ABSENT();
         // 합의된 내용을 바탕으로 stub 생성. 성공한다는 가정.
-        given(attendanceJpaRepository.findByUserId(registrantId)).willReturn(List.of());
+        given(attendanceJpaRepository.findByRegistrant_UserId(registrantId)).willReturn(List.of());
 
 
         attendanceRegistrar.register(registrantId, attendanceCreateRequest);

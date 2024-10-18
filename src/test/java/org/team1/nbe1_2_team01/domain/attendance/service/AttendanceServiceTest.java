@@ -17,7 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
+import org.team1.nbe1_2_team01.domain.attendance.entity.IssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.AttendanceRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
@@ -67,7 +67,7 @@ public class AttendanceServiceTest {
         // given
         String registrantName = user.getUsername();
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
@@ -88,7 +88,7 @@ public class AttendanceServiceTest {
         // given
         Attendance attendance = Attendance.builder()
                 .registrantId(user.getId())
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")
@@ -97,7 +97,7 @@ public class AttendanceServiceTest {
 
         String registrantName = user.getUsername();
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
@@ -118,7 +118,7 @@ public class AttendanceServiceTest {
         // given
         Attendance attendance = Attendance.builder()
                 .registrantId(user.getId())
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")
@@ -129,7 +129,7 @@ public class AttendanceServiceTest {
         String registrantName = user.getUsername();
         AttendanceUpdateRequest attendanceUpdateRequest = AttendanceUpdateRequest.builder()
                 .id(attendanceId)
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(13, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
@@ -150,7 +150,7 @@ public class AttendanceServiceTest {
         // given
         Attendance attendance = Attendance.builder()
                 .registrantId(2L)
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")
@@ -161,7 +161,7 @@ public class AttendanceServiceTest {
         String registrantName = user.getUsername();
         AttendanceUpdateRequest attendanceUpdateRequest = AttendanceUpdateRequest.builder()
                 .id(attendanceId)
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(13, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
@@ -182,7 +182,7 @@ public class AttendanceServiceTest {
         // given
         Attendance attendance = Attendance.builder()
                 .registrantId(user.getId())
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")
@@ -208,7 +208,7 @@ public class AttendanceServiceTest {
         // given
         Attendance attendance = Attendance.builder()
                 .registrantId(2L)
-                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .issueType(IssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출")

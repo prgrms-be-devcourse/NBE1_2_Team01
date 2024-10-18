@@ -29,7 +29,7 @@ public class AttendanceFakeRepository implements AttendanceRepository {
     @Override
     public List<Attendance> findByUserId(Long userId) {
         return attendanceStorage.stream()
-                .filter(attendance -> attendance.getRegistrant().getRegistrantId().equals(userId))
+                .filter(attendance -> attendance.getRegistrant().getUserId().equals(userId))
                 .toList();
     }
 
