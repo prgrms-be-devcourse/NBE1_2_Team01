@@ -1,24 +1,14 @@
 package org.team1.nbe1_2_team01.domain.attendance.service;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_NOT_FOUND;
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_EXISTS;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.USER_NOT_FOUND;
 
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
-import org.team1.nbe1_2_team01.domain.attendance.repository.AttendanceRepository;
-import org.team1.nbe1_2_team01.domain.attendance.service.port.DateTimeHolder;
 import org.team1.nbe1_2_team01.domain.attendance.service.response.AttendanceIdResponse;
-import org.team1.nbe1_2_team01.domain.calendar.application.TeamScheduleService;
-import org.team1.nbe1_2_team01.domain.calendar.controller.dto.ScheduleCreateRequest;
-import org.team1.nbe1_2_team01.domain.calendar.entity.ScheduleType;
-import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
-import org.team1.nbe1_2_team01.domain.group.repository.BelongingRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
@@ -28,88 +18,55 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 @RequiredArgsConstructor
 public class AttendanceService {
 
-    private final AttendanceRepository attendanceRepository;
-    private final DateTimeHolder dateTimeHolder;
+    private final AttendanceRegistrar attendanceRegistrar;
+    private final AttendanceReader attendanceReader;
+    private final AttendanceUpdater attendanceUpdater;
+    private final AttendanceDeleter attendanceDeleter;
     private final UserRepository userRepository;
-    private final TeamScheduleService teamScheduleService;
-    private final BelongingRepository belongingRepository;
 
-    public AttendanceIdResponse registAttendance(
-            String registerName,
+    public AttendanceIdResponse register(
+            String registrantName,
             AttendanceCreateRequest attendanceCreateRequest
     ) {
-        User register = getCurrentUser(registerName);
+        // validate
+        User registrant = getCurrentUser(registrantName);
+        attendanceReader.getList(registrant.getId())
+                .forEach(Attendance::validateCanRegister);
 
-        validateAlreadyRegistToday(register, attendanceCreateRequest.startAt().toLocalDate());
+        // register
+        Long attendanceId = attendanceRegistrar.register(registrant.getId(), attendanceCreateRequest);
 
-        Attendance attendance = attendanceCreateRequest.toEntity(register);
-        Attendance savedAttendance = attendanceRepository.save(attendance);
-
-        return AttendanceIdResponse.from(savedAttendance.getId());
+        // parse to response
+        return AttendanceIdResponse.from(attendanceId);
     }
 
-    private void validateAlreadyRegistToday(User register, LocalDate registDate) {
-        attendanceRepository.findByUserIdAndStartAt(register.getId(), registDate)
-                .ifPresent(attendance -> {
-                    throw new AppException(REQUEST_ALREADY_EXISTS);
-                });
-    }
-
-    public AttendanceIdResponse updateAttendance(
+    public AttendanceIdResponse update(
             String currentUsername,
             AttendanceUpdateRequest attendanceUpdateRequest
     ) {
-        Attendance attendance = attendanceRepository.findById(attendanceUpdateRequest.id())
-                .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
-
+        // validate
         User currentUser = getCurrentUser(currentUsername);
-        attendance.validateRegister(currentUser.getId());
+        Attendance attendance = attendanceReader.get(attendanceUpdateRequest.id());
+        attendance.validateRegistrant(currentUser.getId());
 
-        attendance.update(attendanceUpdateRequest);
+        // update
+        Long attendanceId = attendanceUpdater.update(attendance, attendanceUpdateRequest);
 
-        return AttendanceIdResponse.from(attendance.getId());
+        // parse to response
+        return AttendanceIdResponse.from(attendanceId);
     }
 
-    public void deleteAttendance(
+    public void delete(
             String currentUsername,
             Long attendanceId
     ) {
+        // validate
         User currentUser = getCurrentUser(currentUsername);
+        Attendance attendance = attendanceReader.get(attendanceId);
+        attendance.validateRegistrant(currentUser.getId());
 
-        Attendance attendance = attendanceRepository.findById(attendanceId)
-                .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
-
-        attendance.validateRegister(currentUser.getId());
-
-        attendanceRepository.delete(attendance);
-    }
-
-    public AttendanceIdResponse approveAttendance(Long attendanceId) {
-        Attendance attendance = attendanceRepository.findById(attendanceId)
-                .orElseThrow(() -> new AppException(ATTENDANCE_NOT_FOUND));
-
-        attendance.approve();
-
-        belongingRepository.findByUserId(attendance.getUser().getId())
-                .ifPresent(belonging -> registAttendanceSchedule(attendance, belonging));
-
-        return AttendanceIdResponse.from(attendance.getId());
-    }
-
-    private void registAttendanceSchedule(Attendance attendance, Belonging belonging) {
-        Long teamId = belonging.getTeam().getId();
-        ScheduleCreateRequest scheduleCreateRequest = ScheduleCreateRequest.builder()
-                .name("출결 이슈")
-                .scheduleType(ScheduleType.ATTENDANCE)
-                .startAt(attendance.getStartAt())
-                .endAt(attendance.getEndAt())
-                .description(attendance.getDescription())
-                .build();
-        teamScheduleService.registSchedule(teamId, scheduleCreateRequest);
-    }
-
-    public void rejectAttendance(Long attendanceId) {
-        attendanceRepository.deleteById(attendanceId);
+        // delete
+        attendanceDeleter.delete(attendance);
     }
 
     // 타 도메인 메서드

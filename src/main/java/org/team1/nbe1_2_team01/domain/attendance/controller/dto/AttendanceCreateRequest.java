@@ -23,11 +23,21 @@ public record AttendanceCreateRequest(
 
     public Attendance toEntity(User user) {
         return Attendance.builder()
-                .user(user)
+                //.user(user)
                 .attendanceIssueType(attendanceIssueType)
                 .startAt(startAt)
                 .endAt(endAt)
                 .description(description)
+                .build();
+    }
+
+    public Attendance toEntity(Long registrantId) {
+        return Attendance.builder()
+                .attendanceIssueType(attendanceIssueType)
+                .startAt(startAt)
+                .endAt(endAt)
+                .description(description)
+                .registrantId(registrantId)
                 .build();
     }
 }

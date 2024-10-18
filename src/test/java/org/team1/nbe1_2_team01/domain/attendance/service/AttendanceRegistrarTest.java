@@ -6,14 +6,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 
 @SuppressWarnings("NonAsciiCharacters")
-@ExtendWith(MockitoExtension.class)
 public class AttendanceRegistrarTest {
 
     private final AttendanceRegistrar attendanceRegistrar;
@@ -24,7 +21,7 @@ public class AttendanceRegistrarTest {
     }
 
     @Test
-    void 출결_요청을_성공적으로_등록한다() {
+    void 출결_요청을_성공적으로_저장한다() {
         Long registrantId = 1L;
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
