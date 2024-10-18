@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
 import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.entity.Attendance;
 import org.team1.nbe1_2_team01.domain.attendance.entity.AttendanceIssueType;
 import org.team1.nbe1_2_team01.domain.attendance.fake.AttendanceFakeRepository;
 import org.team1.nbe1_2_team01.domain.attendance.service.port.AttendanceRepository;
@@ -28,6 +29,7 @@ import org.team1.nbe1_2_team01.global.exception.AppException;
 @SuppressWarnings("NonAsciiCharacters")
 public class AttendanceServiceTest {
 
+    private final AttendanceRepository attendanceRepository;
     private final AttendanceReader attendanceReader;
     private final AttendanceRegistrar attendanceRegistrar;
     private final AttendanceUpdater attendanceUpdater;
@@ -36,7 +38,7 @@ public class AttendanceServiceTest {
     private UserRepository userRepository;
 
     public AttendanceServiceTest() {
-        AttendanceRepository attendanceRepository = new AttendanceFakeRepository();
+        this.attendanceRepository = new AttendanceFakeRepository();
         this.attendanceReader = new AttendanceReader(attendanceRepository);
         this.attendanceRegistrar = new AttendanceRegistrar(attendanceRepository);
         this.attendanceUpdater = new AttendanceUpdater(attendanceRepository);
@@ -76,6 +78,15 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_등록_시_오늘_이미_등록했다면_예외를_발생시킨다() {
         // given
+        Attendance attendance = Attendance.builder()
+                .registrantId(user.getId())
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출")
+                .build();
+        attendanceRepository.save(attendance);
+
         String registrantName = user.getUsername();
         AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
@@ -83,7 +94,6 @@ public class AttendanceServiceTest {
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
                 .description("국취제로 인한 외출입니다.")
                 .build();
-        attendanceRegistrar.register(user.getId(), attendanceCreateRequest);
 
         // when
         AttendanceService attendanceService = new AttendanceService(
@@ -98,14 +108,14 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청을_성공적으로_수정한다() {
         // given
-        Long registrantId = 1L;
-        AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
+        Attendance attendance = Attendance.builder()
+                .registrantId(user.getId())
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
-                .description("국취제로 인한 외출입니다.")
+                .description("국취제로 인한 외출")
                 .build();
-        attendanceRegistrar.register(registrantId, attendanceCreateRequest);
+        attendanceRepository.save(attendance);
 
         Long attendanceId = 1L;
         String registrantName = user.getUsername();
@@ -130,14 +140,14 @@ public class AttendanceServiceTest {
     @Test
     void 출결_요청_수정_시_등록자가_아니라면_예외를_발생시킨다() {
         // given
-        Long registrantId = 2L;
-        AttendanceCreateRequest attendanceCreateRequest = AttendanceCreateRequest.builder()
+        Attendance attendance = Attendance.builder()
+                .registrantId(2L)
                 .attendanceIssueType(AttendanceIssueType.ABSENT)
                 .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
                 .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
-                .description("국취제로 인한 외출입니다.")
+                .description("국취제로 인한 외출")
                 .build();
-        attendanceRegistrar.register(registrantId, attendanceCreateRequest);
+        attendanceRepository.save(attendance);
 
         Long attendanceId = 1L;
         String registrantName = user.getUsername();
@@ -160,10 +170,53 @@ public class AttendanceServiceTest {
     }
 
     @Test
-    void 출결_승인() {
+    void 출결_요청을_성공적으로_삭제한다() {
+        // given
+        Attendance attendance = Attendance.builder()
+                .registrantId(user.getId())
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출")
+                .build();
+        attendanceRepository.save(attendance);
+
+        String registrantName = user.getUsername();
+        Long attendanceId = 1L;
+
+        // when
+        AttendanceService attendanceService = new AttendanceService(
+                null, attendanceReader, null, attendanceDeleter, userRepository
+        );
+        attendanceService.delete(registrantName, attendanceId);
+
+        // then
+        assertThat(attendanceRepository.findById(1L).isEmpty())
+                .isTrue();
     }
 
     @Test
-    void 출결_반려() {
+    void 출결_요청_삭제_시_등록자가_아니라면_삭제할_수_없다() {
+        // given
+        Attendance attendance = Attendance.builder()
+                .registrantId(2L)
+                .attendanceIssueType(AttendanceIssueType.ABSENT)
+                .startAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 0, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now(), LocalTime.of(16, 0, 0)))
+                .description("국취제로 인한 외출")
+                .build();
+        attendanceRepository.save(attendance);
+
+        String registrantName = user.getUsername();
+        Long attendanceId = 1L;
+
+        // when
+        AttendanceService attendanceService = new AttendanceService(
+                null, attendanceReader, null, attendanceDeleter, userRepository
+        );
+
+        // then
+        assertThatThrownBy(() -> attendanceService.delete(registrantName, attendanceId))
+                .isInstanceOf(AppException.class);
     }
 }
