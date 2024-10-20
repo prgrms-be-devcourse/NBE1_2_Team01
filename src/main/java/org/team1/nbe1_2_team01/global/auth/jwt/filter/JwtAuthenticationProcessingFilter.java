@@ -1,11 +1,13 @@
 package org.team1.nbe1_2_team01.global.auth.jwt.filter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -47,12 +49,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        // RefreshToken 추출 없거나 유효하지 않으면 null
+
         String refreshToken = jwtService.extractRefreshToken(request)
                 .filter(jwtService::isTokenValid)
                 .orElse(null);
 
-        if(refreshToken !=null){
+        if (refreshToken != null) {
             checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
             return;
         }
@@ -60,10 +62,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
-
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken)
-                .ifPresent(token->{
+                .ifPresent(token -> {
                     String username = token.getUsername();
                     User user = userRepository.findByUsername(username)
                             .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
@@ -72,18 +73,29 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 });
     }
 
-
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
-        jwtService.extractAccessToken(request)
-                .filter(jwtService::isTokenValid)
-                .flatMap(jwtService::extractUsername)
-                .flatMap(userRepository::findByUsername)
-                .ifPresent(this::saveAuthentication);
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("AccessToken이 없습니다."));
 
-        filterChain.doFilter(request, response);
+        try {
+            jwtService.isTokenValid(accessToken);
+            jwtService.extractUsername(accessToken)
+                    .flatMap(userRepository::findByUsername)
+                    .ifPresent(this::saveAuthentication);
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("AccessToken이 만료되었습니다. 새로운 AccessToken을 요청하세요.");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("유효하지 않은 AccessToken입니다.");
+        }
     }
-
 
     public void saveAuthentication(User user) {
         String password = user.getPassword();

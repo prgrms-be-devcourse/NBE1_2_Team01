@@ -1,6 +1,7 @@
 package org.team1.nbe1_2_team01.global.auth.jwt.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
@@ -50,7 +50,7 @@ public class JwtService {
         Date now = new Date();
         Claims claims = Jwts.claims();
         claims.put(USERNAME_CLAIM, username);
-        claims.setExpiration(new Date(now.getTime() + accessTokenExpirationPeriod));
+        claims.setExpiration(new Date(now.getTime() +accessTokenExpirationPeriod));
         return Jwts.builder()
                 .setSubject(ACCESS_TOKEN_SUBJECT)
                 .setClaims(claims)
@@ -107,8 +107,8 @@ public class JwtService {
      */
     public Optional<String> extractAccessToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(accessHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
+                .filter(accessToken -> accessToken.startsWith(BEARER))
+                .map(accessToken -> accessToken.replace(BEARER, ""));
     }
 
     /**
@@ -148,13 +148,18 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parser()
+            Jwts.parserBuilder()
                     .setSigningKey(secretKey)
+                    .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            log.error("토큰이 만료되었습니다. {}", e.getMessage());
+            throw e;
+        }
+        catch (Exception e) {
             log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
-            return false;
+            throw e;
         }
     }
 
