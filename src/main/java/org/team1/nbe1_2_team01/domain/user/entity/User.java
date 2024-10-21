@@ -56,9 +56,6 @@ public class User {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Attendance> attendances = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
     private List<TeamBoard> teamBoards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
@@ -99,10 +96,6 @@ public class User {
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
-    }
-
-    public void addAttendance(Attendance attendance) {
-        this.attendances.add(attendance);
     }
 
     public void addParticipant(Participant participant) {
