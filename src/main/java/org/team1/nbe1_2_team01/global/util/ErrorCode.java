@@ -7,6 +7,10 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum ErrorCode {
+    //jwtToken
+    TOKEN_TIMEOUT(HttpStatus.UNAUTHORIZED, "AccessToken이 만료되었습니다. 새로운 AccessToken을 요청하세요."),
+    TOKEN_INVALID(HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다"),
+
     //emailToken
     CODE_NOT_FOUND(HttpStatus.NOT_FOUND,"인증 코드를 찾을 수 없습니다."),
 

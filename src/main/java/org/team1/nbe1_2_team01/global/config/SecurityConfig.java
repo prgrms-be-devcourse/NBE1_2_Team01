@@ -25,7 +25,7 @@ import org.team1.nbe1_2_team01.global.auth.login.handler.LoginFailureHandler;
 import org.team1.nbe1_2_team01.global.auth.login.handler.LoginSuccessHandler;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
 import org.team1.nbe1_2_team01.global.auth.login.service.LoginService;
-import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.auth.jwt.respository.RefreshTokenRepository;
 
 @Configuration
 @EnableWebSecurity
