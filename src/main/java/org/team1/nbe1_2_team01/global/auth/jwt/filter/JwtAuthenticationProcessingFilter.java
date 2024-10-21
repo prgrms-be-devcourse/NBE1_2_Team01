@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,15 +18,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
-import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
 import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
 import java.io.IOException;
+
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.TOKEN_INVALID;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.TOKEN_TIMEOUT;
 
 /**
  * Jwt 인증 필터
  * "/login 이외의 URI 요청을 처리하는 필터
- *  RTR 방식으로 동작
+ * RTR 방식으로 동작
  * 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공
  * 2. RefreshToken이 없고, AccessToken이 없거나 유효X 인 경우 -> 인증 실패
  * 3. RefreshToken이 있는 경우 -> RefreshToken과 비교하여 일치하면 AccessToken 재발급 RefreshToken 재발급
@@ -85,15 +87,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                     .ifPresent(this::saveAuthentication);
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("AccessToken이 만료되었습니다. 새로운 AccessToken을 요청하세요.");
+            sendErrorResponse(response, TOKEN_TIMEOUT);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("유효하지 않은 AccessToken입니다.");
+            sendErrorResponse(response, TOKEN_INVALID);
         }
     }
 
@@ -112,4 +108,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
+
+    private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        response.setStatus(errorCode.getStatus().value());
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/plain;charset=UTF-8");
+        response.getWriter().write(errorCode.getMessage());
+
+    }
+
 }
