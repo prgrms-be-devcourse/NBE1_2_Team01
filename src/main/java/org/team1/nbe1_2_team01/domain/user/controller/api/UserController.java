@@ -24,7 +24,6 @@ import org.team1.nbe1_2_team01.global.util.Response;
 public class UserController {
     private final UserService userService;
     private final EmailService emailService;
-    private final JwtService jwtService;
 
     /**
      * 회원가입
