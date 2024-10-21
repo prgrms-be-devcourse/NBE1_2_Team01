@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.team1.nbe1_2_team01.domain.user.entity.User;
 import org.team1.nbe1_2_team01.domain.user.repository.UserRepository;
 import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
-import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.auth.jwt.respository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
 import java.io.IOException;
@@ -37,7 +37,6 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.TOKEN_TIMEOUT;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private static final String NO_CHECK_URL = "/api/login";
-
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;

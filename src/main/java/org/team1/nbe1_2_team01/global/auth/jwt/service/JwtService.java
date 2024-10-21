@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
-import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
+import org.team1.nbe1_2_team01.global.auth.jwt.respository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.auth.jwt.token.RefreshToken;
 
 import java.util.Date;
 import java.util.Optional;

@@ -14,6 +14,7 @@ import org.team1.nbe1_2_team01.domain.user.service.response.UserAdminCheckRespon
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.global.auth.email.service.EmailService;
+import org.team1.nbe1_2_team01.global.auth.jwt.service.JwtService;
 import org.team1.nbe1_2_team01.global.util.Response;
 
 @RestController
@@ -23,6 +24,7 @@ import org.team1.nbe1_2_team01.global.util.Response;
 public class UserController {
     private final UserService userService;
     private final EmailService emailService;
+    private final JwtService jwtService;
 
     /**
      * 회원가입
@@ -33,6 +35,7 @@ public class UserController {
         emailService.deleteByEmail(userSignUpRequest.email());
         return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(userIdResponse));
     }
+
 
     /**
      * 로그 아웃

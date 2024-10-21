@@ -17,13 +17,9 @@ import org.team1.nbe1_2_team01.domain.user.service.response.UserAdminCheckRespon
 import org.team1.nbe1_2_team01.domain.user.service.response.UserDetailsResponse;
 import org.team1.nbe1_2_team01.domain.user.service.response.UserIdResponse;
 import org.team1.nbe1_2_team01.domain.user.util.UserConverter;
-import org.team1.nbe1_2_team01.global.auth.redis.repository.EmailRepository;
-import org.team1.nbe1_2_team01.global.auth.redis.repository.RefreshTokenRepository;
+import org.team1.nbe1_2_team01.global.auth.jwt.respository.RefreshTokenRepository;
 import org.team1.nbe1_2_team01.global.exception.AppException;
-import org.team1.nbe1_2_team01.global.util.ErrorCode;
 import org.team1.nbe1_2_team01.global.util.SecurityUtil;
-
-import java.util.List;
 
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.EMAIL_ALREADY_EXISTS;
