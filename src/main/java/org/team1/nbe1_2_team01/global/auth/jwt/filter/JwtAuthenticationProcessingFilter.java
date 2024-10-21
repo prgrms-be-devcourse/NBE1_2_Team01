@@ -37,6 +37,7 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.TOKEN_TIMEOUT;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private static final String NO_CHECK_URL = "/api/login";
+    private static final String REISSUE_URL = "/api/reissue-token";
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -51,19 +52,22 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             return;
         }
 
-        String refreshToken = jwtService.extractRefreshToken(request)
-                .filter(jwtService::isTokenValid)
-                .orElse(null);
+        // 재발급 요청 들어오면 refreshToken 유효성 검사 한 뒤 유효하면 AccessToken 및 RefreshToken 재발급
+        if(request.getRequestURI().equals(REISSUE_URL)) {
+            String refreshToken = jwtService.extractRefreshToken(request)
+                    .filter(jwtService::isTokenValid)
+                    .orElse(null);
 
-        if (refreshToken != null) {
-            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-            return;
+            if (refreshToken != null) {
+                checkRefreshTokenAndReIssueAccessTokenAndRefreshToken(response, refreshToken);
+                return;
+            }
         }
 
         checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
+    public void checkRefreshTokenAndReIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken)
                 .ifPresent(token -> {
                     String username = token.getUsername();
