@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/groupware-test
+    url: jdbc:mysql://localhost:3306/testdb
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: root
+    password: 1234
 
   jpa:
     hibernate:
