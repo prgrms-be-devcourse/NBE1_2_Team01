@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 import org.team1.nbe1_2_team01.IntegrationTestSupport;
 import org.team1.nbe1_2_team01.domain.group.controller.request.TeamCreateRequest;
+import org.team1.nbe1_2_team01.domain.group.entity.Belonging;
 import org.team1.nbe1_2_team01.domain.group.entity.Team;
+import org.team1.nbe1_2_team01.domain.group.entity.TeamType;
 import org.team1.nbe1_2_team01.domain.group.repository.TeamRepository;
 import org.team1.nbe1_2_team01.domain.user.entity.Course;
 import org.team1.nbe1_2_team01.domain.user.entity.Role;
@@ -96,7 +98,13 @@ public class TeamServiceTest extends IntegrationTestSupport {
         TeamCreateRequest teamCreateRequest = new TeamCreateRequest(1L, "PROJECT", "projectTeam", List.of(3L, 4L), 3L);
         Message message = teamService.teamCreate(teamCreateRequest);
         assertThat(message.getValue()).isEqualTo("1");
-        
+        Team createdTeam = teamRepository.findById(1L).get();
+        assertThat(createdTeam.getName()).isEqualTo("projectTeam");
+        assertThat(createdTeam.getBelongings().stream().map(Belonging::getUser).map(User::getId).toList()).contains(3L, 4L);
+        assertThat(createdTeam.getTeamType()).isEqualTo(TeamType.PROJECT);
+        assertThat(createdTeam.isCreationWaiting()).isEqualTo(false);
+        assertThat(createdTeam.isDeletionWaiting()).isEqualTo(false);
+        assertThat(createdTeam.getCourse().getId()).isEqualTo(1L);
     }
 
 
