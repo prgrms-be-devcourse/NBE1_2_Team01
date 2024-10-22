@@ -146,13 +146,12 @@ public class JwtService {
      * 해당 토큰이 유효한지 검증하는 메서드
      */
 
-    public boolean isTokenValid(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
-            return true;
         } catch (ExpiredJwtException e) {
             log.error("토큰이 만료되었습니다. {}", e.getMessage());
             throw e;

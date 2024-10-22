@@ -23,71 +23,96 @@ import org.team1.nbe1_2_team01.global.util.ErrorCode;
 
 import java.io.IOException;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.TOKEN_INVALID;
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.TOKEN_TIMEOUT;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.*;
 
 /**
  * Jwt 인증 필터
- * "/login 이외의 URI 요청을 처리하는 필터
  * RTR 방식으로 동작
  * 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공
  * 2. RefreshToken이 없고, AccessToken이 없거나 유효X 인 경우 -> 인증 실패
- * 3. RefreshToken이 있는 경우 -> RefreshToken과 비교하여 일치하면 AccessToken 재발급 RefreshToken 재발급
+ * 3. 재발급 요청 시 RefreshToken 검증 유효하면 AccessToken, RefreshToken 재발급
  */
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
-    private static final String NO_CHECK_URL = "/api/login";
-    private static final String REISSUE_URL = "/api/reissue-token";
+    private static final String LOGIN_URI = "/api/login";
+    private static final String REISSUE_URI = "/api/reissue-token";
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-
     private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+
         // 로그인 요청 들어오면 다음 필터 호출
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response);
+        if (isLoginRequest(requestURI)) {
+            handleLoginRequest(request, response, filterChain);
             return;
         }
 
         // 재발급 요청 들어오면 refreshToken 유효성 검사 한 뒤 유효하면 AccessToken 및 RefreshToken 재발급
-        if(request.getRequestURI().equals(REISSUE_URL)) {
-            String refreshToken = jwtService.extractRefreshToken(request)
-                    .filter(jwtService::isTokenValid)
-                    .orElse(null);
-
-            if (refreshToken != null) {
-                checkRefreshTokenAndReIssueAccessTokenAndRefreshToken(response, refreshToken);
-                return;
-            }
+        if (isReissueRequest(requestURI)) {
+            handleTokenReissueRequest(request, response);
+            return;
         }
 
-        checkAccessTokenAndAuthentication(request, response, filterChain);
+        handleAccessTokenValidation(request, response, filterChain);
     }
 
-    public void checkRefreshTokenAndReIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
+    private boolean isLoginRequest(String requestURI) {
+        return LOGIN_URI.equals(requestURI);
+    }
+
+    private boolean isReissueRequest(String requestURI) {
+        return REISSUE_URI.equals(requestURI);
+    }
+
+    private void handleLoginRequest(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        filterChain.doFilter(request, response);
+    }
+
+    private void handleTokenReissueRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // GET 요청이 아닌 경우 에러 메세지 반환
+        if(!request.getMethod().equals("GET")){
+            sendErrorResponse(response, REQUEST_INVALID);
+            return;
+        }
+        String refreshToken = jwtService.extractRefreshToken(request)
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("RefreshToken이 없습니다"));
+        try {
+            jwtService.validateToken(refreshToken);
+            if (refreshToken != null) {
+                checkRefreshTokenAndReIssueAccessTokenAndRefreshToken(response, refreshToken);
+            }
+        } catch (Exception e) {
+            sendErrorResponse(response, TOKEN_INVALID);
+        }
+    }
+
+    private void checkRefreshTokenAndReIssueAccessTokenAndRefreshToken(HttpServletResponse response, String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken)
-                .ifPresent(token -> {
-                    String username = token.getUsername();
-                    User user = userRepository.findByUsername(username)
-                            .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
-                    String reIssuedRefreshToken = jwtService.createRefreshToken(username);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(username), reIssuedRefreshToken);
-                });
+                .ifPresentOrElse(token -> {
+                            String username = token.getUsername();
+                            userRepository.findByUsername(username)
+                                    .orElseThrow(() -> new UsernameNotFoundException("해당 사용자가 존재하지 않습니다"));
+                            String reIssuedRefreshToken = jwtService.createRefreshToken(username);
+                            jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(username), reIssuedRefreshToken);
+                        },
+                        () -> {
+                            try {
+                                sendErrorResponse(response, TOKEN_NOT_EXIST);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
     }
 
-    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                                  FilterChain filterChain) throws ServletException, IOException {
+    private void handleAccessTokenValidation(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("AccessToken이 없습니다."));
-
         try {
-            jwtService.isTokenValid(accessToken);
-            jwtService.extractUsername(accessToken)
-                    .flatMap(userRepository::findByUsername)
-                    .ifPresent(this::saveAuthentication);
+            authenticationUser(accessToken);
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             sendErrorResponse(response, TOKEN_TIMEOUT);
@@ -96,7 +121,15 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         }
     }
 
-    public void saveAuthentication(User user) {
+
+    private void authenticationUser(String accessToken) {
+        jwtService.validateToken(accessToken);
+        jwtService.extractUsername(accessToken)
+                .flatMap(userRepository::findByUsername)
+                .ifPresent(this::saveAuthentication);
+    }
+
+    private void saveAuthentication(User user) {
         String password = user.getPassword();
 
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
