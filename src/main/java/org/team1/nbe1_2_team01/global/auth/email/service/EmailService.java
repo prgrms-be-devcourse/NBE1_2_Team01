@@ -34,9 +34,9 @@ public class EmailService {
                 .build();
         emailRepository.save(emailToken);
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, EmailUtil.getEncoding());
         helper.setTo(email);
-        helper.setSubject("데브코스 회원가입 링크");
+        helper.setSubject(EmailUtil.getSubject());
         // true 로 설정 하면 html 로 전송
         helper.setText(EmailUtil.createSignupContent(code, courseId), true);
 
