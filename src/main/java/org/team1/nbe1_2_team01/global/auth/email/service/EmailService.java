@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
-import org.team1.nbe1_2_team01.global.auth.email.repository.EmailRepository;
-import org.team1.nbe1_2_team01.global.auth.email.token.EmailToken;
+import org.team1.nbe1_2_team01.global.auth.email.util.EmailUtil;
+import org.team1.nbe1_2_team01.global.auth.redis.repository.EmailRepository;
+import org.team1.nbe1_2_team01.global.auth.redis.token.EmailToken;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 import java.util.UUID;
@@ -21,11 +23,8 @@ import static org.team1.nbe1_2_team01.global.util.ErrorCode.CODE_NOT_FOUND;
 public class EmailService {
     private final JavaMailSenderImpl mailSender;
     private final EmailRepository emailRepository;
+    private final RetryTemplate retryTemplate;
 
-    private static final String CONTENT = "<p>회원가입을 하려면 <a href=\"%s\">여기</a>를 클릭하세요</p>";
-    private static final String SIGNUP_URL = "http://localhost:8080/user/sign-up";
-    private static final String CODE = "?code=";
-    private static final String COURSE_ID = "&courseId=";
 
     public void sendSignUpLinkToEmail(String email, Long courseId) throws MessagingException {
         UUID code = UUID.randomUUID();
@@ -35,17 +34,18 @@ public class EmailService {
                 .build();
         emailRepository.save(emailToken);
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, EmailUtil.getEncoding());
         helper.setTo(email);
-        helper.setSubject("데브코스 회원가입 링크");
+        helper.setSubject(EmailUtil.getSubject());
         // true 로 설정 하면 html 로 전송
-        helper.setText(createSignupContent(code, courseId), true);
-        this.mailSender.send(message);
-        log.info("메일 전송 성공");
-    }
+        helper.setText(EmailUtil.createSignupContent(code, courseId), true);
 
-    private String createSignupContent(UUID uuid, Long courseId) {
-        return String.format(CONTENT, SIGNUP_URL + CODE + uuid + COURSE_ID + courseId);
+        //retry 로직 적용
+        retryTemplate.execute(retryContext -> {
+            mailSender.send(message);
+            log.info("{} 메일 전송 완료", email);
+            return null;
+        });
     }
 
 
