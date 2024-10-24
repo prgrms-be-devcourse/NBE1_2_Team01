@@ -17,6 +17,8 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private ChatActionType actionType; // 방금 이거 추가
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -33,10 +35,12 @@ public class Chat {
     @Builder
     private Chat(
             String content,
+            ChatActionType actionType,
             LocalDateTime createdAt,
             Participant participant) {
         this.participant = participant;
         this.content = content;
+        this.actionType = actionType;
         this.createdAt = createdAt;
         participant.addChat(this);
     }
