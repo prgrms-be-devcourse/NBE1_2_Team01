@@ -1,28 +1,24 @@
 package org.team1.nbe1_2_team01.domain.attendance.entity;
 
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_ACCESS_DENIED;
-import static org.team1.nbe1_2_team01.global.util.ErrorCode.ATTENDANCE_TIME_OUT_OF_RANGE;
 import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_APPROVED;
+import static org.team1.nbe1_2_team01.global.util.ErrorCode.REQUEST_ALREADY_EXISTS;
 
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceUpdateRequest;
-import org.team1.nbe1_2_team01.domain.user.entity.User;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceUpdateRequest;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 @Entity
@@ -35,74 +31,69 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Embedded
+    @AttributeOverride(name = "userId", column = @Column(name = "user_id"))
+    private Registrant registrant;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private AttendanceIssueType attendanceIssueType;
-
-    private LocalDateTime startAt;
-
-    private LocalDateTime endAt;
+    private IssueType issueType;
 
     private String description;
 
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean creationWaiting;
+    @Enumerated(EnumType.STRING)
+    private ApprovalState approvalState;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Embedded
+    private Duration duration;
 
     @Builder
-    private Attendance(
-            User user,
-            AttendanceIssueType attendanceIssueType,
+    public Attendance(
+            IssueType issueType,
             LocalDateTime startAt,
             LocalDateTime endAt,
             String description,
-            boolean creationWaiting
+            Long registrantId
     ) {
-        validateTime(startAt);
-        validateTime(endAt);
-
-        this.user = user;
-        this.attendanceIssueType = attendanceIssueType;
-        this.startAt = startAt;
-        this.endAt = endAt;
+        this.issueType = issueType;
         this.description = description;
-        this.creationWaiting = creationWaiting;
-        //user.addAttendance(this);
+        this.approvalState = ApprovalState.PENDING;
+        this.duration = new Duration(startAt, endAt);
+        this.registrant = new Registrant(registrantId);
     }
 
+    // @TODO : update 로직 분리
     public void update(AttendanceUpdateRequest attendanceUpdateRequest) {
-        validateTime(attendanceUpdateRequest.startAt());
-        validateTime(attendanceUpdateRequest.endAt());
-
-        this.attendanceIssueType = attendanceUpdateRequest.attendanceIssueType();
-        this.startAt = attendanceUpdateRequest.startAt();
-        this.endAt = attendanceUpdateRequest.endAt();
+        if (!isPending()) {
+            throw new AppException(REQUEST_ALREADY_APPROVED);
+        }
+        this.issueType = attendanceUpdateRequest.issueType();
+        this.duration = new Duration(attendanceUpdateRequest.startAt(), attendanceUpdateRequest.endAt());
         this.description = attendanceUpdateRequest.description();
     }
 
+    private boolean isPending() {
+        return approvalState.equals(ApprovalState.PENDING);
+    }
+
     public void approve() {
-        if (!creationWaiting) {
+        if (isApprove()) {
             throw new AppException(REQUEST_ALREADY_APPROVED);
         }
-        creationWaiting = false;
+        approvalState = ApprovalState.APPROVED;
     }
 
-    public void validateRegister(Long currentUserId) {
-        Long registerId = user.getId();
-        if (!registerId.equals(currentUserId)) {
-            throw new AppException(ATTENDANCE_ACCESS_DENIED);
-        }
+    private boolean isApprove() {
+        return approvalState.equals(ApprovalState.APPROVED);
     }
 
-    private void validateTime(LocalDateTime time) {
-        LocalTime date = time.toLocalTime();
+    public void validateRegistrant(Long currentUserId) {
+        registrant.validateRegistrant(currentUserId);
+    }
 
-        if (date.isBefore(LocalTime.of(9, 0, 0))
-                || date.isAfter(LocalTime.of(18, 0, 1))) {
-            throw new AppException(ATTENDANCE_TIME_OUT_OF_RANGE);
+    public void validateCanRegister() {
+        if (isPending() && duration.isRegisteredToday()) {
+            throw new AppException(REQUEST_ALREADY_EXISTS);
         }
     }
 }

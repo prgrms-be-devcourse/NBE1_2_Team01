@@ -3,7 +3,7 @@ package org.team1.nbe1_2_team01.global.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
-import org.team1.nbe1_2_team01.domain.attendance.controller.dto.AttendanceCreateRequest;
+import org.team1.nbe1_2_team01.domain.attendance.service.dto.AttendanceCreateRequest;
 
 public class PeriodValidator implements ConstraintValidator<PeriodCheck, AttendanceCreateRequest> {
 
