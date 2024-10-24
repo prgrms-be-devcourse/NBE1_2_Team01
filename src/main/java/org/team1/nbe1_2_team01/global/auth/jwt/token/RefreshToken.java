@@ -1,6 +1,5 @@
-package org.team1.nbe1_2_team01.global.auth.redis.token;
+package org.team1.nbe1_2_team01.global.auth.jwt.token;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;

@@ -1,4 +1,4 @@
-package org.team1.nbe1_2_team01.global.auth.redis.token;
+package org.team1.nbe1_2_team01.global.auth.email.token;
 
 import lombok.Builder;
 import lombok.Getter;
