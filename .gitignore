@@ -37,3 +37,11 @@ out/
 .vscode/
 
 /src/main/resources/config/**
+/src/main/generated/
+/src/test/resources/**
+
+### MacOS Directory Config Files ###
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
