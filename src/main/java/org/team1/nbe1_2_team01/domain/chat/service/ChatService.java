@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.team1.nbe1_2_team01.domain.chat.controller.request.ChatMessageRequest;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.EmoticonMessageRequest;
 import org.team1.nbe1_2_team01.domain.chat.entity.Chat;
+import org.team1.nbe1_2_team01.domain.chat.entity.ChatActionType;
 import org.team1.nbe1_2_team01.domain.chat.entity.Participant;
 import org.team1.nbe1_2_team01.domain.chat.entity.ParticipantPK;
 import org.team1.nbe1_2_team01.domain.chat.repository.ChatRepository;
@@ -31,7 +33,10 @@ public class ChatService {
     @Transactional
     public ChatMessageResponse sendMessage(Long channelId, ChatMessageRequest msgRequest) {
         try {
-            Chat chat = createChat(channelId, msgRequest.getContent(), msgRequest.getUserId());
+            if (msgRequest.getActionType() == null) {
+                msgRequest.setActionType(ChatActionType.SEND_MESSAGE); // Null 이면  SEND_MESSAGE로 설정
+            }
+            Chat chat = createChat(channelId, msgRequest.getContent(), msgRequest.getUserId()); // 채팅방을 만드는 메소드
 
             return ChatMessageResponse.builder()
                     .channelId(channelId)
@@ -44,6 +49,20 @@ public class ChatService {
         }
     }
 
+    // 이모티콘 보내기
+    @Transactional
+    public ChatMessageResponse sendEmoticon(Long channelId, EmoticonMessageRequest emoticonMessageRequest) {
+        ChatMessageRequest emoticonMessage = ChatMessageRequest.builder()
+                .channelId(channelId)
+                .userId(emoticonMessageRequest.getUserId())
+                .content(emoticonMessageRequest.getEmoticonUrl())  // 일단은 url 로 설정
+                .actionType(ChatActionType.SEND_EMOTICON)  // 이모티콘 액션 타입 설정
+                .build();
+
+        // 실제 메시지 전송
+        return sendMessage(channelId, emoticonMessage);
+    }
+
     // 채팅 수정하기
     public Long updateMessage(Long chatId, Long userId, String newChatMessage) {
         Chat chat = chatRepository.findById(chatId)
@@ -53,7 +72,7 @@ public class ChatService {
             throw new AppException(USER_NOT_AUTHORIZE);
         }
         chat.setContent(newChatMessage);
-        chat.setCreatedAt(LocalDateTime.now()); // 필드가 생성 필드만 있어서 조금 애매
+        chat.setCreatedAt(LocalDateTime.now());
         return chat.getId();
     }
 
@@ -69,7 +88,7 @@ public class ChatService {
         }
     }
 
-    // 채팅방 만들기
+    // 채팅 만들기
     @Transactional
     public Chat createChat(Long channelId, String message, Long userId) {
         ParticipantPK participantPK = new ParticipantPK(userId, channelId);

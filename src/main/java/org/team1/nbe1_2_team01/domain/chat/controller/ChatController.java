@@ -11,6 +11,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
+import org.team1.nbe1_2_team01.domain.chat.controller.request.EmoticonMessageRequest;
+import org.team1.nbe1_2_team01.domain.chat.entity.ChatActionType;
 import org.team1.nbe1_2_team01.domain.chat.service.response.ChatMessageResponse;
 import org.team1.nbe1_2_team01.domain.chat.service.response.ChatResponse;
 import org.team1.nbe1_2_team01.domain.chat.controller.request.ChatMessageRequest;
@@ -29,11 +31,18 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    // 메시지를 보내는 컨트롤러
+    // 메시지 보내기
     @MessageMapping("/chat/{channelId}")
     @SendTo("/topic/chat/{channelId}")
     public ChatMessageResponse sendMessage(@DestinationVariable Long channelId, @Payload ChatMessageRequest msgRequest) {
         return chatService.sendMessage(channelId, msgRequest);
+    }
+
+    // 이모티콘 보내기
+    @MessageMapping("/chat/{channelId}/emoticon")
+    @SendTo("/topic/chat/{channelId}/emoticon")
+    public ChatMessageResponse sendEmoticon(@DestinationVariable Long channelId, @Payload EmoticonMessageRequest emoticonRequest) {
+        return chatService.sendEmoticon(channelId, emoticonRequest);
     }
 
     // 채팅방 목록을 불러오기
