@@ -4,12 +4,11 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.team1.nbe1_2_team01.global.auth.redis.repository.EmailRepository;
-import org.team1.nbe1_2_team01.global.auth.redis.token.EmailToken;
+import org.team1.nbe1_2_team01.global.auth.email.repository.EmailRepository;
+import org.team1.nbe1_2_team01.global.auth.email.token.EmailToken;
 import org.team1.nbe1_2_team01.global.exception.AppException;
 
 import java.util.UUID;

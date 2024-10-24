@@ -1,8 +1,8 @@
-package org.team1.nbe1_2_team01.global.auth.redis.repository;
+package org.team1.nbe1_2_team01.global.auth.jwt.respository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import org.team1.nbe1_2_team01.global.auth.redis.token.RefreshToken;
+import org.team1.nbe1_2_team01.global.auth.jwt.token.RefreshToken;
 
 import java.util.Optional;
 
