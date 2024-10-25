@@ -108,9 +108,15 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                         });
     }
 
-    private void handleAccessTokenValidation(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
+    private void handleAccessTokenValidation(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String accessToken = jwtService.extractAccessToken(request)
-                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("AccessToken이 없습니다."));
+                .orElse(null);
+
+        if (accessToken == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             authenticationUser(accessToken);
             filterChain.doFilter(request, response);
